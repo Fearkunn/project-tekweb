@@ -210,21 +210,13 @@ include('../db_connect/DatabaseConnection.php');
 
     $query = "SELECT * FROM users WHERE username = '$username'";
     $result = mysqli_query($conn, $query);
-    //troubleshoot
-    if($result){
-        echo"Berhasil";
-    }else{
-        echo "Error: " . mysqli_error($conn);
-    }
     // Ambil data hasil query
     $user = mysqli_fetch_assoc($result);
 
     // Validasi apakah user ditemukan
     if ($user) {
         // Verifikasi password
-        if (password_verify($password, $user['password'])) {
-            // Login berhasil, set session
-            $_SESSION['user_id'] = $user['id'];
+        if (password_verify($password, $user['user_password'])) {
             $_SESSION['username'] = $user['username'];
 
             // Redirect ke halaman utama

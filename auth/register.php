@@ -1,4 +1,7 @@
-
+<?php
+    session_start();
+    include('../db_connect/DatabaseConnection.php');
+?>
 
 <!doctype html>
 <html lang="en">
@@ -182,9 +185,8 @@
 </html>
 
 <?php
-    session_start();
-    include('../db_connect/DatabaseConnection.php');
-    
+
+
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $username = mysqli_real_escape_string($conn, $_POST['username']);
         $email = mysqli_real_escape_string($conn, $_POST['user_email']);
@@ -219,7 +221,7 @@
                     if (mysqli_query($conn, $insert_query)) {
                         echo "<script>console.log('Insert query done');</script>";
                         $_SESSION['username'] = $username;  // Menyimpan username di session
-                        header("Location: ../main_form/mainForm.php");  // Redirect ke halaman utama setelah registrasi berhasil
+                        header("Location: ..\main_form\mainForm.php");  // Redirect ke halaman utama setelah registrasi berhasil
                         exit();
                     } else {
                         $error_message = "Terjadi kesalahan, coba lagi nanti.";
