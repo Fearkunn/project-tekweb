@@ -55,7 +55,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $mail->Host = 'smtp.gmail.com';
                     $mail->SMTPAuth = true;
                     $mail->Username = 'uap.company2023@gmail.com';
-                    $mail->Password = 'tnrc uyby ixpt ybkr';
+                    $mail->Password = 'lmjz izih evfk pbve';
                     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                     $mail->Port = 587;
 
