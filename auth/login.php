@@ -2,36 +2,70 @@
 session_start();
 include('../db_connect/DatabaseConnection.php');
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    
-    $username = mysqli_real_escape_string($conn, $_POST['username']); //mysqli untuk mencegah sql injection
-    $password = mysqli_real_escape_string($conn, $_POST['user_password']);
-    
+// Validasi token "Remember Me"
+if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_token'])) {
+    $token = base64_decode($_COOKIE['remember_token']);
+    list($user_id, $expiry, $signature) = explode('|', $token);
 
-    $query = "SELECT * FROM users WHERE username = '$username'";
-    $result = mysqli_query($conn, $query);
-    // Ambil data hasil query
-    $user = mysqli_fetch_assoc($result);
-
-    // Validasi apakah user ditemukan
-    if ($user) {
-        // Verifikasi password
-        if (password_verify($password, $user['user_password'])) {
-            $_SESSION['username'] = $user['username'];
-
-            // Redirect ke halaman utama
-            header("Location: ../main_form/mainForm.php");
-            exit();
-        } else {  
-            $error_message = "Password salah.";
-            echo "<script>console.log('Password salah');</script>";
-        }
+    if (time() > $expiry) {
+        setcookie('remember_token', '', time() - 3600, "/", "", true, true); // Hapus cookie
+        $error_message = "Session Anda telah kedaluwarsa.";
     } else {
-        $error_message = "Username tidak ditemukan.";
-        echo "<script>console.log('Username tidak ditemukan');</script>";
+        $secret_key = 'your_secret_key';
+        $valid_signature = hash_hmac('sha256', "$user_id|$expiry", $secret_key);
+
+        if (hash_equals($valid_signature, $signature)) {
+            $_SESSION['user_id'] = $user_id;
+
+            $new_expiry = time() + (30 * 24 * 60 * 60);
+            $new_data = "$user_id|$new_expiry";
+            $new_signature = hash_hmac('sha256', $new_data, $secret_key);
+            $new_token = base64_encode("$new_data|$new_signature");
+
+            setcookie('remember_token', $new_token, $new_expiry, "/", "", true, true);
+
+            header("Location: dashboard.php");
+            exit();
+        } else {
+            setcookie('remember_token', '', time() - 3600, "/", "", true, true);
+        }
+    }
+}
+
+// Login handler
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $username = mysqli_real_escape_string($conn, $_POST['username']);
+    $password = mysqli_real_escape_string($conn, $_POST['user_password']);
+
+    $stmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $user = $result->fetch_assoc();
+
+    if ($user && password_verify($password, $user['user_password'])) {
+        $_SESSION['user_id'] = $user['id_user'];
+        $_SESSION['username'] = $user['username'];
+
+        if (isset($_POST['remember_me'])) {
+            $user_id = $user['id_user'];
+            $expiry = time() + (30 * 24 * 60 * 60);
+            $secret_key = 'your_secret_key';
+
+            $data = "$user_id|$expiry";
+            $signature = hash_hmac('sha256', $data, $secret_key);
+            $token = base64_encode("$data|$signature");
+
+            setcookie('remember_token', $token, $expiry, "/", "", true, true);
+        }
+        header("Location: ../main_form/mainForm.php");
+        exit();
+    } else {
+        $error_message = "Username atau password salah.";
     }
 }
 ?>
+
 
 <!doctype html>
 <html lang="en">
