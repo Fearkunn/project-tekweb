@@ -1,7 +1,4 @@
-<?php
-session_start();
-include('../db_connect/DatabaseConnection.php');
-?>
+
 
 <!doctype html>
 <html lang="en">
@@ -185,7 +182,9 @@ include('../db_connect/DatabaseConnection.php');
 </html>
 
 <?php
-
+    session_start();
+    include('../db_connect/DatabaseConnection.php');
+    
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $username = mysqli_real_escape_string($conn, $_POST['username']);
         $email = mysqli_real_escape_string($conn, $_POST['user_email']);
