@@ -3,10 +3,6 @@ session_start();
 include ('C:\xampp\htdocs\Uap\db_connect\DatabaseConnection.php');
 ?>
 
-<?php
-session_start();
-include ('C:\xampp\htdocs\Uap\db_connect\DatabaseConnection.php');
-?>
 
 <!doctype html>
 <html lang="en">
@@ -77,21 +73,13 @@ include ('C:\xampp\htdocs\Uap\db_connect\DatabaseConnection.php');
 <body>
     <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
-            <a class="navbar-brand logo" href="#">
-                <img src="\Uap\assets\Logo.svg" alt="UapLogo">
+            <a class="navbar-brand mx-auto" href="\Uap\main_form\mainForm.php">
+                <img src="\Uap\assets\UapLogoText.svg" alt="UapLogo">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse justify-content-center" id="navbarScroll">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">Store</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Library</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Community</a></li>
-                    <li class="nav-item"><a class="nav-link disabled" aria-disabled="true" href="#">Guest</a></li>
-                </ul>
-                <a href="\Uap\auth\login.php" class="btn btn-outline-danger">Login</a>
-            </div>
+        
         </div>
     </nav>
 
