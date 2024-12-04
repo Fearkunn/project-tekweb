@@ -1,89 +1,205 @@
+
 <?php
 session_start();
 include('../db_connect/DatabaseConnection.php');
 ?>
-
 
 <!doctype html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Login</title>
+    <title>Register</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-            background-color: #2C2C2C;
-            color: white;
-            height: 100%;
-            width: 100%;
-            background-image: url('https://i.im.ge/2024/11/16/zTTkxF.Background.png');
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-position: center top;
-        }
 
-     
-        .navbar {
-            background-color: #2C2C2C; /* Tetap abu-abu gelap */
-            font-family: Arial, sans-serif;
-        }
-        .navbar-brand, .nav-link {
-            color: #FFFFFF !important; /* Font putih untuk kontras */
-        }
-        .navbar-brand {
-            font-weight: bold;
-            font-size: 1.25rem;
-        }
-        .navbar-nav .nav-link:hover {
-            color: #FF4C4C !important; /* Merah terang saat hover */
-        }
-        .nav-link {
-            margin-right: 1.5rem;
-        }
-        .navbar-toggler {
-            border-color: #FFFFFF; /* Tanda toggle putih */
-        }
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        background-color: #2C2C2C;
+        color: white;
+    }
 
-        .container {
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+    #register-section {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        background-image: url('https://i.im.ge/2024/11/16/zTTkxF.Background.png');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center top;
+        margin: 0;
+        padding: 0;
+    }
 
-        .login-box {
-            background-color: rgba(0, 0, 0, 0.8);
-            padding: 20px;
-            border-radius: 8px;
-            color: white;
-            width: 100%;
-            max-width: 400px;
-        }
+    .navbar {
+        background-color: #2C2C2C;
+        font-family: Arial, sans-serif;
+        padding: 10px 20px;
+    }
 
-        .login-box h2 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-    </style>
+    .navbar-brand, .nav-link {
+        color: #FFFFFF !important;
+    }
+
+    .navbar-brand {
+        font-weight: bold;
+        font-size: 1.5rem;
+    }
+
+    .container {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .register-box {
+        background-color: rgba(0, 0, 0, 0.8);
+        padding: 30px 25px;
+        border-radius: 10px;
+        color: white;
+        width: 100%;
+        max-width: 400px;
+        margin: 10px 0;
+    }
+
+    section {
+        font-size: 1rem;
+        line-height: 1.6;
+        padding: 30px 0;
+        margin:0;
+    }
+
+    section h3 {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+
+    section p {
+        color: #AAA;
+        margin-bottom: 15px;
+    }
+
+    section .btn-primary {
+        background-color: #007bff;
+        border: none;
+        padding: 10px 20px;
+        font-size: 1rem;
+        border-radius: 5px;
+    }
+
+    section .btn-primary:hover {
+        background-color: #0056b3;
+    }
+
+    .text-section {
+        padding: 40px 20px;
+    }
+
+    footer {
+        font-size: 0.9rem;
+        color: #AAA;
+        text-align: center;
+        padding: 30px;
+        background-color: #1C1C1C;
+    }
+
+    .register-btn {
+        background: linear-gradient(90deg, #1b73e8, #004ba0);
+        border: none;
+        color: white;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .register-btn:hover {
+        background: linear-gradient(90deg, #004ba0, #1b73e8);
+        transform: scale(1.05);
+    }
+
+    section.text-white-5py {
+        margin-bottom: 0;
+    }
+
+    .register {
+        padding-bottom: 20px;
+    }
+
+</style>
+
 </head>
 <body>
+    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
             <a class="navbar-brand mx-auto" href="..\main_form\mainForm.php">
-                <img src="\Uap\assets\UapLogoText.svg" alt="UapLogo">
+                <img src="..\assets\UapLogoText.svg" alt="UapLogo">
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-        
         </div>
     </nav>
 
-    
+    <!-- Section Register -->
+    <section id="register-section">
+        <div class="container">
+            <div class="register-box">
+                <h2>Register</h2>
+                <form action="#" method="POST">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Enter your username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirm_password" class="form-label">Confirm Password</label>
+                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Confirm your password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Register</button>
+                </form>
+                <div class="text-center mt-3">
+                    <a href="..\auth\Login.php" class="text-decoration-none text-info">Already have an account? Login</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Baru di UAP Section -->
+    <section class="text-white py-5" style="background-color: #1C1C1C;">
+        <div class="container register">
+            <div class="row">
+                <!-- Kolom 1 -->
+                <div class="col-md-6 d-flex flex-column justify-content-center">
+                    <h3 class="mb-3" style="font-size: 1.5rem; font-weight: bold;">Baru di UAP?</h3>
+                    <p style="color: #ccc; font-size: 1.1rem;">
+                        Gratis dan mudah. Temukan ribuan game untuk dimainkan dengan jutaan teman baru.
+                    </p>
+                </div>
+                <!-- Kolom 2 -->
+                <div class="col-md-6 d-flex flex-column align-items-center justify-content-center">
+                    <a href="..\auth\Register.php" class="btn btn-primary mb-3 px-5 py-3 register-btn">
+                        Buat Akun
+                    </a>
+                    <a href="#" class="text-decoration-none" style="color: #5caeff; font-size: 1rem;">Pelajari lebih lanjut tentang UAP</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="text-center text-white" style="background-color: #1C1C1C;">
+        <div class="container">
+            <p>© 2024 UAP Corporation. Hak cipta dilindungi Undang-Undang.</p>
+            <p>Semua game gratis</p>
+        </div>
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
