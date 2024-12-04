@@ -2,6 +2,7 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+$username = 'Guest'; 
 if (isset($_SESSION['username'])) {
     $username = $_SESSION['username'];
     $is_logged_in = true;  // User is logged in

@@ -7,7 +7,7 @@ if (session_status() === PHP_SESSION_NONE) {
 include('../db_connect/DatabaseConnection.php');
 
 // Default value for $username
-$username = 'Guest'; 
+
 
 // Check if the user is logged in via session
 include('../auth/cookieValidation.php');
