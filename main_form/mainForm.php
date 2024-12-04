@@ -1,3 +1,13 @@
+<?php
+session_start();
+if (isset($_SESSION['username'])) {
+    $username = $_SESSION['username'];
+    $is_logged_in = true;  // Menandakan pengguna sudah login
+} else {
+    $username = 'Guest';
+    $is_logged_in = false;  // Menandakan pengguna sebagai tamu
+}
+?>
 <!doctype html>
 <html lang="en">
 <head>
@@ -90,10 +100,16 @@
                         <a class="nav-link" href="#">Community</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link disabled" aria-disabled="true" href="#">Guest</a>
+                        <a class="nav-link disabled" aria-disabled="true" href="#"><?php echo $username; ?></a>
                     </li>
                 </ul>
-                <a href="..\auth\login.php" class="login-btn">Login</a>  
+                <?php if ($is_logged_in): ?>
+                    <!-- Tampilkan tombol Logout jika user sudah login -->
+                    <a href="..\auth\logout.php" class="login-btn">Logout</a>  
+                <?php else: ?>
+                    <!-- Tampilkan tombol Login jika user belum login -->
+                    <a href="..\auth\login.php" class="login-btn">Login</a>
+                <?php endif; ?>
             </div>
         </div>
     </nav>
