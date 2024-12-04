@@ -24,9 +24,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             exit();
         } else {  
             $error_message = "Password salah.";
+            echo "<script>console.log('Password salah');</script>";
         }
     } else {
         $error_message = "Username tidak ditemukan.";
+        echo "<script>console.log('Username tidak ditemukan');</script>";
     }
 }
 ?>

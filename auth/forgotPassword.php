@@ -1,62 +1,122 @@
 <?php
-// Mulai session
 session_start();
 
 // Jika pengguna sudah login, arahkan ke halaman dashboard
 if (isset($_SESSION['user_id'])) {
-    header("Location: dashboard.php");
+    header("Location: ../main_form/mainForm.php");
     exit();
 }
 
 // Include koneksi database
 include('../db_connect/DatabaseConnection.php');
 
+// Include PHPMailer
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require '../PHPMailer/src/Exception.php';
+require '../PHPMailer/src/PHPMailer.php';
+require '../PHPMailer/src/SMTP.php';
+
+// Atur langkah proses
+if (!isset($_SESSION['step'])) {
+    $_SESSION['step'] = 1; // Default untuk langkah pertama
+}
+
+$error = ''; // Pesan error
+
+// Proses jika form telah dikirim
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $email = $_POST['email'];
+    // Langkah 1: Memeriksa email
+    if ($_SESSION['step'] == 1 && isset($_POST['user_email'])) {
+        $email = $_POST['user_email'];
 
-    // Validasi email
-    if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        // Periksa apakah email ada di database
-        $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        if ($result->num_rows > 0) {
-            // Jika email ditemukan, buat token reset password dan kirim email
-            $token = bin2hex(random_bytes(50)); // Membuat token acak
-
-            // Simpan token di database
-            $stmt = $conn->prepare("UPDATE users SET reset_token = ? WHERE email = ?");
-            $stmt->bind_param("ss", $token, $email);
+        // Validasi email
+        if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            // Periksa apakah email ada di database
+            $stmt = $conn->prepare("SELECT * FROM users WHERE user_email = ?");
+            $stmt->bind_param("s", $email);
             $stmt->execute();
+            $result = $stmt->get_result();
 
-            // Kirim email dengan link reset password
-            $reset_link = "http://localhost/Uap/auth/reset_password.php?token=" . $token;
-            $subject = "Password Reset Request";
-            $message = "Klik link berikut untuk mereset password Anda: " . $reset_link;
-            $headers = "From: no-reply@yourdomain.com";
+            if ($result->num_rows > 0) {
+                // Jika email ditemukan, buat kode reset password
+                $Kode = random_int(100000, 999999);
 
-            if (mail($email, $subject, $message, $headers)) {
-                echo "Email reset password telah dikirim.";
+                // Simpan kode dan waktu ke session
+                $_SESSION['reset_Kode'] = $Kode;
+                $_SESSION['reset_Kode_time'] = time();
+                $_SESSION['email'] = $email;
+
+                // Kirim email dengan PHPMailer
+                $mail = new PHPMailer(true);
+                try {
+                    $mail->isSMTP();
+                    $mail->Host = 'smtp.gmail.com';
+                    $mail->SMTPAuth = true;
+                    $mail->Username = 'uap.company2023@gmail.com';
+                    $mail->Password = 'tnrc uyby ixpt ybkr';
+                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                    $mail->Port = 587;
+
+                    $mail->setFrom('uap.company2023@gmail.com', 'Uap');
+                    $mail->addAddress($email);
+
+                    $mail->isHTML(true);
+                    $mail->Subject = "Reset Password Request - Your Verification Code";
+                    $mail->Body = "
+                        <p>Halo,</p>
+                        <p>Kode verifikasi Anda adalah:</p>
+                        <h1 style='text-align: center; color: #007bff;'>{$Kode}</h1>
+                        <p>Gunakan kode ini untuk melanjutkan proses reset password.</p>
+                    ";
+
+                    $mail->send();
+                    $_SESSION['step'] = 2; // Beralih ke langkah kedua
+                } catch (Exception $e) {
+                    $error = "Gagal mengirim email: {$mail->ErrorInfo}";
+                }
             } else {
-                echo "Gagal mengirim email. Coba lagi nanti.";
+                $error = "Email tidak ditemukan.";
             }
         } else {
-            echo "Email tidak ditemukan.";
+            $error = "Format email tidak valid.";
         }
-    } else {
-        echo "Email tidak valid.";
+    }
+
+    // Langkah 2: Memeriksa kode
+    if ($_SESSION['step'] == 2 && isset($_POST['Kode'])) {
+        $Kode = $_POST['Kode'];
+
+        // Validasi kode
+        if (isset($_SESSION['reset_Kode']) && $Kode == $_SESSION['reset_Kode']) {
+            if (time() - $_SESSION['reset_Kode_time'] < 600) { // 600 detik = 10 menit
+                // Hapus data session terkait kode
+                $_SESSION['reset_Kode'] = null;
+                $_SESSION['reset_Kode_time'] = null;
+                $_SESSION['step'] = null;
+                //$_SESSION['user_email'] = $email;
+
+                // Redirect ke halaman reset password
+                header("Location: resetPassword.php");
+                exit();
+            } else {
+                $error = "Kode telah kadaluarsa.";
+            }
+        } else {
+            $error = "Kode tidak valid.";
+        }
     }
 }
 ?>
+
 
 <!doctype html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Register</title>
+    <title>Forgot Password</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <style>
 
@@ -187,26 +247,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
     </nav>
 
-    <!-- Section Register -->
-    <section id="register-section">
+    <!-- Section Forgot Password -->
+    <section id="forgot-password-section">
         <div class="container">
-            <div class="register-box">
+            <div class="forgot-password-box">
                 <h2>Forgot Password</h2>
-                <form action="#" method="POST">   
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" name="user_email" placeholder="Enter your email" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary w-100">Register</button>
-                </form>
+                <?php if ($_SESSION['step'] == 1): ?>
+                    <form action="#" method="POST">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="user_email" placeholder="Enter your email" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Submit</button>
+                    </form>
+                <?php elseif ($_SESSION['step'] == 2): ?>
+                    <form action="#" method="POST">
+                        <div class="mb-3">
+                            <label for="Kode" class="form-label">Kode</label>
+                            <input type="text" class="form-control" id="Kode" name="Kode" placeholder="Enter your Kode" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Submit</button>
+                    </form>
+                <?php endif; ?>
+
+
                 <div class="text-center mt-3">
-                    <a href="..\auth\Login.php" class="text-decoration-none text-info">Already have an account? Login</a>
+                    <a href="..\auth\Login.php" class="text-decoration-none text-info">Remember your password? Login</a>
                 </div>
             </div>
         </div>
     </section>
-
-    
 
     <!-- Footer -->
     <footer class="text-center text-white p-4" style="background-color: #1C1C1C;">
