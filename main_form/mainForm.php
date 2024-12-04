@@ -6,44 +6,66 @@
     <title>Login</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <style>
-        .navbar {
-            background-color: #1b2838;
-            font-family: Arial, sans-serif;
-        }
-        .navbar-brand, .nav-link {
-            color: #c7d5e0 !important;
-        }
-        .navbar-brand {
-            font-weight: bold;
-            font-size: 1.25rem;
-        }
-        .navbar-nav .nav-link:hover {
-            color: #66c0f4 !important;
-        }
-        .nav-link {
-            margin-right: 1.5rem;
-        }
-        .navbar-toggler {
-            border-color: #66c0f4;
-        }
-        .login-btn {
-            border: 1px solid #66c0f4;
-            padding: 5px 10px;
-            border-radius: 3px;
-            text-decoration: none;
-            color:white;
-        }
-        .MainSection{
-          background-image:url('https://steamuserimages-a.akamaihd.net/ugc/1704034371950843733/CDA31159C79E5296CEB13D6AB82B221C4CB19F85/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false');
-          background-size: cover;
-          background-position: center;
-          height: 100vh; /* Tinggi penuh layar */
-          display: flex;
-          color: white;
-        }
-        .LoginText{
-          font-size: 50px;
-          font-family: Arial, sans-serif;
+    .navbar {
+    background-color: #2C2C2C; /* Tetap abu-abu gelap */
+    font-family: Arial, sans-serif;
+}
+.navbar-brand, .nav-link {
+    color: #FFFFFF !important; /* Font putih untuk kontras */
+}
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.25rem;
+}
+.navbar-nav .nav-link:hover {
+    color: #FF4C4C !important; /* Merah terang saat hover */
+}
+.nav-link {
+    margin-right: 1.5rem;
+}
+.navbar-toggler {
+    border-color: #FFFFFF; /* Tanda toggle putih */
+}
+.login-btn {
+    background-color: #000000; /* Tombol hitam */
+    border: 2px solid #FF4C4C; /* Garis tepi merah */
+    padding: 5px 10px;
+    border-radius: 3px;
+    color: #FFFFFF; /* Font putih */
+    text-decoration: none;
+}
+.login-btn:hover {
+    background-color: #FF4C4C; /* Tombol berubah merah terang saat hover */
+    color: #FFFFFF; /* Font tetap putih */
+}
+.MainSection {
+    background-image: url('https://i.im.ge/2024/11/16/zTTkxF.Background.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center top;
+    height: 100vh;
+    display: flex;
+    align-items: center; /* Agar teks di tengah secara vertikal */
+    justify-content: center; /* Agar teks di tengah secara horizontal */
+    color: #FFFFFF;
+}
+.LoginText {
+    font-size: 50px;
+    font-family: Arial, sans-serif;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8); /* Memastikan teks tetap jelas */
+}
+
+        
+        @media (min-height: 1081px) {
+            .MainSection {
+                background-image: 
+                    url('https://i.im.ge/2024/11/16/zTTkxF.Background.png'), /* Top part */
+                    url('/assets/aokwokwowk.png'); /* Bottom part */
+                background-size: 100% auto, 100% auto; /* Make both images extend horizontally */
+                background-repeat: no-repeat, repeat-y; /* Repeat local image vertically if needed */
+                background-position: center top, center bottom; /* Stack: Top, then bottom */
+                height: 100vh; /* Ensure it extends as needed */
+            }
         }
     </style>
 </head>
@@ -73,13 +95,13 @@
             </div>
         </div>
     </nav>
-      <!--Section Login-->
+    <!-- Section Login -->
     <section>
-      <div class="MainSection">
-          <div class="LoginText">
-            Login
-          </div>
-      </div>
+        <div class="MainSection">
+            <div class="LoginText">
+                Login
+            </div>
+        </div>
     </section>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
