@@ -2,36 +2,6 @@
 session_start();
 include('../db_connect/DatabaseConnection.php');
 
-// Validasi token "Remember Me"
-if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_token'])) {
-    $token = base64_decode($_COOKIE['remember_token']);
-    list($user_id, $expiry, $signature) = explode('|', $token);
-
-    if (time() > $expiry) {
-        setcookie('remember_token', '', time() - 3600, "/", "", true, true); // Hapus cookie
-        $error_message = "Session Anda telah kedaluwarsa.";
-    } else {
-        $secret_key = 'your_secret_key';
-        $valid_signature = hash_hmac('sha256', "$user_id|$expiry", $secret_key);
-
-        if (hash_equals($valid_signature, $signature)) {
-            $_SESSION['user_id'] = $user_id;
-
-            $new_expiry = time() + (30 * 24 * 60 * 60);
-            $new_data = "$user_id|$new_expiry";
-            $new_signature = hash_hmac('sha256', $new_data, $secret_key);
-            $new_token = base64_encode("$new_data|$new_signature");
-
-            setcookie('remember_token', $new_token, $new_expiry, "/", "", true, true);
-
-            header("Location: dashboard.php");
-            exit();
-        } else {
-            setcookie('remember_token', '', time() - 3600, "/", "", true, true);
-        }
-    }
-}
-
 // Login handler
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = mysqli_real_escape_string($conn, $_POST['username']);
@@ -49,15 +19,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         if (isset($_POST['remember_me'])) {
             $user_id = $user['id_user'];
-            $expiry = time() + (30 * 24 * 60 * 60);
+            $expiry = time() + (30 * 24 * 60 * 60); // 30 hari
             $secret_key = 'your_secret_key';
-
+        
             $data = "$user_id|$expiry";
             $signature = hash_hmac('sha256', $data, $secret_key);
             $token = base64_encode("$data|$signature");
+        
+            setcookie('remember_me_token', $token, $expiry, "/", "", false, true); // Buat cookie
+            error_log("Cookie dibuat: $token");
 
-            setcookie('remember_token', $token, $expiry, "/", "", true, true);
+        } 
+        if (isset($_COOKIE['remember_me_token'])) {
+            $token = $_COOKIE['remember_me_token'];
+            error_log("Cookie diterima: $token");
+        } else {
+            error_log("Cookie tidak ditemukan");
         }
+                   
         header("Location: ../main_form/mainForm.php");
         exit();
     } else {
@@ -215,7 +194,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <input type="password" class="form-control" id="password" name="user_password" placeholder="Enter your password" required>
                     </div>
                     <div class="form-check mb-3">
-                        <input type="checkbox" class="form-check-input" id="remember" name="remember">
+                        <input type="checkbox" class="form-check-input" id="remember" name="remember_me">
                         <label class="form-check-label" for="remember">Remember Me</label>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Login</button>
