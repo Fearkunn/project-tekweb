@@ -1,4 +1,3 @@
-
 <?php
 session_start();
 include('../db_connect/DatabaseConnection.php');
@@ -152,11 +151,11 @@ include('../db_connect/DatabaseConnection.php');
                     </div>
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required>
+                        <input type="email" class="form-control" id="email" name="user_email" placeholder="Enter your email" required>
                     </div>
                     <div class="mb-3">
                         <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
+                        <input type="password" class="form-control" id="password" name="user_password" placeholder="Enter your password" required>
                     </div>
                     <div class="mb-3">
                         <label for="confirm_password" class="form-label">Confirm Password</label>
@@ -171,30 +170,10 @@ include('../db_connect/DatabaseConnection.php');
         </div>
     </section>
 
-    <!-- Baru di UAP Section -->
-    <section class="text-white py-5" style="background-color: #1C1C1C;">
-        <div class="container register">
-            <div class="row">
-                <!-- Kolom 1 -->
-                <div class="col-md-6 d-flex flex-column justify-content-center">
-                    <h3 class="mb-3" style="font-size: 1.5rem; font-weight: bold;">Baru di UAP?</h3>
-                    <p style="color: #ccc; font-size: 1.1rem;">
-                        Gratis dan mudah. Temukan ribuan game untuk dimainkan dengan jutaan teman baru.
-                    </p>
-                </div>
-                <!-- Kolom 2 -->
-                <div class="col-md-6 d-flex flex-column align-items-center justify-content-center">
-                    <a href="..\auth\Register.php" class="btn btn-primary mb-3 px-5 py-3 register-btn">
-                        Buat Akun
-                    </a>
-                    <a href="#" class="text-decoration-none" style="color: #5caeff; font-size: 1rem;">Pelajari lebih lanjut tentang UAP</a>
-                </div>
-            </div>
-        </div>
-    </section>
+    
 
     <!-- Footer -->
-    <footer class="text-center text-white" style="background-color: #1C1C1C;">
+    <footer class="text-center text-white p-4" style="background-color: #1C1C1C;">
         <div class="container">
             <p>© 2024 UAP Corporation. Hak cipta dilindungi Undang-Undang.</p>
             <p>Semua game gratis</p>
