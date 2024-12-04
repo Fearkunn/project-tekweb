@@ -185,7 +185,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <button type="submit" class="btn btn-primary w-100">Login</button>
                 </form>
                 <div class="text-center mt-3">
-                    <a href="#" class="text-decoration-none text-info">Forgot Password?</a>
+                    <a href="..\auth\forgotPassword.php" class="text-decoration-none text-info">Forgot Password?</a>
                 </div>
             </div>
         </div>
