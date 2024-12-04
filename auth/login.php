@@ -1,6 +1,6 @@
 <?php
 session_start();
-include ('C:\xampp\htdocs\Uap\db_connect\DatabaseConnection.php');
+include('../db_connect/DatabaseConnection.php');
 ?>
 
 <!doctype html>
@@ -130,8 +130,8 @@ include ('C:\xampp\htdocs\Uap\db_connect\DatabaseConnection.php');
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
-            <a class="navbar-brand mx-auto" href="\Uap\main_form\mainForm.php">
-                <img src="\Uap\assets\UapLogoText.svg" alt="UapLogo">
+            <a class="navbar-brand mx-auto" href="..\main_form\mainForm.php">
+                <img src="..\assets\UapLogoText.svg" alt="UapLogo">
             </a>
         </div>
     </nav>
@@ -176,7 +176,7 @@ include ('C:\xampp\htdocs\Uap\db_connect\DatabaseConnection.php');
             </div>
             <!-- Kolom 2 -->
             <div class="col-md-6 d-flex flex-column align-items-center justify-content-center">
-            <a href="\Uap\auth\Register.php" class="btn btn-primary mb-3 px-5 py-3 register-btn">
+            <a href="..\auth\Register.php" class="btn btn-primary mb-3 px-5 py-3 register-btn">
                 Buat Akun
             </a>
                 <a href="#" class="text-decoration-none" style="color: #5caeff; font-size: 1rem;">Pelajari lebih lanjut tentang UAP</a>

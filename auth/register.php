@@ -1,6 +1,6 @@
 <?php
 session_start();
-include ('C:\xampp\htdocs\Uap\db_connect\DatabaseConnection.php');
+include('../db_connect/DatabaseConnection.php');
 ?>
 
 
@@ -73,7 +73,7 @@ include ('C:\xampp\htdocs\Uap\db_connect\DatabaseConnection.php');
 <body>
     <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
-            <a class="navbar-brand mx-auto" href="\Uap\main_form\mainForm.php">
+            <a class="navbar-brand mx-auto" href="..\main_form\mainForm.php">
                 <img src="\Uap\assets\UapLogoText.svg" alt="UapLogo">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">

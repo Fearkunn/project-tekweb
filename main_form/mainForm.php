@@ -60,7 +60,7 @@
             .MainSection {
                 background-image: 
                     url('https://i.im.ge/2024/11/16/zTTkxF.Background.png'), /* Top part */
-                    url('/assets/aokwokwowk.png'); /* Bottom part */
+                    url('../assets/aokwokwowk.png'); /* Bottom part */
                 background-size: 100% auto, 100% auto; /* Make both images extend horizontally */
                 background-repeat: no-repeat, repeat-y; /* Repeat local image vertically if needed */
                 background-position: center top, center bottom; /* Stack: Top, then bottom */
@@ -73,7 +73,7 @@
     <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
             <a class="navbar-brand logo" href="#" >
-                    <img src="\Uap\assets\Logo.svg" alt="UapLogo">
+                    <img src="..\assets\Logo.svg" alt="UapLogo">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -93,7 +93,7 @@
                         <a class="nav-link disabled" aria-disabled="true" href="#">Guest</a>
                     </li>
                 </ul>
-                <a href="\Uap\auth\login.php" class="login-btn">Login</a>  
+                <a href="..\auth\login.php" class="login-btn">Login</a>  
             </div>
         </div>
     </nav>
