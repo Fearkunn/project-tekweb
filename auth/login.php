@@ -1,4 +1,3 @@
-
 <?php
 session_start();
 include('../db_connect/DatabaseConnection.php');
@@ -231,12 +230,10 @@ include('../db_connect/DatabaseConnection.php');
             // Redirect ke halaman utama
             header("Location: ../main_form/mainForm.php");
             exit();
-        } else {
-            // Password salah
+        } else {  
             $error_message = "Password salah.";
         }
     } else {
-        // Username tidak ditemukan
         $error_message = "Username tidak ditemukan.";
     }
 }
