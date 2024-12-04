@@ -39,6 +39,18 @@ include ('C:\xampp\htdocs\Uap\db_connect\DatabaseConnection.php');
             text-decoration: none;
             color:white;
         }
+        .LoginSection{
+          background-image:url('https://steamuserimages-a.akamaihd.net/ugc/1704034371950843733/CDA31159C79E5296CEB13D6AB82B221C4CB19F85/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false');
+          background-size: cover;
+          background-position: center;
+          height: 100vh; /* Tinggi penuh layar */
+          display: flex;
+          color: white;
+        }
+        .LoginText{
+          font-size: 50px;
+          font-family: Arial, sans-serif;
+        }
     </style>
 </head>
 <body>
@@ -63,11 +75,18 @@ include ('C:\xampp\htdocs\Uap\db_connect\DatabaseConnection.php');
                         <a class="nav-link" href="#">Username Profile</a>
                     </li>
                 </ul>
-                <a href="login.php" class="login-btn">Login</a>  
+            
             </div>
         </div>
     </nav>
-
+      <!--Section Login-->
+    <section>
+      <div class="LoginSection">
+          <div class="LoginText">
+            Login
+          </div>
+      </div>
+    </section>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>
