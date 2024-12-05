@@ -18,7 +18,8 @@ $query_pending = "
     SELECT 
         g.id_game, 
         g.game_name, 
-        g.game_desc, 
+        g.game_desc,
+        g.games_image,
         p.publisher_name 
     FROM games g
     JOIN publisher p ON g.id_publisher = p.id_publisher
@@ -92,18 +93,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             </div>
         <?php endif; ?>
 
-        <h3 class="mt-4">Games Belum Disetujui</h3>
-        <div class="list-group">
+        <h3 class="mt-4">Daftar Game:</h3>
+        <div class="row">
             <?php while ($row = $result_pending->fetch_assoc()): ?>
-                <div class="list-group-item">
-                    <h5><?php echo $row['game_name']; ?></h5>
-                    <p><?php echo $row['game_desc']; ?></p>
-                    <p>Publisher: <?php echo $row['publisher_name']; ?></p>
-                    <form method="POST" class="d-flex">
-                        <input type="hidden" name="game_id" value="<?php echo $row['id_game']; ?>">
-                        <button type="submit" name="action" value="approve" class="btn btn-success">Approve</button>
-                        <button type="submit" name="action" value="delete" class="btn btn-danger" onclick="return confirm('Are you sure you want to Reject this game?');">Reject</button>
-                    </form>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <img src="<?php echo $row['games_image']; ?>" alt="Cover" class="card-img-top" style="height: 200px; object-fit: cover;">
+                        <div class="card-body">
+                            <h5 class="card-title"><?php echo $row['game_name']; ?></h5>
+                            <p class="card-text"><?php echo $row['game_desc']; ?></p>
+                            <p class="text-muted">Publisher: <?php echo $row['publisher_name']; ?></p>
+                            <form method="POST">
+                                <input type="hidden" name="game_id" value="<?php echo $row['id_game']; ?>">
+                                <button type="submit" name="action" value="approve" class="btn btn-primary">Approve</button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             <?php endwhile; ?>
         </div>
