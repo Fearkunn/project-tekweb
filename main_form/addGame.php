@@ -5,6 +5,10 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 include('../db_connect/DatabaseConnection.php');
 
+// Define ImgBB API key and URL
+define('IMGBB_API_KEY', 'YOUR_IMGBB_API_KEY'); // Replace with your ImgBB API key
+define('IMGBB_URL', 'https://api.imgbb.com/1/upload');
+
 // Proses jika form ditambahkan
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['gameName'])) {
     // Proses tambah game
@@ -13,28 +17,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['gameName'])) {
     $coverImage = $_FILES['coverImage'];
     $gameGenres = isset($_POST['gameGenres']) ? $_POST['gameGenres'] : [];
 
-    // Proses upload gambar cover
-    $uploadDir = '../uploads/'; // Pastikan folder ini ada dan dapat ditulis
-    $coverImagePath = $uploadDir . basename($coverImage['name']);
-    move_uploaded_file($coverImage['tmp_name'], $coverImagePath);
+    // Proses upload gambar cover ke ImgBB
+    $coverImagePath = null;
 
-    // Simpan game ke database
-    $stmt = $conn->prepare("INSERT INTO games (game_name, game_desc, games_image, is_admit) VALUES (?, ?, ?, ?)");
-    $isAdmit = true; // Default status
-    $stmt->bind_param("sssi", $gameName, $gameDesc, $coverImagePath, $isAdmit);
+    // Check if the file was uploaded without errors
+    if (isset($coverImage) && $coverImage['error'] == 0) {
+        $imageData = base64_encode(file_get_contents($coverImage['tmp_name']));
+        
+        // Prepare data for ImgBB
+        $data = [
+            'image' => $imageData,
+            'key' => '635ce58a6dce8d81a73d9f2d6edb0e9f'
+        ];
 
-    if ($stmt->execute()) {
-        $successMessage = "Game berhasil ditambahkan.";
-        $lastInsertId = $stmt->insert_id; // Dapatkan ID game terakhir yang ditambahkan
+        // Use cURL to upload the image
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, IMGBB_URL);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
-        // Simpan genre ke database
-        foreach ($gameGenres as $genreId) {
-            $stmtGenre = $conn->prepare("INSERT INTO game_genre (id_game, id_genre) VALUES (?, ?)");
-            $stmtGenre->bind_param("ii", $lastInsertId, $genreId);
-            $stmtGenre->execute();
+        // Execute cURL and get the response
+        $response = curl_exec($ch);
+
+        // Decode the response
+        $responseData = json_decode($response, true);
+
+        if (isset($responseData['data']['url'])) {
+            $coverImagePath = $responseData['data']['url']; // Get the URL of the uploaded image
+        } else {
+            $errorMessage = "Gagal mengupload gambar: " . $responseData['message'];
         }
     } else {
-        $errorMessage = "Gagal menambahkan game: " . $conn->error;
+        $errorMessage = "Gambar tidak valid.";
+    }
+
+    // Simpan game ke database jika gambar berhasil diupload
+    if ($coverImagePath) {
+        $stmt = $conn->prepare("INSERT INTO games (game_name, game_desc, games_image, is_admit) VALUES (?, ?, ?, ?)");
+        $isAdmit = true; // Default status
+        $stmt->bind_param("sssi", $gameName, $gameDesc, $coverImagePath, $isAdmit);
+
+        if ($stmt->execute()) {
+            $lastInsertId = $stmt->insert_id; // Dapatkan ID game terakhir yang ditambahkan
+
+            // Simpan genre ke database
+            if ($gameGenres) {
+                foreach ($gameGenres as $genreId) {
+                    $stmt = $conn->prepare("INSERT INTO detail_genre (id_game, id_genre) VALUES (?, ?)");
+                    $stmt->bind_param("ii", $newGameId, $genreId);
+                    $stmt->execute();
+                }
+                $successMessage = "Game berhasil ditambahkan.";
+            }
+        } else {
+            $errorMessage = "Gagal menambahkan game: " . $conn->error;
+        }
     }
 }
 
