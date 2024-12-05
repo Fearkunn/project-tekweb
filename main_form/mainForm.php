@@ -146,40 +146,47 @@ include('../auth/cookieValidation.php');
             </div>
         </div>
     </nav>
-
-    <div class="video-section">
-        <video autoplay muted loop class="w-100" style="height: 500px; object-fit: cover; z-index:-1; position:fixed;">
-            <source src="https://shared.fastly.steamstatic.com/store_item_assets/steam/clusters/frontpage/b04ec5ca66d2105a0fccc116/webm_page_bg_indonesian.webm?t=1731704947" type="video/mp4">
-            Browser Anda tidak mendukung video HTML5.
-        </video>
-    </div>
-    <!-- Navbar Kedua -->
-    <nav class="navbar navbar-expand-lg navbar-dark mt-3 mx-auto" style="z-index:2;width:940px; length=66px; padding:0; ">
-        <div class="container navbar-custom">
-            <ul class="navbar-nav mx-auto">
-                <li class="nav-item">
-                    <a class="nav-link text-white" href="#">Toko</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-white" href="#">Baru & Patut Dicoba</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-white" href="#">Kategori</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-white" href="#">Toko Poin</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-white" href="#">Berita</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-white" href="#">Lab</a>
-                </li>
-            </ul>
+    
+    <section id="loop-video">
+        <div class="video-section">
+            <video autoplay muted loop class="w-100" style="height: 500px; object-fit: cover; z-index:-1; position:fixed;">
+                <source src="https://shared.fastly.steamstatic.com/store_item_assets/steam/clusters/frontpage/b04ec5ca66d2105a0fccc116/webm_page_bg_indonesian.webm?t=1731704947" type="video/mp4">
+                Browser Anda tidak mendukung video HTML5.
+            </video>
         </div>
-    </nav>
+    </section>
 
+    <!-- Navbar Kedua -->
+     <section id="navbar-game">
+        <nav class="navbar navbar-expand-lg navbar-dark mt-3 mx-auto" style="z-index:2;width:940px; length=66px; padding:0; ">
+            <div class="container navbar-custom">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="#">Toko</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="#">Baru & Patut Dicoba</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="#">Kategori</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="#">Toko Poin</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="#">Berita</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="#">Lab</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </section>
 
+    <section id="home_page_content">
+
+    </section>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
