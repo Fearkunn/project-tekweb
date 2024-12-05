@@ -14,17 +14,40 @@ if (!$is_admin) {
 }
 
 // Ambil data semua game
-$query_all_games = "
-    SELECT 
-        g.id_game, 
-        g.game_name, 
-        g.game_desc, 
-        p.publisher_name 
-    FROM games g
-    JOIN publisher p ON g.id_publisher = p.id_publisher
-    WHERE g.is_admit = 1;
-";
-$result_all_games = $conn->query($query_all_games);
+$searchTerm = '';
+if (isset($_POST['search'])) {
+    $searchTerm = $_POST['search'];
+    $query_all_games = "
+        SELECT 
+            g.id_game, 
+            g.game_name, 
+            g.game_desc,
+            g.games_image,
+            p.publisher_name 
+        FROM games g
+        JOIN publisher p ON g.id_publisher = p.id_publisher
+        WHERE g.is_admit = 1 AND g.game_name LIKE ?
+    ";
+    $stmt = $conn->prepare($query_all_games);
+    $likeTerm = "%" . $searchTerm . "%";
+    $stmt->bind_param("s", $likeTerm);
+    $stmt->execute();
+    $result_all_games = $stmt->get_result();
+} else {
+    // Default query to get all games
+    $query_all_games = "
+        SELECT 
+            g.id_game, 
+            g.game_name, 
+            g.game_desc,
+            g.games_image,
+            p.publisher_name 
+        FROM games g
+        JOIN publisher p ON g.id_publisher = p.id_publisher
+        WHERE g.is_admit = 1;
+    ";
+    $result_all_games = $conn->query($query_all_games);
+}
 
 // Hapus game
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete') {
@@ -81,17 +104,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             </div>
         <?php endif; ?>
 
-        <h3 class="mt-4">Semua Game</h3>
-        <div class="list-group">
+        <!-- Search Form -->
+        <form method="POST" class="mb-4">
+            <div class="input-group">
+                <input type="text" class="form-control" name="search" placeholder="Search by game name..." value="<?php echo htmlspecialchars($searchTerm); ?>">
+                <button class="btn btn-primary" type="submit">Search</button>
+            </div>
+        </form>
+
+        <h3 class="mt-4">Daftar Game:</h3>
+        <div class="row">
             <?php while ($row = $result_all_games->fetch_assoc()): ?>
-                <div class="list-group-item">
-                    <h5><?php echo $row['game_name']; ?></h5>
-                    <p><?php echo $row['game_desc']; ?></p>
-                    <p>Publisher: <?php echo $row['publisher_name']; ?></p>
-                    <form method="POST" class="d-flex">
-                        <input type="hidden" name="game_id" value="<?php echo $row['id_game']; ?>">
-                        <button type="submit" name="action" value="delete" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this game?');">Delete</button>
-                    </form>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <img src="<?php echo $row['games_image']; ?>" alt="Cover" class="card-img-top" style="height: 200px; object-fit: cover;">
+                        <div class="card-body">
+                            <h5 class="card-title"><?php echo $row['game_name']; ?></h5>
+                            <p class="card-text"><?php echo $row['game_desc']; ?></p>
+                            <p class="text-muted">Publisher: <?php echo $row['publisher_name']; ?></p>
+                            <form method="POST">
+                                <input type="hidden" name="game_id" value="<?php echo $row['id_game']; ?>">
+                                <button type="submit" name="action" value="delete" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this game?');">Hapus</button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             <?php endwhile; ?>
         </div>
