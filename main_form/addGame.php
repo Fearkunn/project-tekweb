@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['gameName'])) {
     move_uploaded_file($coverImage['tmp_name'], $coverImagePath);
 
     // Simpan game ke database
-    $stmt = $conn->prepare("INSERT INTO games (game_name, game_desc, games_profile, is_admit) VALUES (?, ?, ?, ?)");
+    $stmt = $conn->prepare("INSERT INTO games (game_name, game_desc, games_image, is_admit) VALUES (?, ?, ?, ?)");
     $isAdmit = true; // Default status
     $stmt->bind_param("sssi", $gameName, $gameDesc, $coverImagePath, $isAdmit);
 
@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_game_id'])) {
 }
 
 // Ambil data game untuk ditampilkan
-$games = $conn->query("SELECT id_game, game_name, game_desc, games_profile, is_admit FROM games");
+$games = $conn->query("SELECT id_game, game_name, game_desc, games_image, is_admit FROM games");
 ?>
 
 <!DOCTYPE html>
@@ -161,7 +161,7 @@ $games = $conn->query("SELECT id_game, game_name, game_desc, games_profile, is_a
             while ($game = $games->fetch_assoc()) {
                 echo "<div class='col-md-4 mb-4'>";
                 echo "<div class='card h-100'>";
-                echo "<img src='" . $game['games_profile'] . "' alt='Cover' class='card-img-top' style='height: 200px; object-fit: cover;'>";
+                echo "<img src='" . $game['games_image'] . "' alt='Cover' class='card-img-top' style='height: 200px; object-fit: cover;'>";
                 echo "<div class='card-body'>";
                 echo "<h5 class='card-title'>" . $game['game_name'] . "</h5>";
                 echo "<p class='card-text'>" . $game['game_desc'] . "</p>";
