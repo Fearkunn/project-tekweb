@@ -14,29 +14,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['gameName'])) {
     // Ambil id_publisher berdasarkan user_id dari session
     $userId = $_SESSION['username'];
     $stmt = $conn->prepare("SELECT id_publisher FROM publisher WHERE publisher_name = ?");
-    $stmt->bind_param("i", $username);
+    $stmt->bind_param("s", $userId);
     $stmt->execute();
     $result = $stmt->get_result();
     
     if ($result && $result->num_rows > 0) {
         $row = $result->fetch_assoc();
         $idPublisher = $row['id_publisher'];
-        echo "Username dari sesi: " . $idPublisher . "<br>";
     } else {
         die("Publisher tidak ditemukan untuk pengguna ini.");
     }
 
-    // Proses upload gambar ke folder
-    $coverImagePath = null;
+    // Proses upload gambar ke ImgBB
+    $coverImageUrl = null;
     if (isset($_FILES['coverImage']) && $_FILES['coverImage']['error'] == 0) {
-        // Tentukan path tempat gambar akan disimpan
-        $uploadDir = '../uploads/';
-        $fileName = basename($_FILES['coverImage']['name']);
-        $coverImagePath = $uploadDir . $fileName;
+        $apiKey = '635ce58a6dce8d81a73d9f2d6edb0e9f'; // Ganti dengan API key ImgBB kamu
+        $imageData = base64_encode(file_get_contents($_FILES['coverImage']['tmp_name']));
 
-        // Pindahkan file gambar ke folder tujuan
-        if (!move_uploaded_file($_FILES['coverImage']['tmp_name'], $coverImagePath)) {
-            die("Gagal mengupload gambar.");
+        $postFields = [
+            'key' => $apiKey,
+            'image' => $imageData
+        ];
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, "https://api.imgbb.com/1/upload");
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        
+        $response = curl_exec($ch);
+        curl_close($ch);
+
+        // Mengonversi hasil ke array
+        $responseData = json_decode($response, true);
+        
+        // Cek apakah upload berhasil
+        if (isset($responseData['data']['url'])) {
+            $coverImageUrl = $responseData['data']['url'];
+        } else {
+            die("Gagal mengupload gambar ke ImgBB: " . $responseData['error']['message']);
         }
     }
 
@@ -50,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['gameName'])) {
     $stmt = $conn->prepare("INSERT INTO games (id_game, game_name, game_desc, is_admit, release_date, id_publisher, games_profile) VALUES (?, ?, ?, ?, NOW(), ?, ?)");
     $isAdmit = false; 
     
-    $stmt->bind_param("issiis", $newGameId, $gameName, $gameDesc, $isAdmit, $idPublisher, $coverImagePath);
+    $stmt->bind_param("issiis", $newGameId, $gameName, $gameDesc, $isAdmit, $idPublisher, $coverImageUrl);
     if ($stmt->execute()) {
         // Simpan genre
         if ($gameGenres) {
