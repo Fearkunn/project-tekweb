@@ -6,7 +6,40 @@ if (session_status() === PHP_SESSION_NONE) {
 
 include('../db_connect/DatabaseConnection.php');
 
-// Default value for $username
+
+$is_logged_in = isset($_SESSION['username']) && !empty($_SESSION['username']); //set is logged in
+
+if($is_logged_in){ //jika ada is logged_in jika ga ada username kosong
+    $username = $_SESSION['username'];
+}else{
+    $username = '';
+}
+
+$is_publisher = false;
+
+if ($is_logged_in) {
+    // Siapkan query
+    $query = "SELECT publisher_name FROM publisher WHERE publisher_name = ?";
+    $stmt = $conn->prepare($query);
+
+    if ($stmt) {
+       $stmt->bind_param("s", $username);
+        $stmt->execute();
+    
+        $result = $stmt->get_result();
+        $publisher = $result->fetch_assoc(); //untuk di cek di isset($publisher['publisher_name'])
+
+        //jika isset mengeluarkan hasil null maka is publisher akan jadi false
+        if (isset($publisher['publisher_name']) && $publisher['publisher_name'] === $username) {
+            $is_publisher = true;
+        }else{
+            $is_publisher = false;
+        }
+    }
+}
+
+
+
 
 
 // Check if the user is logged in via session
@@ -134,6 +167,11 @@ include('../auth/cookieValidation.php');
                     <li class="nav-item">
                         <a class="nav-link disabled" aria-disabled="true" href="#"><?php echo $username; ?></a>
                     </li>
+                    <?php if ($is_publisher): ?>
+                        <li class="nav-item">
+                            <a href="../main_form/addGame.php" class="nav-link">Add Game</a>
+                        </li>
+                    <?php endif; ?>    
                 </ul>
                 <?php if ($is_logged_in): ?>
                     <div class="dropdown" style="background-color: #2C2C2C;">
@@ -228,7 +266,6 @@ include('../auth/cookieValidation.php');
                     <span class="visually-hidden">Next</span>
                 </button>
             </div>
-
         </div>
         
     </section>

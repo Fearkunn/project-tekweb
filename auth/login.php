@@ -7,40 +7,53 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = mysqli_real_escape_string($conn, $_POST['username']);
     $password = mysqli_real_escape_string($conn, $_POST['user_password']);
 
-    $stmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
+    $stmt = $conn->prepare("SELECT * FROM publisher WHERE publisher_name = ?");
     $stmt->bind_param("s", $username);
     $stmt->execute();
     $result = $stmt->get_result();
     $user = $result->fetch_assoc();
 
-    if ($user && password_verify($password, $user['user_password'])) {
-        $_SESSION['user_id'] = $user['id_user'];
-        $_SESSION['username'] = $user['username'];
-
-        if (isset($_POST['remember_me'])) {
-            $user_id = $user['id_user'];
-            $expiry = time() + (30 * 24 * 60 * 60); // 30 hari
-            $secret_key = 'your_secret_key';
-        
-            $data = "$user_id|$expiry";
-            $signature = hash_hmac('sha256', $data, $secret_key);
-            $token = base64_encode("$data|$signature");
-        
-            setcookie('remember_me_token', $token, $expiry, "/", "", false, true); // Buat cookie
-            error_log("Cookie dibuat: $token");
-
-        } 
-        if (isset($_COOKIE['remember_me_token'])) {
-            $token = $_COOKIE['remember_me_token'];
-            error_log("Cookie diterima: $token");
-        } else {
-            error_log("Cookie tidak ditemukan");
-        }
-                   
+    if($user){
+        $_SESSION['user_id'] = $user['id_publisher'];
+        $_SESSION['username'] = $user['publisher_name'];
         header("Location: ../main_form/mainForm.php");
-        exit();
-    } else {
-        $error_message = "Username atau password salah.";
+    }else{
+
+        $stmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $user = $result->fetch_assoc();
+
+        if ($user && password_verify($password, $user['user_password'])) {
+            $_SESSION['user_id'] = $user['id_user'];
+            $_SESSION['username'] = $user['username'];
+    
+            if (isset($_POST['remember_me'])) {
+                $user_id = $user['id_user'];
+                $expiry = time() + (30 * 24 * 60 * 60); // 30 hari
+                $secret_key = 'your_secret_key';
+            
+                $data = "$user_id|$expiry";
+                $signature = hash_hmac('sha256', $data, $secret_key);
+                $token = base64_encode("$data|$signature");
+            
+                setcookie('remember_me_token', $token, $expiry, "/", "", false, true); // Buat cookie
+                error_log("Cookie dibuat: $token");
+    
+            } 
+            if (isset($_COOKIE['remember_me_token'])) {
+                $token = $_COOKIE['remember_me_token'];
+                error_log("Cookie diterima: $token");
+            } else {
+                error_log("Cookie tidak ditemukan");
+            }
+                       
+            header("Location: ../main_form/mainForm.php");
+            exit();
+        } else {
+            $error_message = "Username atau password salah.";
+        }
     }
 }
 ?>
