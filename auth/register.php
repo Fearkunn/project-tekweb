@@ -8,41 +8,68 @@
         $password = mysqli_real_escape_string($conn, $_POST['user_password']);
         $confirm_password = mysqli_real_escape_string($conn, $_POST['confirm_password']);
 
-        if ($confirm_password !== $confirm_password) {
+        if ($confirm_password !== $password) {
             $error_message = "Password Tidak Sama";
-        }else{
-            //check validasi email ada atau tidak di db
-            $query = "SELECT * FROM users WHERE user_email = '$email'";
-            
-            $result = mysqli_query($conn, $query);
-            if (mysqli_num_rows($result) > 0) {
-                $error_message = "Email sudah terdaftar";
-                
-            }else{
-                $query = "SELECT * FROM users WHERE username = '$username'";
+        } else {
+            // Check if the email contains "@publisher"
+            if (strpos($email, '@publisher') !== false) {
+                // Publisher registration logic
+                $query = "SELECT * FROM publisher WHERE publisher_name = '$username' OR publisher_name = '$email'";
                 $result = mysqli_query($conn, $query);
                 if (mysqli_num_rows($result) > 0) {
-                $error_message = "Username sudah ada";
-                }else{
-                    $id_query = "SELECT MAX(id_user) AS max_id FROM users";
+                    $error_message = "Publisher with this name or email already exists.";
+                } else {
+                    // Get the max publisher ID
+                    $id_query = "SELECT MAX(id_publisher) AS max_id FROM publisher";
                     $id_result = mysqli_query($conn, $id_query);
                     $id_row = mysqli_fetch_assoc($id_result);
-                    $new_user_id = $id_row['max_id'] + 1;
-                    
-                    // Increment the max_id by 1 for the new user
-                    //mengirim password dengan password_hash agar terenkripsi
+                    $new_publisher_id = $id_row['max_id'] + 1;
+
+                    // Hash the password before inserting
                     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-                    $insert_query = "INSERT INTO users (id_user,username, user_email, user_password) VALUES ('$new_user_id','$username', '$email', '$hashed_password')";
+                    $insert_query = "INSERT INTO publisher (id_publisher, publisher_name, publisher_password, logo_publisher) 
+                                     VALUES ('$new_publisher_id', '$username', '$hashed_password', '')"; // You can set a default logo or allow uploading
                     if (mysqli_query($conn, $insert_query)) {
-                        echo "<script>console.log('Insert query done');</script>";
-                        $_SESSION['username'] = $username;  // Menyimpan username di session
-                        header("Location: ..\main_form\mainForm.php");  // Redirect ke halaman utama setelah registrasi berhasil
+                        echo "<script>console.log('Publisher insert query done');</script>";
+                        $_SESSION['username'] = $username; // Save username in session
+                        header("Location: ..\main_form\mainForm.php"); // Redirect to main form
                         exit();
                     } else {
                         $error_message = "Terjadi kesalahan, coba lagi nanti.";
                     }
                 }
-            }  
+            } else {
+                // Regular user registration logic
+                $query = "SELECT * FROM users WHERE user_email = '$email'";
+                $result = mysqli_query($conn, $query);
+                if (mysqli_num_rows($result) > 0) {
+                    $error_message = "Email sudah terdaftar";
+                } else {
+                    $query = "SELECT * FROM users WHERE username = '$username'";
+                    $result = mysqli_query($conn, $query);
+                    if (mysqli_num_rows($result) > 0) {
+                        $error_message = "Username sudah ada";
+                    } else {
+                        $id_query = "SELECT MAX(id_user) AS max_id FROM users";
+                        $id_result = mysqli_query($conn, $id_query);
+                        $id_row = mysqli_fetch_assoc($id_result);
+                        $new_user_id = $id_row['max_id'] + 1;
+                        
+                        // Hash the password before inserting
+                        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+                        $insert_query = "INSERT INTO users (id_user, username, user_email, user_password) 
+                                         VALUES ('$new_user_id', '$username', '$email', '$hashed_password')";
+                        if (mysqli_query($conn, $insert_query)) {
+                            echo "<script>console.log('User insert query done');</script>";
+                            $_SESSION['username'] = $username; // Save username in session
+                            header("Location: ..\main_form\mainForm.php"); // Redirect to main form
+                            exit();
+                        } else {
+                            $error_message = "Terjadi kesalahan, coba lagi nanti.";
+                        }
+                    }
+                }
+            }
         }
     }
 ?>
