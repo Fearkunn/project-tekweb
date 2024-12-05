@@ -161,7 +161,7 @@ include('../auth/cookieValidation.php');
                         <a class="nav-link active" aria-current="page" href="#">Store</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Library</a>
+                        <a class="nav-link" href="../main_form/library.php">Library</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">Community</a>
