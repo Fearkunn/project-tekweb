@@ -6,7 +6,7 @@ if (session_status() === PHP_SESSION_NONE) {
 include('../db_connect/DatabaseConnection.php');
 
 // Periksa apakah user adalah admin
-$is_admin = isset($_SESSION['role'])&& strtolower($_SESSION['role'])=== 'admin';
+$is_admin = isset($_SESSION['role_user'])&& $_SESSION['role_user']=== 'admin';
 
 if (!$is_admin) {
     header('Location: ../auth/login.php'); // Redirect jika bukan admin
