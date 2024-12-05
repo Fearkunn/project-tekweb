@@ -32,7 +32,7 @@ include('../auth/cookieValidation.php');
         font-weight: bold;
         font-size: 1.25rem;
     }
-    .navbar-nav .nav-link:hover {
+    .navbar-abc .nav-link:hover {
         color: #FF4C4C !important; /* Merah terang saat hover */
     }
     .nav-link {
@@ -82,6 +82,15 @@ include('../auth/cookieValidation.php');
         border-color:white;
     }
 
+    .navbar-custom{
+        background: linear-gradient( rgba(200, 14, 49, 0.8), rgba(125, 7, 23, 0.8));
+    }
+
+    .navbar-custom a:hover{
+        background-color: #c51d3a; /* Darker red background on hover */
+        border-radius: 4px; /* Optional: Rounded corners on hover */
+        color: white !important;
+    }
         
         @media (min-height: 1081px) {
             .MainSection {
@@ -105,7 +114,7 @@ include('../auth/cookieValidation.php');
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse justify-content-center" id="navbarScroll">
+            <div class="collapse navbar-collapse justify-content-center navbar-abc" id="navbarScroll">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="#">Store</a>
@@ -137,6 +146,41 @@ include('../auth/cookieValidation.php');
             </div>
         </div>
     </nav>
+
+    <div class="video-section">
+        <video autoplay muted loop class="w-100" style="height: 500px; object-fit: cover; z-index:-1; position:fixed;">
+            <source src="https://shared.fastly.steamstatic.com/store_item_assets/steam/clusters/frontpage/b04ec5ca66d2105a0fccc116/webm_page_bg_indonesian.webm?t=1731704947" type="video/mp4">
+            Browser Anda tidak mendukung video HTML5.
+        </video>
+    </div>
+    <!-- Navbar Kedua -->
+    <nav class="navbar navbar-expand-lg navbar-dark mt-3 mx-auto" style="z-index:2;width:940px; length=66px; padding:0; ">
+        <div class="container navbar-custom">
+            <ul class="navbar-nav mx-auto">
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="#">Toko</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="#">Baru & Patut Dicoba</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="#">Kategori</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="#">Toko Poin</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="#">Berita</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="#">Lab</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>
