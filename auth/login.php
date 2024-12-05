@@ -81,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         min-height: 100vh;
         display: flex;
         flex-direction: column;
-        background-image: url('https://i.im.ge/2024/11/16/zTTkxF.Background.png');
+        background-image: url('../assets/Login.png');
         background-size: cover;
         background-repeat: no-repeat;
         background-position: center top;
