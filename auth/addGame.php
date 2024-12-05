@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['gameName'])) {
     $stmt = $conn->prepare("INSERT INTO games (game_name, game_desc, games_profile, is_admit) VALUES (?, ?, ?, ?)");
     $isAdmit = true; // Default status
     $stmt->bind_param("sssi", $gameName, $gameDesc, $coverImagePath, $isAdmit);
-    
+
     if ($stmt->execute()) {
         $successMessage = "Game berhasil ditambahkan.";
         $lastInsertId = $stmt->insert_id; // Dapatkan ID game terakhir yang ditambahkan
@@ -168,81 +168,18 @@ $games = $conn->query("SELECT id_game, game_name, game_desc, games_profile, is_a
                 
                 // Indikator Status
                 $statusClass = $game['is_admit'] ? 'text-success' : 'text-danger'; // Menggunakan warna hijau untuk approved dan merah untuk rejected
-                $statusText = $game['is_admit'] ? 'Approved' : 'Rejected';
-                echo "<p class='card-text'><small class='$statusClass'>$statusText</small></p>";
+                $statusText = $game['is_admit'] ? 'Sudah Diterima' : 'Belum Diterima';
+                echo "<p class='$statusClass'>$statusText</p>";
 
-                // Tombol Edit
-                echo "<button type='button' class='btn btn-warning' data-bs-toggle='modal' data-bs-target='#editGameModal' data-game-id='" . $game['id_game'] . "' data-game-name='" . $game['game_name'] . "' data-game-desc='" . $game['game_desc'] . "' data-is-admit='" . $game['is_admit'] . "'>Edit</button>";
-                echo "<form action='' method='POST' style='display:inline;'>";
-                echo "<input type='hidden' name='delete_game_id' value='" . $game['id_game'] . "'>";
-                echo "<button type='submit' class='btn btn-danger'>Delete</button>";
+                echo "<form method='POST'>";
+                echo "<button type='submit' name='delete_game_id' value='" . $game['id_game'] . "' class='btn btn-danger btn-sm'>Hapus</button>";
                 echo "</form>";
-                echo "</div>"; // End card-body
-                echo "</div>"; // End card
-                echo "</div>"; // End col-md-4
+                echo "</div></div></div>";
             }
             ?>
         </div>
     </section>
 
-    <!-- Modal untuk Edit Game -->
-    <div class="modal fade" id="editGameModal" tabindex="-1" aria-labelledby="editGameModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editGameModalLabel">Edit Game</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form action="" method="POST">
-                    <div class="modal-body">
-                        <input type="hidden" name="edit_game_id" id="editGameId">
-                        <div class="mb-3">
-                            <label for="editGameName" class="form-label">Nama Game</label>
-                            <input type="text" class="form-control" id="editGameName" name="editGameName" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editGameDesc" class="form-label">Deskripsi Game</label>
-                            <textarea class="form-control" id="editGameDesc" name="editGameDesc" rows="3" required></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editIsAdmit" class="form-label">Status Persetujuan</label>
-                            <select class="form-select" id="editIsAdmit" name="editIsAdmit">
-                                <option value="1">Approved</option>
-                                <option value="0">Rejected</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                        <button type="submit" class="btn btn-primary">Simpan</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kiA5ipJqA0z2fM0beK7MSxk3yH3mVoT9JNRcJYc7FjbTS5L5EEESR9bb8grSTcEK" crossorigin="anonymous"></script>
-    <script>
-        // Menyiapkan data untuk modal edit
-        const editGameModal = document.getElementById('editGameModal');
-        editGameModal.addEventListener('show.bs.modal', event => {
-            const button = event.relatedTarget; // Tombol yang memicu modal
-            const gameId = button.getAttribute('data-game-id');
-            const gameName = button.getAttribute('data-game-name');
-            const gameDesc = button.getAttribute('data-game-desc');
-            const isAdmit = button.getAttribute('data-is-admit');
-
-            // Mengisi nilai pada modal edit
-            const editGameId = editGameModal.querySelector('#editGameId');
-            const editGameName = editGameModal.querySelector('#editGameName');
-            const editGameDesc = editGameModal.querySelector('#editGameDesc');
-            const editIsAdmit = editGameModal.querySelector('#editIsAdmit');
-
-            editGameId.value = gameId;
-            editGameName.value = gameName;
-            editGameDesc.value = gameDesc;
-            editIsAdmit.value = isAdmit;
-        });
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
