@@ -7,83 +7,67 @@ include('../db_connect/DatabaseConnection.php');
 
 // Proses jika form ditambahkan
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['gameName'])) {
+    // Proses tambah game
     $gameName = $_POST['gameName'];
     $gameDesc = $_POST['gameDesc'];
-    $gameGenres = $_POST['gameGenres'];
+    $coverImage = $_FILES['coverImage'];
+    $gameGenres = isset($_POST['gameGenres']) ? $_POST['gameGenres'] : [];
+
+    // Proses upload gambar cover
+    $uploadDir = '../uploads/'; // Pastikan folder ini ada dan dapat ditulis
+    $coverImagePath = $uploadDir . basename($coverImage['name']);
+    move_uploaded_file($coverImage['tmp_name'], $coverImagePath);
+
+    // Simpan game ke database
+    $stmt = $conn->prepare("INSERT INTO games (game_name, game_desc, games_profile, is_admit) VALUES (?, ?, ?, ?)");
+    $isAdmit = true; // Default status
+    $stmt->bind_param("sssi", $gameName, $gameDesc, $coverImagePath, $isAdmit);
     
-    // Ambil id_publisher berdasarkan user_id dari session
-    $userId = $_SESSION['username'];
-    $stmt = $conn->prepare("SELECT id_publisher FROM publisher WHERE publisher_name = ?");
-    $stmt->bind_param("s", $userId);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    
-    if ($result && $result->num_rows > 0) {
-        $row = $result->fetch_assoc();
-        $idPublisher = $row['id_publisher'];
-    } else {
-        die("Publisher tidak ditemukan untuk pengguna ini.");
-    }
-
-    // Proses upload gambar ke ImgBB
-    $coverImageUrl = null;
-    if (isset($_FILES['coverImage']) && $_FILES['coverImage']['error'] == 0) {
-        $apiKey = '635ce58a6dce8d81a73d9f2d6edb0e9f'; // Ganti dengan API key ImgBB kamu
-        $imageData = base64_encode(file_get_contents($_FILES['coverImage']['tmp_name']));
-
-        $postFields = [
-            'key' => $apiKey,
-            'image' => $imageData
-        ];
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, "https://api.imgbb.com/1/upload");
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        
-        $response = curl_exec($ch);
-        curl_close($ch);
-
-        // Mengonversi hasil ke array
-        $responseData = json_decode($response, true);
-        
-        // Cek apakah upload berhasil
-        if (isset($responseData['data']['url'])) {
-            $coverImageUrl = $responseData['data']['url'];
-        } else {
-            die("Gagal mengupload gambar ke ImgBB: " . $responseData['error']['message']);
-        }
-    }
-
-    // Ambil nilai id_game terbesar yang ada di tabel games
-    $result = $conn->query("SELECT MAX(id_game) AS max_id FROM games");
-    $row = $result->fetch_assoc();
-    $maxId = $row['max_id'];
-    $newGameId = $maxId + 1;
-
-    // Simpan game ke database dengan id_game yang baru
-    $stmt = $conn->prepare("INSERT INTO games (id_game, game_name, game_desc, is_admit, release_date, id_publisher, games_profile) VALUES (?, ?, ?, ?, NOW(), ?, ?)");
-    $isAdmit = false; 
-    
-    $stmt->bind_param("issiis", $newGameId, $gameName, $gameDesc, $isAdmit, $idPublisher, $coverImageUrl);
     if ($stmt->execute()) {
-        // Simpan genre
-        if ($gameGenres) {
-            foreach ($gameGenres as $genreId) {
-                $stmt = $conn->prepare("INSERT INTO detail_genre (id_game, id_genre) VALUES (?, ?)");
-                $stmt->bind_param("ii", $newGameId, $genreId);
-                $stmt->execute();
-            }
-        }
         $successMessage = "Game berhasil ditambahkan.";
+        $lastInsertId = $stmt->insert_id; // Dapatkan ID game terakhir yang ditambahkan
+
+        // Simpan genre ke database
+        foreach ($gameGenres as $genreId) {
+            $stmtGenre = $conn->prepare("INSERT INTO game_genre (id_game, id_genre) VALUES (?, ?)");
+            $stmtGenre->bind_param("ii", $lastInsertId, $genreId);
+            $stmtGenre->execute();
+        }
     } else {
-        $errorMessage = "Gagal menyimpan game: " . $conn->error;
+        $errorMessage = "Gagal menambahkan game: " . $conn->error;
+    }
+}
+
+// Proses jika game dihapus
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_game_id'])) {
+    $deleteGameId = $_POST['delete_game_id'];
+    $stmt = $conn->prepare("DELETE FROM games WHERE id_game = ?");
+    $stmt->bind_param("i", $deleteGameId);
+    if ($stmt->execute()) {
+        $successMessage = "Game berhasil dihapus.";
+    } else {
+        $errorMessage = "Gagal menghapus game: " . $conn->error;
+    }
+}
+
+// Proses jika form edit game di-submit
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_game_id'])) {
+    $editGameId = $_POST['edit_game_id'];
+    $gameName = $_POST['editGameName'];
+    $gameDesc = $_POST['editGameDesc'];
+    $isAdmit = isset($_POST['editIsAdmit']) ? true : false; // Misalnya Anda ingin mengedit status persetujuan
+
+    $stmt = $conn->prepare("UPDATE games SET game_name = ?, game_desc = ?, is_admit = ? WHERE id_game = ?");
+    $stmt->bind_param("ssii", $gameName, $gameDesc, $isAdmit, $editGameId);
+    if ($stmt->execute()) {
+        $successMessage = "Game berhasil diperbarui.";
+    } else {
+        $errorMessage = "Gagal memperbarui game: " . $conn->error;
     }
 }
 
 // Ambil data game untuk ditampilkan
-$games = $conn->query("SELECT game_name, game_desc, games_profile FROM games");
+$games = $conn->query("SELECT id_game, game_name, game_desc, games_profile, is_admit FROM games");
 ?>
 
 <!DOCTYPE html>
@@ -172,19 +156,93 @@ $games = $conn->query("SELECT game_name, game_desc, games_profile FROM games");
 
         <!-- Daftar Game -->
         <h3 class="mt-4">Daftar Game:</h3>
-        <ul class="list-group">
+        <div class="row">
             <?php
             while ($game = $games->fetch_assoc()) {
-                echo "<li class='list-group-item'>";
-                echo "<img src='" . $game['games_profile'] . "' alt='Cover' class='img-thumbnail me-2' style='width: 100px;'>";
-                echo "<strong>" . $game['game_name'] . "</strong>";
-                echo "<p>" . $game['game_desc'] . "</p>";
-                echo "</li>";
+                echo "<div class='col-md-4 mb-4'>";
+                echo "<div class='card h-100'>";
+                echo "<img src='" . $game['games_profile'] . "' alt='Cover' class='card-img-top' style='height: 200px; object-fit: cover;'>";
+                echo "<div class='card-body'>";
+                echo "<h5 class='card-title'>" . $game['game_name'] . "</h5>";
+                echo "<p class='card-text'>" . $game['game_desc'] . "</p>";
+                
+                // Indikator Status
+                $statusClass = $game['is_admit'] ? 'text-success' : 'text-danger'; // Menggunakan warna hijau untuk approved dan merah untuk rejected
+                $statusText = $game['is_admit'] ? 'Approved' : 'Rejected';
+                echo "<p class='card-text'><small class='$statusClass'>$statusText</small></p>";
+
+                // Tombol Edit
+                echo "<button type='button' class='btn btn-warning' data-bs-toggle='modal' data-bs-target='#editGameModal' data-game-id='" . $game['id_game'] . "' data-game-name='" . $game['game_name'] . "' data-game-desc='" . $game['game_desc'] . "' data-is-admit='" . $game['is_admit'] . "'>Edit</button>";
+                echo "<form action='' method='POST' style='display:inline;'>";
+                echo "<input type='hidden' name='delete_game_id' value='" . $game['id_game'] . "'>";
+                echo "<button type='submit' class='btn btn-danger'>Delete</button>";
+                echo "</form>";
+                echo "</div>"; // End card-body
+                echo "</div>"; // End card
+                echo "</div>"; // End col-md-4
             }
             ?>
-        </ul>
+        </div>
     </section>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Modal untuk Edit Game -->
+    <div class="modal fade" id="editGameModal" tabindex="-1" aria-labelledby="editGameModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editGameModalLabel">Edit Game</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="" method="POST">
+                    <div class="modal-body">
+                        <input type="hidden" name="edit_game_id" id="editGameId">
+                        <div class="mb-3">
+                            <label for="editGameName" class="form-label">Nama Game</label>
+                            <input type="text" class="form-control" id="editGameName" name="editGameName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editGameDesc" class="form-label">Deskripsi Game</label>
+                            <textarea class="form-control" id="editGameDesc" name="editGameDesc" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editIsAdmit" class="form-label">Status Persetujuan</label>
+                            <select class="form-select" id="editIsAdmit" name="editIsAdmit">
+                                <option value="1">Approved</option>
+                                <option value="0">Rejected</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kiA5ipJqA0z2fM0beK7MSxk3yH3mVoT9JNRcJYc7FjbTS5L5EEESR9bb8grSTcEK" crossorigin="anonymous"></script>
+    <script>
+        // Menyiapkan data untuk modal edit
+        const editGameModal = document.getElementById('editGameModal');
+        editGameModal.addEventListener('show.bs.modal', event => {
+            const button = event.relatedTarget; // Tombol yang memicu modal
+            const gameId = button.getAttribute('data-game-id');
+            const gameName = button.getAttribute('data-game-name');
+            const gameDesc = button.getAttribute('data-game-desc');
+            const isAdmit = button.getAttribute('data-is-admit');
+
+            // Mengisi nilai pada modal edit
+            const editGameId = editGameModal.querySelector('#editGameId');
+            const editGameName = editGameModal.querySelector('#editGameName');
+            const editGameDesc = editGameModal.querySelector('#editGameDesc');
+            const editIsAdmit = editGameModal.querySelector('#editIsAdmit');
+
+            editGameId.value = gameId;
+            editGameName.value = gameName;
+            editGameDesc.value = gameDesc;
+            editIsAdmit.value = isAdmit;
+        });
+    </script>
 </body>
 </html>
