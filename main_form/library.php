@@ -7,8 +7,8 @@ if (session_status() === PHP_SESSION_NONE) {
 include('../db_connect/DatabaseConnection.php');
 
 // Check if user is logged in
-$is_logged_in = isset($_SESSION['user_id']) && !empty($_SESSION['user_id']);
-$user_id = $is_logged_in ? $_SESSION['user_id'] : '';
+$is_logged_in = isset($_SESSION['username']) && !empty($_SESSION['username']);
+$user_id = $is_logged_in ? ($_SESSION['user_id'] ?? '') : '';
 
 // Redirect to login page if not logged in
 if (!$is_logged_in) {
