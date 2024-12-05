@@ -229,7 +229,7 @@
                         <label for="password" class="form-label">Password</label>
                         <input type="password" class="form-control" id="password" name="user_password" placeholder="Enter your password" required>
                     </div>
-                    <div class="mb-3">
+                    <div class="mb-3 pb-3">
                         <label for="confirm_password" class="form-label">Confirm Password</label>
                         <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Confirm your password" required>
                     </div>
