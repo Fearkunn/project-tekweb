@@ -17,6 +17,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['gameName'])) {
     $coverImage = $_FILES['coverImage'];
     $gameGenres = isset($_POST['gameGenres']) ? $_POST['gameGenres'] : [];
 
+    // Ambil id_publisher berdasarkan user_id dari session
+    $userId = $_SESSION['username'];
+    $stmt = $conn->prepare("SELECT id_publisher FROM publisher WHERE publisher_name = ?");
+    $stmt->bind_param("s", $userId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result && $result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $idPublisher = $row['id_publisher'];
+    } else {
+        die("Publisher tidak ditemukan untuk pengguna ini.");
+    }
+
     // Proses upload gambar cover ke ImgBB
     $coverImagePath = null;
 
@@ -54,9 +68,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['gameName'])) {
 
     // Simpan game ke database jika gambar berhasil diupload
     if ($coverImagePath) {
-        $stmt = $conn->prepare("INSERT INTO games (game_name, game_desc, games_image, is_admit) VALUES (?, ?, ?, ?)");
-        $isAdmit = true; // Default status
-        $stmt->bind_param("sssi", $gameName, $gameDesc, $coverImagePath, $isAdmit);
+        $stmt = $conn->prepare("INSERT INTO games (id_game, game_name, game_desc, is_admit, release_date, id_publisher, games_image) VALUES (?, ?, ?, ?, NOW(), ?, ?)");
+        $isAdmit = false; // Default status
+        $stmt->bind_param("issiis", $newGameId, $gameName, $gameDesc, $isAdmit, $idPublisher, $coverImagePath);
 
         if ($stmt->execute()) {
             $lastInsertId = $stmt->insert_id; // Dapatkan ID game terakhir yang ditambahkan
