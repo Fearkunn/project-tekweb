@@ -9,7 +9,7 @@ include('../db_connect/DatabaseConnection.php');
 $game_id = isset($_GET['game_id']) ? intval($_GET['game_id']) : 0;
 
 // Fetch game details along with publisher, genres, and reviews
-$query_game = "SELECT g.game_name, g.game_desc, g.release_date, g.like_count, g.games_profile, p.publisher_name, p.publisher_logo 
+$query_game = "SELECT g.game_name, g.game_desc, g.release_date, g.like_count, g.games_image, p.publisher_name, p.publisher_logo 
                FROM games g
                JOIN publisher p ON g.id_publisher = p.id_publisher
                WHERE g.id_game = ?";

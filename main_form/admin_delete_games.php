@@ -52,12 +52,17 @@ if (isset($_POST['search'])) {
 // Hapus game
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete') {
     $gameId = intval($_POST['game_id']);
-    $deleteQuery = "DELETE FROM games WHERE id_game = ?";
-    $deleteStmt = $conn->prepare($deleteQuery);
-    $deleteStmt->bind_param("i", $gameId);
-    if ($deleteStmt->execute()) {
-        header('Location: ' . $_SERVER['PHP_SELF']);
-        exit;
+    $stmt = $conn->prepare("DELETE FROM detail_genre WHERE id_game = ?");
+    $stmt->bind_param("i", $gameId);
+    if ($stmt->execute()) {
+        $successMessage = "Detail berhasil dihapus.";
+    } else {
+        $errorMessage = "Gagal menghapus detail: " . $conn->error;
+    }
+    $stmt = $conn->prepare("DELETE FROM games WHERE id_game = ?");
+    $stmt->bind_param("i", $gameId);
+    if ($stmt->execute()) {
+        $successMessage = "Game berhasil dihapus.";
     } else {
         $errorMessage = "Gagal menghapus game: " . $conn->error;
     }

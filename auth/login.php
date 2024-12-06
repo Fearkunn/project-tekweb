@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $result = $stmt->get_result();
     $user = $result->fetch_assoc();
 
-    if($user){
+    if($user && password_verify($password, $user['user_password'])){
         $_SESSION['user_id'] = $user['id_publisher'];
         $_SESSION['username'] = $user['publisher_name'];
         header("Location: ../main_form/mainForm.php");
