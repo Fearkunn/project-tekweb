@@ -171,7 +171,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
         /* Efek saat hover */
-        .register-btn:hover {
+    .register-btn:hover {
         background: linear-gradient(90deg, #004ba0, #1b73e8); /* Gradien berbalik */
         transform: scale(1.05); /* Sedikit memperbesar tombol */
     }
@@ -202,24 +202,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <section id="login-section">
         <div class="container">
             <div class="login-box">
-                <h2>Login</h2>
+                <h2 class="pb-3">Login Akun</h2>
                 <form action="#" method="POST">
                     <div class="mb-3">
                         <label for="username" class="form-label">Username</label>
-                        <input type="text" class="form-control" id="username" name="username" placeholder="Enter your username" required>
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Masukkan username Anda" required>
                     </div>
                     <div class="mb-3">
                         <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" name="user_password" placeholder="Enter your password" required>
+                        <input type="password" class="form-control" id="password" name="user_password" placeholder="Masukkan password Anda" required>
                     </div>
                     <div class="form-check mb-3">
                         <input type="checkbox" class="form-check-input" id="remember" name="remember_me">
-                        <label class="form-check-label" for="remember">Remember Me</label>
+                        <label class="form-check-label" for="remember">Ingat Saya</label>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Login</button>
                 </form>
-                <div class="text-center mt-3">
-                    <a href="..\auth\forgotPassword.php" class="text-decoration-none text-info">Forgot Password?</a>
+                <div class="text-center mt-4">
+                    <a href="..\auth\forgotPassword.php" class="text-decoration-none text-info">Lupa Password?</a>
                 </div>
             </div>
         </div>
@@ -253,8 +253,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <!-- Footer -->
     <footer class="text-center text-white" style="background-color: #1C1C1C;">
         <div class="container">
-            <p>© 2024 UAP Corporation. Hak cipta dilindungi Undang-Undang.</p>
-            <p>Semua game gratis</p>
+            <p>© 2024 UAP Corporation. Hak cipta dilindungi Undang-Undang. Semua game gratis</p>
         </div>
 
     </footer>

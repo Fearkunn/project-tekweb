@@ -9,7 +9,7 @@
         $confirm_password = mysqli_real_escape_string($conn, $_POST['confirm_password']);
 
         if ($confirm_password !== $password) {
-            $error_message = "Password Tidak Sama";
+            $error_message = "Password Tidak Sama.";
         } else {
             // Check if the email contains "@publisher"
             if (strpos($email, '@publisher') !== false) {
@@ -96,7 +96,7 @@
         min-height: 100vh;
         display: flex;
         flex-direction: column;
-        background-image: url('https://i.im.ge/2024/11/16/zTTkxF.Background.png');
+        background-image: url('../assets/Background.png');
         background-size: cover;
         background-repeat: no-repeat;
         background-position: center top;
@@ -215,28 +215,28 @@
     <section id="register-section">
         <div class="container">
             <div class="register-box">
-                <h2>Register</h2>
+                <h2 class="pb-3">Register Akun</h2>
                 <form action="#" method="POST">
                     <div class="mb-3">
                         <label for="username" class="form-label">Username</label>
-                        <input type="text" class="form-control" id="username" name="username" placeholder="Enter your username" required>
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Masukkan username Anda" required>
                     </div>
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" name="user_email" placeholder="Enter your email" required>
+                        <input type="email" class="form-control" id="email" name="user_email" placeholder="Masukkan email Anda" required>
                     </div>
                     <div class="mb-3">
                         <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" name="user_password" placeholder="Enter your password" required>
+                        <input type="password" class="form-control" id="password" name="user_password" placeholder="Masukkan password Anda" required>
                     </div>
                     <div class="mb-3 pb-3">
                         <label for="confirm_password" class="form-label">Confirm Password</label>
-                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Confirm your password" required>
+                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Konfirmasi password Anda" required>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Register</button>
                 </form>
-                <div class="text-center mt-3">
-                    <a href="..\auth\Login.php" class="text-decoration-none text-info">Already have an account? Login</a>
+                <div class="text-center mt-4">
+                    <a href="..\auth\Login.php" class="text-decoration-none text-info">Sudah punya akun? Login</a>
                 </div>
             </div>
         </div>
@@ -245,10 +245,9 @@
     
 
     <!-- Footer -->
-    <footer class="text-center text-white p-4" style="background-color: #1C1C1C;">
+    <footer class="text-center text-white" style="background-color: #1C1C1C;">
         <div class="container">
-            <p>© 2024 UAP Corporation. Hak cipta dilindungi Undang-Undang.</p>
-            <p>Semua game gratis</p>
+            <p>© 2024 UAP Corporation. Hak cipta dilindungi Undang-Undang. Semua game gratis</p>
         </div>
     </footer>
 

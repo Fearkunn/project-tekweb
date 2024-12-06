@@ -93,6 +93,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['gameName'])) {
 // Proses jika game dihapus
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_game_id'])) {
     $deleteGameId = $_POST['delete_game_id'];
+    $stmt = $conn->prepare("DELETE FROM detail_genre WHERE id_game = ?");
+    $stmt->bind_param("i", $deleteGameId);
+    if ($stmt->execute()) {
+        $successMessage = "Detail berhasil dihapus.";
+    } else {
+        $errorMessage = "Gagal menghapus detail: " . $conn->error;
+    }
     $stmt = $conn->prepare("DELETE FROM games WHERE id_game = ?");
     $stmt->bind_param("i", $deleteGameId);
     if ($stmt->execute()) {
@@ -132,36 +139,64 @@ $games = $conn->query("SELECT id_game, game_name, game_desc, games_image, is_adm
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <title>Add Game</title>
     <style>
-        .navbar { background-color: #333; color: #fff; padding: 10px; }
-        .navbar-brand { font-weight: bold; font-size: 1.5rem; }
-        .icon-plus { font-size: 2rem; color: #007bff; }
-        .card { cursor: pointer; transition: transform 0.2s; }
-        .card:hover { transform: scale(1.05); }
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        background-color: #2C2C2C;
+
+    }
+    #add-game-section{
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        background-image: url('../assets/Background.png');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center top;
+        margin: 0;
+        padding: 0;
+    }
+    .navbar {
+        background-color: #2C2C2C;
+        font-family: Arial, sans-serif;
+        padding: 10px 20px;
+    }
+    .navbar-brand, .nav-link {
+        color: #FFFFFF !important;
+    }
+    .navbar-brand {
+        font-weight: bold;
+        font-size: 1.5rem;
+    }
+    .btn {
+        cursor: pointer; 
+        transition: transform 0.2s; 
+    }
+    .btn:hover { 
+        transform: scale(1.05); 
+    }
     </style>
 </head>
 <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
-            <a class="navbar-brand" href="../main_form/mainForm.php">
-                <img src="../assets/UapLogoText.svg" alt="Logo">
+            <a class="navbar-brand mx-auto" href="../main_form/mainForm.php">
+                <img src="../assets/UapLogoText.svg" alt="UapLogo">
             </a>
         </div>
     </nav>
 
-    <section class="container mt-5">
+    <section id="add-game-section">
+    <div class="container pt-5">
         <!-- Tombol Tambah Game -->
-        <div class="row justify-content-left" style="width:16rem;height:17rem;">
-            <div class="card text-center" id="gameCard" data-bs-toggle="modal" data-bs-target="#gameModal">
-                <div class="card-body d-flex justify-content-center align-items-center">
-                    <i class="bi bi-plus-circle icon-plus"></i>
-                </div>
-            </div>
-        </div>
+        <div class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#gameModal">Tambahkan game baru</div>
+        
 
         <!-- Modal untuk tambah game -->
         <div class="modal fade" id="gameModal" tabindex="-1" aria-labelledby="gameModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="gameModalLabel">Tambah Game</h5>
@@ -170,7 +205,7 @@ $games = $conn->query("SELECT id_game, game_name, game_desc, games_image, is_adm
                     <form action="" method="POST" enctype="multipart/form-data">
                         <div class="modal-body">
                             <div class="mb-3">
-                                <label for="coverImage" class="form-label">Gambar Cover</label>
+                                <label for="coverImage" class="form-label">Gambar Game</label>
                                 <input type="file" class="form-control" id="coverImage" name="coverImage" accept="image/*" required>
                             </div>
                             <div class="mb-3">
@@ -184,16 +219,44 @@ $games = $conn->query("SELECT id_game, game_name, game_desc, games_image, is_adm
                             <div class="mb-3">
                                 <label for="gameGenres" class="form-label">Pilih Genre</label>
                                 <div>
-                                    <?php
-                                    // Ambil genre dari database
-                                    $result = $conn->query("SELECT id_genre, genre_name FROM genre");
-                                    while ($row = $result->fetch_assoc()) {
-                                        echo "<div class='form-check'>";
-                                        echo "<input class='form-check-input' type='checkbox' name='gameGenres[]' value='" . $row['id_genre'] . "' id='genre" . $row['id_genre'] . "'>";
-                                        echo "<label class='form-check-label' for='genre" . $row['id_genre'] . "'>" . $row['genre_name'] . "</label>";
-                                        echo "</div>";
-                                    }
-                                    ?>
+                                <?php
+                                // Ambil genre dari database
+                                $result = $conn->query("SELECT id_genre, genre_name FROM genre");
+                                $genres = [];
+
+                                // Simpan semua genre dalam array untuk pemrosesan
+                                while ($row = $result->fetch_assoc()) {
+                                    $genres[] = $row;
+                                }
+
+                                // Hitung jumlah genre
+                                $totalGenres = count($genres);
+                                $half = ceil($totalGenres / 2); // Tentukan titik tengah untuk membagi dua kolom
+
+                                echo "<div class='row'>";
+
+                                // Kolom pertama
+                                echo "<div class='col-md-6'>";
+                                for ($i = 0; $i < $half; $i++) {
+                                    echo "<div class='form-check'>";
+                                    echo "<input class='form-check-input' type='checkbox' name='gameGenres[]' value='" . $genres[$i]['id_genre'] . "' id='genre" . $genres[$i]['id_genre'] . "'>";
+                                    echo "<label class='form-check-label' for='genre" . $genres[$i]['id_genre'] . "'>" . $genres[$i]['genre_name'] . "</label>";
+                                    echo "</div>";
+                                }
+                                echo "</div>";
+
+                                // Kolom kedua
+                                echo "<div class='col-md-6'>";
+                                for ($i = $half; $i < $totalGenres; $i++) {
+                                    echo "<div class='form-check'>";
+                                    echo "<input class='form-check-input' type='checkbox' name='gameGenres[]' value='" . $genres[$i]['id_genre'] . "' id='genre" . $genres[$i]['id_genre'] . "'>";
+                                    echo "<label class='form-check-label' for='genre" . $genres[$i]['id_genre'] . "'>" . $genres[$i]['genre_name'] . "</label>";
+                                    echo "</div>";
+                                }
+                                echo "</div>";
+
+                                echo "</div>";
+                                ?>
                                 </div>
                             </div>
                         </div>
@@ -207,11 +270,11 @@ $games = $conn->query("SELECT id_game, game_name, game_desc, games_image, is_adm
         </div>
 
         <!-- Daftar Game -->
-        <h3 class="mt-4">Daftar Game:</h3>
-        <div class="row">
+        <h3 class="mt-4 text-light">Daftar Game:</h3>
+        <div class="row row-cols-3">
             <?php
             while ($game = $games->fetch_assoc()) {
-                echo "<div class='col-md-4 mb-4'>";
+                echo "<div class='col mb-4 mt-3'>";
                 echo "<div class='card h-100'>";
                 echo "<img src='" . $game['games_image'] . "' alt='Cover' class='card-img-top' style='height: 200px; object-fit: cover;'>";
                 echo "<div class='card-body'>";
@@ -230,6 +293,7 @@ $games = $conn->query("SELECT id_game, game_name, game_desc, games_image, is_adm
             }
             ?>
         </div>
+    </div>
     </section>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

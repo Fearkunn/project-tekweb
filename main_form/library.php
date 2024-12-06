@@ -19,7 +19,7 @@ if (!$is_logged_in) {
 // Fetch user's games from the database
 $order_by = isset($_GET['sort']) && $_GET['sort'] === 'asc' ? 'ASC' : 'DESC'; // Default sorting
 $query = "
-    SELECT l.id_library, g.game_name, g.games_profile
+    SELECT l.id_library, g.game_name, g.games_image
     FROM library l
     INNER JOIN games g ON l.id_game = g.id_game
     WHERE l.id_user = ?
@@ -113,7 +113,7 @@ $library = $result->fetch_all(MYSQLI_ASSOC);
                 <?php foreach ($library as $game): ?>
                     <div class="col-md-3 mb-4">
                         <div class="card game-card">
-                            <img src="<?php echo htmlspecialchars($game['games_profile']); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($game['game_name']); ?>">
+                            <img src="<?php echo htmlspecialchars($game['games_image']); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($game['game_name']); ?>">
                             <div class="card-body">
                                 <h5 class="card-title"><?php echo htmlspecialchars($game['game_name']); ?></h5>
                             </div>

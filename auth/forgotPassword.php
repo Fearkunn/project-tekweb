@@ -129,11 +129,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         color: white;
     }
 
-    #register-section {
+    #forgot-password-section {
         min-height: 100vh;
         display: flex;
         flex-direction: column;
-        background-image: url('https://i.im.ge/2024/11/16/zTTkxF.Background.png');
+        background-image: url('../assets/Background.png');
         background-size: cover;
         background-repeat: no-repeat;
         background-position: center top;
@@ -163,7 +163,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         justify-content: center;
     }
 
-    .register-box {
+    .forgot-password-box {
         background-color: rgba(0, 0, 0, 0.8);
         padding: 30px 25px;
         border-radius: 10px;
@@ -252,38 +252,37 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <section id="forgot-password-section">
         <div class="container">
             <div class="forgot-password-box">
-                <h2>Forgot Password</h2>
+                <h2 class="pb-3">Lupa Password</h2>
                 <?php if ($_SESSION['step'] == 1): ?>
                     <form action="#" method="POST">
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="user_email" placeholder="Enter your email" required>
+                            <input type="email" class="form-control" id="email" name="user_email" placeholder="Masukkan email Anda" required>
                         </div>
-                        <button type="submit" class="btn btn-primary w-100">Submit</button>
+                        <button type="submit" class="btn btn-primary w-100">Kirim</button>
                     </form>
                 <?php elseif ($_SESSION['step'] == 2): ?>
                     <form action="#" method="POST">
                         <div class="mb-3">
                             <label for="Kode" class="form-label">Kode</label>
-                            <input type="text" class="form-control" id="Kode" name="Kode" placeholder="Enter your Kode" required>
+                            <input type="text" class="form-control" id="Kode" name="Kode" placeholder="Masukkan kode" required>
                         </div>
-                        <button type="submit" class="btn btn-primary w-100">Submit</button>
+                        <button type="submit" class="btn btn-primary w-100">Kirim</button>
                     </form>
                 <?php endif; ?>
 
 
-                <div class="text-center mt-3">
-                    <a href="..\auth\Login.php" class="text-decoration-none text-info">Remember your password? Login</a>
+                <div class="text-center mt-4">
+                    <a href="..\auth\Login.php" class="text-decoration-none text-info">Ingat password Anda? Login</a>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="text-center text-white p-4" style="background-color: #1C1C1C;">
+    <footer class="text-center text-white" style="background-color: #1C1C1C;">
         <div class="container">
-            <p>© 2024 UAP Corporation. Hak cipta dilindungi Undang-Undang.</p>
-            <p>Semua game gratis</p>
+            <p>© 2024 UAP Corporation. Hak cipta dilindungi Undang-Undang. Semua game gratis</p>
         </div>
     </footer>
 
