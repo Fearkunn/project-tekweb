@@ -160,28 +160,28 @@ include('../auth/cookieValidation.php');
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="#">Store</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="../main_form/library.php">Library</a>
-                    </li>
+                    <?php if (!$is_publisher): ?>
+                        <li class="nav-item">
+                            <a class="nav-link" href="../main_form/library.php">Library</a>
+                        </li>
+                    <?php elseif ($is_publisher): ?>
+                        <li class="nav-item">
+                            <a href="../main_form/addGame.php" class="nav-link">Add Game</a>
+                        </li>
+                    <?php endif; ?>  
                     <li class="nav-item">
                         <a class="nav-link" href="#">Community</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link disabled" aria-disabled="true" href="#"><?php echo $username; ?></a>
-                    </li>
-                    <?php if ($is_publisher): ?>
-                        <li class="nav-item">
-                            <a href="../main_form/addGame.php" class="nav-link">Add Game</a>
-                        </li>
-                    <?php endif; ?>    
+                    </li>   
                 </ul>
                 <?php if ($is_logged_in): ?>
                     <div class="dropdown" style="background-color: #2C2C2C;">
-                        <button class=" btn btn-secondary dropdown-toggle bi bi-person-circle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" style="font-size: 1.8rem; background-color: #2C2C2C;" aria-expanded="false"><?php echo " ",$username; ?></button>
+                        <button class=" btn btn-secondary dropdown-toggle bi bi-person-circle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" style="font-size: 1.3rem; background-color: #2C2C2C;" aria-expanded="false"><?php echo " ",$username; ?></button>
                         <ul class="dropdown-menu bg-dark" aria-labelledby="dropdownMenuButton1">
                             <li><a class="dropdown-item" href="userProfile.php">Profile</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="../auth/logout.php">Change account</a></li>
                             <li><a class="dropdown-item" href="../auth/logout.php">Logout</a></li>
                         </ul>
                     </div>
