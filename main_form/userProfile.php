@@ -7,8 +7,8 @@ if (session_status() === PHP_SESSION_NONE) {
 include('../db_connect/DatabaseConnection.php');
 
 // Check if user is logged in
-$is_logged_in = isset($_SESSION['user_id']) && !empty($_SESSION['user_id']);
-$user_id = $is_logged_in ? $_SESSION['user_id'] : '';
+$is_logged_in = isset($_SESSION['username']) && !empty($_SESSION['username']);
+$user_id = $is_logged_in ? $_SESSION['username'] : '';
 
 if (!$is_logged_in) {
     header("Location: ../auth/login.php");
@@ -17,29 +17,61 @@ if (!$is_logged_in) {
 
 // Fetch user profile and role
 $user_query = "
-    SELECT username, user_profile, role_user 
+    SELECT username, user_profile, role_user
     FROM users 
-    WHERE id_user = ?
+    WHERE username = ?
 ";
 $user_stmt = $conn->prepare($user_query);
-$user_stmt->bind_param("i", $user_id);
+$user_stmt->bind_param("s", $user_id);
 $user_stmt->execute();
 $user_result = $user_stmt->get_result();
-$user_data = $user_result->fetch_assoc();
 
-// Fetch total number of games owned by the user
-$total_games_query = "
-    SELECT COUNT(*) AS total_games
-    FROM library
-    WHERE id_user = ?
-";
-$total_games_stmt = $conn->prepare($total_games_query);
-$total_games_stmt->bind_param("i", $user_id);
-$total_games_stmt->execute();
-$total_games_result = $total_games_stmt->get_result();
-$total_games_data = $total_games_result->fetch_assoc();
+if ($user_result->num_rows > 0) {
+    $user_data = $user_result->fetch_assoc();
+    $profile_picture = !empty($user_data['user_profile']) && filter_var($user_data['user_profile'], FILTER_VALIDATE_URL)
+        ? $user_data['user_profile']
+        : "../assets/login.png";
+    $role = htmlspecialchars($user_data['role_user']);
+    $username = htmlspecialchars($user_data['username']);
+    // Fetch total number of games owned by the user
+    $total_games_query = "
+        SELECT COUNT(*) AS total_games
+        FROM library
+        WHERE id_user = (
+            SELECT id_user 
+            FROM users 
+            WHERE username = ?
+        )
+    ";
+    $total_games_stmt = $conn->prepare($total_games_query);
+    $total_games_stmt->bind_param("i", $user_id);
+    $total_games_stmt->execute();
+    $total_games_result = $total_games_stmt->get_result();
+    $total_games_data = $total_games_result->fetch_assoc();
+    $total_games = $total_games_data['total_games'];
+} else {
+    // If user_id is not found in users table, check publisher table
+    $publisher_query = "
+        SELECT publisher_name, publisher_logo 
+        FROM publisher 
+        WHERE publisher_name = ?
+    ";
+    $publisher_stmt = $conn->prepare($publisher_query);
+    $publisher_stmt->bind_param("s", $user_id);
+    $publisher_stmt->execute();
+    $publisher_result = $publisher_stmt->get_result();
 
-$total_games = $total_games_data['total_games'];
+    if ($publisher_result->num_rows > 0) {
+        // If user_id is found in publisher table
+        $publisher_data = $publisher_result->fetch_assoc();
+        $profile_picture = !empty($publisher_data['publisher_logo']) && filter_var($publisher_data['publisher_logo'], FILTER_VALIDATE_URL)
+        ? $publisher_data['publisher_logo']
+        : "../assets/login.png";
+        $role = "PUBLISHER";
+        $username = htmlspecialchars($publisher_data['publisher_name']);
+        $total_games = "N/A"; // Publisher doesn't have a games library
+    }
+}
 ?>
 <!doctype html>
 <html lang="en">
@@ -92,14 +124,9 @@ $total_games = $total_games_data['total_games'];
             
     <!-- User Profile Section -->
         <div class="user-profile">
-        <?php if (!empty($user_data['user_profile']) && filter_var($user_data['user_profile'], FILTER_VALIDATE_URL)): ?>
-            <img src="<?php echo htmlspecialchars($user_data['user_profile'], ENT_QUOTES, 'UTF-8'); ?>" alt="User Profile">
-        <?php else: ?>
-            <img src="../assets/login.png" alt="Default Profile">
-        <?php endif; ?>
-
-            <h1><?php echo htmlspecialchars($user_data['username']); ?></h1>
-            <p>Role: <?php echo htmlspecialchars($user_data['role_user']); ?></p>
+            <img src="<?php echo $profile_picture; ?>" alt="Profile Picture">
+            <h1><?php echo $username; ?></h1>
+            <p>Role: <?php echo $role; ?></p>
         </div>
 
         <div class="text-center">

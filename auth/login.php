@@ -1,3 +1,4 @@
+
 <?php
 session_start();
 include('../db_connect/DatabaseConnection.php');
@@ -18,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $result = $stmt->get_result();
     $user = $result->fetch_assoc();
 
-    if($user && password_verify($password, $user['user_password'])){
+    if($user && password_verify($password, $user['publisher_password'])){
         $_SESSION['user_id'] = $user['id_publisher'];
         $_SESSION['username'] = $user['publisher_name'];
         header("Location: ../main_form/mainForm.php");
