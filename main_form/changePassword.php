@@ -1,5 +1,7 @@
 <?php
 session_start();
+
+// Jika tidak ada sesi username, arahkan ke login
 if (!isset($_SESSION['username'])) {
     header("Location: ../auth/login.php");
     exit();
@@ -9,7 +11,42 @@ include('../db_connect/DatabaseConnection.php');
 
 $error = '';
 $success = '';
+$current_username = $_SESSION['username'];
 
+// Periksa apakah username ada di tabel `users` atau `publisher`
+$user_query = "SELECT user_password FROM users WHERE username = ?";
+$user_stmt = $conn->prepare($user_query);
+$user_stmt->bind_param("s", $current_username);
+$user_stmt->execute();
+$user_result = $user_stmt->get_result();
+
+if ($user_result->num_rows > 0) {
+    // Jika username ditemukan di tabel `users`
+    $table = "users";
+    $password_column = "user_password";
+    $update_query = "UPDATE users SET user_password = ? WHERE username = ?";
+} else {
+    // Periksa di tabel `publisher`
+    $publisher_query = "SELECT publisher_password FROM publisher WHERE publisher_name = ?";
+    $publisher_stmt = $conn->prepare($publisher_query);
+    $publisher_stmt->bind_param("s", $current_username);
+    $publisher_stmt->execute();
+    $publisher_result = $publisher_stmt->get_result();
+
+    if ($publisher_result->num_rows > 0) {
+        // Jika username ditemukan di tabel `publisher`
+        $table = "publisher";
+        $password_column = "publisher_password";
+        $update_query = "UPDATE publisher SET publisher_password = ? WHERE publisher_name = ?";
+    } else {
+        // Jika username tidak ditemukan di kedua tabel, logout
+        session_destroy();
+        header("Location: ../auth/login.php");
+        exit();
+    }
+}
+
+// Jika metode POST digunakan untuk mengubah password
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $current_password = $_POST['current_password'];
     $new_password = $_POST['new_password'];
@@ -20,20 +57,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($new_password !== $confirm_password) {
         $error = "New passwords do not match!";
     } else {
-        $username = $_SESSION['username'];
-        $query = "SELECT user_password FROM users WHERE username = ?";
-        $stmt = $conn->prepare($query);
-        $stmt->bind_param("s", $username);
+        // Ambil password saat ini dari database
+        $stmt = $conn->prepare("SELECT $password_column FROM $table WHERE " . ($table === "users" ? "username = ?" : "publisher_name = ?"));
+        $stmt->bind_param("s", $current_username);
         $stmt->execute();
         $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
             $user = $result->fetch_assoc();
-            if (password_verify($current_password, $user['user_password'])) {
+            if (password_verify($current_password, $user[$password_column])) {
+                // Hash password baru
                 $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
-                $update_query = "UPDATE users SET user_password = ? WHERE username = ?";
+
+                // Update password
                 $update_stmt = $conn->prepare($update_query);
-                $update_stmt->bind_param("ss", $hashed_password, $username);
+                $update_stmt->bind_param("ss", $hashed_password, $current_username);
                 if ($update_stmt->execute()) {
                     $success = "Password successfully updated!";
                 } else {
@@ -42,6 +80,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 $error = "Incorrect current password!";
             }
+        } else {
+            $error = "User not found!";
         }
     }
 }
