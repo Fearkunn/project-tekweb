@@ -1,67 +1,102 @@
 <?php
-// Kode sebelumnya untuk memulai session dan koneksi database
+// Memulai sesi dan koneksi database
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-include('../db_connect/DatabaseConnection.php'); // Pastikan ini sesuai dengan jalur file Anda
+include('../db_connect/DatabaseConnection.php'); // Sesuaikan dengan jalur file Anda
 
-define('IMGBB_URL', 'https://api.imgbb.com/1/upload'); // Definisikan URL ImgBB
+define('IMGBB_URL', 'https://api.imgbb.com/1/upload'); // URL ImgBB API
+define('IMGBB_API_KEY', '635ce58a6dce8d81a73d9f2d6edb0e9f'); // Ganti dengan API Key Anda
 
-// Proses pengunggahan file
+$errorMessage = '';
+$success = '';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['user_profile'])) {
     $user_profile = $_FILES['user_profile'];
     $username = $_SESSION['username'];
-    $user_id = $_SESSION['user_id'];
-    
+
     // Validasi apakah file adalah gambar
-    if ($user_profile['error'] == 0) {
+    if ($user_profile['error'] === 0 && getimagesize($user_profile['tmp_name']) !== false) {
         $ImagePath = null;
 
         // Menggunakan ImgBB API untuk mengupload gambar
         $imageData = base64_encode(file_get_contents($user_profile['tmp_name']));
-        
-        // Prepare data for ImgBB
+
+        // Data untuk ImgBB
         $data = [
             'image' => $imageData,
-            'key' => '635ce58a6dce8d81a73d9f2d6edb0e9f' // Ganti dengan API Key ImgBB Anda
+            'key' => IMGBB_API_KEY
         ];
 
-        // Use cURL to upload the image
+        // Kirim data ke ImgBB menggunakan cURL
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, IMGBB_URL);
-        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
-        // Execute cURL and get the response
         $response = curl_exec($ch);
         if (curl_errno($ch)) {
             $errorMessage = 'cURL Error: ' . curl_error($ch);
         }
         curl_close($ch);
 
-        // Decode the response
+        // Decode respons dari ImgBB
         $responseData = json_decode($response, true);
 
         if (isset($responseData['data']['url'])) {
-            $ImagePath = $responseData['data']['url']; // Get the URL of the uploaded image
+            $ImagePath = $responseData['data']['url']; // URL gambar yang diunggah
         } else {
-            $errorMessage = "Gagal mengupload gambar: " . (isset($responseData['message']) ? $responseData['message'] : 'Unknown error');
+            $errorMessage = "Gagal mengupload gambar: " . ($responseData['error']['message'] ?? 'Unknown error');
         }
     } else {
-        $errorMessage = "Gambar tidak valid.";
+        $errorMessage = "File tidak valid. Harap unggah gambar.";
     }
 
-    // Simpan path gambar ke database
+    // Simpan URL gambar ke database
     if ($ImagePath) {
-        $update_query = "UPDATE users SET user_profile = ? WHERE id_user = ?";
-        $update_stmt = $conn->prepare($update_query);
-        $update_stmt->bind_param("si", $ImagePath, $_SESSION['user_id']);
-        if ($update_stmt->execute()) { // Memanggil execute sebagai fungsi
-            $success = "Foto profil berhasil diperbarui!";
+        // Cek apakah username ada di tabel `users` atau `publisher`
+        $table = '';
+        $column = '';
 
+        // Cek di tabel `users`
+        $user_query = "SELECT id_user FROM users WHERE username = ?";
+        $user_stmt = $conn->prepare($user_query);
+        $user_stmt->bind_param("s", $username);
+        $user_stmt->execute();
+        $user_result = $user_stmt->get_result();
+
+        if ($user_result->num_rows > 0) {
+            // Username ditemukan di tabel `users`
+            $table = "users";
+            $column = "id_user";
         } else {
-            $error = "Gagal memperbarui foto profil di database.";
+            // Periksa di tabel `publisher`
+            $publisher_query = "SELECT id_publisher FROM publisher WHERE publisher_name = ?";
+            $publisher_stmt = $conn->prepare($publisher_query);
+            $publisher_stmt->bind_param("s", $username);
+            $publisher_stmt->execute();
+            $publisher_result = $publisher_stmt->get_result();
+
+            if ($publisher_result->num_rows > 0) {
+                // Username ditemukan di tabel `publisher`
+                $table = "publisher";
+                $column = "id_publisher";
+            }
+        }
+
+        if ($table) {
+            // Jika ditemukan di `users`, simpan di user_profile, jika di `publisher`, simpan di publisher_logo
+            $update_query = "UPDATE $table SET " . ($table == 'users' ? 'user_profile' : 'publisher_logo') . " = ? WHERE $column = ?";
+            $update_stmt = $conn->prepare($update_query);
+            $update_stmt->bind_param("si", $ImagePath, $_SESSION['user_id']);
+            if ($update_stmt->execute()) {
+                $success = "Foto profil berhasil diperbarui!";
+            } else {
+                $errorMessage = "Gagal memperbarui foto profil di database.";
+            }
+        } else {
+            $errorMessage = "Akun tidak ditemukan di sistem.";
         }
     }
 }
@@ -87,10 +122,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['user_profile'])) {
     <div class="container">
         <div class="form-box">
             <h2>Change Profile Picture</h2>
-            <?php if (isset($errorMessage)): ?>
+            <?php if ($errorMessage): ?>
                 <div class="alert alert-danger"><?php echo $errorMessage; ?></div>
             <?php endif; ?>
-            <?php if (isset($success)): ?>
+            <?php if ($success): ?>
                 <div class="alert alert-success"><?php echo $success; ?></div>
                 <a href="userProfile.php" class="btn btn-secondary">Back to Profile</a>
             <?php endif; ?>
