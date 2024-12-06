@@ -1,5 +1,7 @@
 <?php
 session_start();
+
+// Jika tidak ada sesi username, arahkan ke login
 if (!isset($_SESSION['username'])) {
     header("Location: ../auth/login.php");
     exit();
@@ -9,30 +11,69 @@ include('../db_connect/DatabaseConnection.php');
 
 $error = '';
 $success = '';
+$current_username = $_SESSION['username'];
 
+// Periksa apakah username ada di tabel `users` atau `publisher`
+$user_query = "SELECT * FROM users WHERE username = ?";
+$user_stmt = $conn->prepare($user_query);
+$user_stmt->bind_param("s", $current_username);
+$user_stmt->execute();
+$user_result = $user_stmt->get_result();
+
+if ($user_result->num_rows > 0) {
+    // Jika username ditemukan di tabel `users`
+    $table = "users";
+    $update_query = "UPDATE users SET username = ? WHERE username = ?";
+} else {
+    // Periksa di tabel `publisher`
+    $publisher_query = "SELECT * FROM publisher WHERE publisher_name = ?";
+    $publisher_stmt = $conn->prepare($publisher_query);
+    $publisher_stmt->bind_param("s", $current_username);
+    $publisher_stmt->execute();
+    $publisher_result = $publisher_stmt->get_result();
+
+    if ($publisher_result->num_rows > 0) {
+        // Jika username ditemukan di tabel `publisher`
+        $table = "publisher";
+        $update_query = "UPDATE publisher SET publisher_name = ? WHERE publisher_name = ?";
+    } else {
+        // Jika username tidak ditemukan di kedua tabel, logout
+        session_destroy();
+        header("Location: ../auth/login.php");
+        exit();
+    }
+}
+
+// Jika metode POST digunakan untuk mengubah username
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $new_username = $_POST['new_username'];
 
     if (empty($new_username)) {
         $error = "Username cannot be empty!";
     } else {
-        // Check if the new username already exists in the database
-        $query = "SELECT * FROM users WHERE username = ?";
-        $stmt = $conn->prepare($query);
-        $stmt->bind_param("s", $new_username);
-        $stmt->execute();
-        $result = $stmt->get_result();
+        // Cek apakah username baru sudah digunakan di tabel `users`
+        $check_user_query = "SELECT * FROM users WHERE username = ?";
+        $check_user_stmt = $conn->prepare($check_user_query);
+        $check_user_stmt->bind_param("s", $new_username);
+        $check_user_stmt->execute();
+        $user_exists = $check_user_stmt->get_result()->num_rows > 0;
 
-        if ($result->num_rows > 0) {
+        // Cek apakah username baru sudah digunakan di tabel `publisher`
+        $check_publisher_query = "SELECT * FROM publisher WHERE publisher_name = ?";
+        $check_publisher_stmt = $conn->prepare($check_publisher_query);
+        $check_publisher_stmt->bind_param("s", $new_username);
+        $check_publisher_stmt->execute();
+        $publisher_exists = $check_publisher_stmt->get_result()->num_rows > 0;
+
+        if ($user_exists || $publisher_exists) {
             $error = "Username already taken!";
         } else {
-            $current_username = $_SESSION['username'];
-            $update_query = "UPDATE users SET username = ? WHERE username = ?";
+            // Lakukan update username
             $update_stmt = $conn->prepare($update_query);
             $update_stmt->bind_param("ss", $new_username, $current_username);
 
             if ($update_stmt->execute()) {
-                // Update session with the new username
+                // Perbarui sesi dengan username baru
                 $_SESSION['username'] = $new_username;
                 $success = "Username successfully updated!";
             } else {

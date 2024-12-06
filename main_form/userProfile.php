@@ -44,7 +44,7 @@ if ($user_result->num_rows > 0) {
         )
     ";
     $total_games_stmt = $conn->prepare($total_games_query);
-    $total_games_stmt->bind_param("i", $user_id);
+    $total_games_stmt->bind_param("s", $user_id);
     $total_games_stmt->execute();
     $total_games_result = $total_games_stmt->get_result();
     $total_games_data = $total_games_result->fetch_assoc();
