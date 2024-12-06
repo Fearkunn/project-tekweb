@@ -179,7 +179,7 @@ include('../auth/cookieValidation.php');
                     <div class="dropdown" style="background-color: #2C2C2C;">
                         <button class=" btn btn-secondary dropdown-toggle bi bi-person-circle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" style="font-size: 1.8rem; background-color: #2C2C2C;" aria-expanded="false"><?php echo " ",$username; ?></button>
                         <ul class="dropdown-menu bg-dark" aria-labelledby="dropdownMenuButton1">
-                            <li><a class="dropdown-item" href="#">Action</a></li>
+                            <li><a class="dropdown-item" href="userProfile.php">Profile</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="../auth/logout.php">Change account</a></li>
                             <li><a class="dropdown-item" href="../auth/logout.php">Logout</a></li>
