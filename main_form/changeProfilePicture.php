@@ -92,6 +92,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['user_profile'])) {
             $update_stmt->bind_param("si", $ImagePath, $_SESSION['user_id']);
             if ($update_stmt->execute()) {
                 $success = "Foto profil berhasil diperbarui!";
+                unset($_POST);
+                echo '<script>window.history.replaceState(null, null, window.location.href);</script>';
             } else {
                 $errorMessage = "Gagal memperbarui foto profil di database.";
             }

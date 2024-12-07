@@ -74,6 +74,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $update_stmt->bind_param("ss", $hashed_password, $current_username);
                 if ($update_stmt->execute()) {
                     $success = "Password successfully updated!";
+                    unset($_POST);
+                    echo '<script>window.history.replaceState(null, null, window.location.href);</script>';
                 } else {
                     $error = "Failed to update password.";
                 }

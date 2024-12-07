@@ -76,6 +76,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Perbarui sesi dengan username baru
                 $_SESSION['username'] = $new_username;
                 $success = "Username successfully updated!";
+                unset($_POST);
+                echo '<script>window.history.replaceState(null, null, window.location.href);</script>';
             } else {
                 $error = "Failed to update username.";
             }
