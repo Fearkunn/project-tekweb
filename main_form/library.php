@@ -19,7 +19,7 @@ if (!$is_logged_in) {
 // Fetch user's games from the database
 $order_by = isset($_GET['sort']) && $_GET['sort'] === 'asc' ? 'ASC' : 'DESC'; // Default sorting
 $query = "
-    SELECT l.id_library, g.game_name, g.games_image
+    SELECT l.id_library, g.game_name, g.games_image, g.like_count
     FROM library l
     INNER JOIN games g ON l.id_game = g.id_game
     WHERE l.id_user = ?
@@ -31,6 +31,7 @@ $stmt->execute();
 $result = $stmt->get_result();
 
 $library = $result->fetch_all(MYSQLI_ASSOC);
+$userLiked = '';
 
 ?>
 <!doctype html>
@@ -116,8 +117,23 @@ $library = $result->fetch_all(MYSQLI_ASSOC);
                             <img src="<?php echo htmlspecialchars($game['games_image']); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($game['game_name']); ?>">
                             <div class="card-body">
                                 <h5 class="card-title"><?php echo htmlspecialchars($game['game_name']); ?></h5>
+                                <p class="card-text">Likes: <?php echo htmlspecialchars($game['like_count']); ?></p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <!-- Like Checkbox -->
+                                    <div>
+                                        <input type="checkbox" class="form-check-input like-checkbox" data-game-id="<?php echo $game['id_library']; ?>" id="like-<?php echo $game['id_library']; ?>" 
+                                            <?php echo $userLiked ? 'checked' : ''; ?>>
+                                        <label for="like-<?php echo $game['id_library']; ?>">Like</label>
+                                    </div>
+                                    
+                                    <!-- Review Button -->
+                                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#reviewModal-<?php echo $game['id_library']; ?>">
+                                        Review
+                                    </button>
+                                </div>
                             </div>
                         </div>
+
                     </div>
                 <?php endforeach; ?>
             <?php else: ?>
@@ -129,5 +145,38 @@ $library = $result->fetch_all(MYSQLI_ASSOC);
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script>
+            document.querySelectorAll('.like-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const gameId = this.getAttribute('data-game-id');
+                const isLiked = this.checked;
+                console.log(isLiked);
+
+                fetch('likeGame.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ game_id: gameId, liked: isLiked })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+
+                    // Update jumlah like di UI
+                    const likeCountElement = this.closest('.card').querySelector('.card-text');
+                    let currentLikeCount = parseInt(likeCountElement.innerText.replace('Likes: ', ''));
+                    console.log(currentLikeCount);
+
+                    if (isLiked) {
+                        likeCountElement.innerText = `Likes: ${currentLikeCount + 1}`;
+                    } else {
+                        likeCountElement.innerText = `Likes: ${currentLikeCount - 1}`;
+                    }
+                });
+            });
+        });
+
+    </script>
 </body>
 </html>

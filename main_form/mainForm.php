@@ -164,7 +164,7 @@ include('../auth/cookieValidation.php');
             <div class="collapse navbar-collapse justify-content-center navbar-abc" id="navbarScroll">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">Store</a>
+                        <a class="nav-link active" aria-current="page" href="store.php">Store</a>
                     </li>
                     <?php if (!$is_publisher): ?>
                         <li class="nav-item">

@@ -21,7 +21,7 @@ $game = $result_game->fetch_assoc();
 
 if (!$game) {
     // Redirect or show an error if game not found
-    header("Location: ../index.php");
+    header("Location: store.php");
     exit();
 }
 
@@ -132,7 +132,7 @@ include('../auth/cookieValidation.php');
 
     <div class="container my-5">
         <h1><?php echo htmlspecialchars($game['game_name']); ?></h1>
-        <img src="<?php echo htmlspecialchars($game['games_profile']); ?>" alt="<?php echo htmlspecialchars($game['game_name']); ?>" class="game-image">
+        <img src="<?php echo htmlspecialchars($game['games_image']); ?>" alt="<?php echo htmlspecialchars($game['game_name']); ?>" class="game-image">
         <p class="like-count">Likes: <?php echo htmlspecialchars($game['like_count']); ?></p>
         <p class="game-description"><?php echo nl2br(htmlspecialchars($game['game_desc'])); ?></p>
         <p><strong>Publisher:</strong> <?php echo htmlspecialchars($game['publisher_name']); ?></p>

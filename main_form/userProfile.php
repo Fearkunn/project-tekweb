@@ -5,10 +5,17 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 include('../db_connect/DatabaseConnection.php');
+if (!isset($_SESSION['role_user'])) {
+    // Redirect ke halaman login jika belum login
+    header("Location: ../auth/login.php");
+    exit();
+}
 
 // Check if user is logged in
 $is_logged_in = isset($_SESSION['username']) && !empty($_SESSION['username']);
 $user_id = $is_logged_in ? $_SESSION['username'] : '';
+
+$role = $_SESSION['role_user'];
 
 if (!$is_logged_in) {
     header("Location: ../auth/login.php");
@@ -31,7 +38,7 @@ if ($user_result->num_rows > 0) {
     $profile_picture = !empty($user_data['user_profile']) && filter_var($user_data['user_profile'], FILTER_VALIDATE_URL)
         ? $user_data['user_profile']
         : "../assets/login.png";
-    $role = htmlspecialchars($user_data['role_user']);
+    
     $username = htmlspecialchars($user_data['username']);
     // Fetch total number of games owned by the user
     $total_games_query = "
@@ -67,10 +74,25 @@ if ($user_result->num_rows > 0) {
         $profile_picture = !empty($publisher_data['publisher_logo']) && filter_var($publisher_data['publisher_logo'], FILTER_VALIDATE_URL)
         ? $publisher_data['publisher_logo']
         : "../assets/login.png";
-        $role = "PUBLISHER";
+
         $username = htmlspecialchars($publisher_data['publisher_name']);
         $total_games = "N/A"; // Publisher doesn't have a games library
     }
+    $total_games_query = "
+    SELECT COUNT(*) AS total_games
+    FROM games  
+    WHERE id_publisher = (
+        SELECT id_publisher
+        FROM publisher
+        WHERE publisher_name = ?
+    )
+    ";
+    $total_games_stmt = $conn->prepare($total_games_query);
+    $total_games_stmt->bind_param("s", $user_id);
+    $total_games_stmt->execute();
+    $total_games_result = $total_games_stmt->get_result();
+    $total_games_data = $total_games_result->fetch_assoc();
+    $total_games = $total_games_data['total_games'];
 }
 ?>
 <!doctype html>
@@ -156,9 +178,16 @@ if ($user_result->num_rows > 0) {
 
 
             <!-- Stats Section -->
+             <?php if ($role == "PUBLISHER") : ?>
             <div class="stats text-center">
-                <p><strong>Total Games Owned:</strong> <?php echo $total_games; ?></p>
+                <p><strong>Total Games Published:</strong> <?php echo $total_games; ?></p>
             </div>
+            <?php endif; ?>
+            <?php if ($role == "USER") : ?>
+                <div class="stats text-center">
+                    <p><strong>Total Games Owned:</strong> <?php echo $total_games;?></p>
+                </div>
+            <?php endif;?>
         </div>
     </section>
 </body>
