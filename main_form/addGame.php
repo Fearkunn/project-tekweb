@@ -30,6 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['gameName'])) {
     } else {
         die("Publisher tidak ditemukan untuk pengguna ini.");
     }
+    
 
     // Proses upload gambar cover ke ImgBB
     $coverImagePath = null;
@@ -126,8 +127,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_game_id'])) {
     }
 }
 
-// Ambil data game untuk ditampilkan
-$games = $conn->query("SELECT id_game, game_name, game_desc, games_image, is_admit FROM games");
+// Ambil data game berdasarkan id_publisher dari session
+$userId = $_SESSION['username'];
+$stmt = $conn->prepare("SELECT id_publisher FROM publisher WHERE publisher_name = ?");
+$stmt->bind_param("s", $userId);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result && $result->num_rows > 0) {
+    $row = $result->fetch_assoc();
+    $idPublisher = $row['id_publisher'];
+} else {
+    die("Publisher tidak ditemukan untuk pengguna ini.");
+}
+
+$gamesStmt = $conn->prepare("SELECT id_game, game_name, game_desc, games_image, is_admit FROM games WHERE id_publisher = ?");
+$gamesStmt->bind_param("i", $idPublisher);
+$gamesStmt->execute();
+$games = $gamesStmt->get_result();
 ?>
 
 <!DOCTYPE html>
