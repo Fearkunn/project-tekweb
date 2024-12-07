@@ -126,24 +126,8 @@ while ($row = $topLikedGamesResult->fetch_assoc()) {
 
         /* Tabel */
         .table {
-            color: white;
-            background-color: rgba(0, 0, 0, 0.7);
             border-radius: 10px;
             overflow: hidden;
-        }
-
-        .table thead {
-            background: #ff4c4c;
-            color: white;
-        }
-
-        .table tbody tr:nth-child(even) {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .table tbody tr:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-            cursor: pointer;
         }
 
         h2, h3 {
@@ -153,7 +137,6 @@ while ($row = $topLikedGamesResult->fetch_assoc()) {
             background-color: rgba(0, 0, 0, 0.8); /* Warna semi-transparan */
             padding: 30px 25px; /* Ruang dalam */
             border-radius: 10px; /* Sudut membulat */
-            color: white; /* Warna teks */
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Efek bayangan */
             margin-bottom: 20px; /* Spasi antar box */
         }
@@ -183,7 +166,7 @@ while ($row = $topLikedGamesResult->fetch_assoc()) {
         </div>
     </nav>
 
-    <div class="container my-5">
+    <div class="container py-5">
         <h2 class="text-center mb-4">Admin Dashboard</h2>
 
         <!-- Statistik -->
@@ -226,8 +209,8 @@ while ($row = $topLikedGamesResult->fetch_assoc()) {
 
         <!-- Publisher Teratas -->
         <div class="content-box mt-4">
-            <h3>3 Publisher Teratas dengan Game Terbanyak</h3>
-            <table class="table table-hover">
+            <h3 class="pb-4">3 Publisher dengan Game Terbanyak</h3>
+            <table class="table table-hover table-secondary">
                 <thead>
                     <tr>
                         <th>Publisher</th>
@@ -247,8 +230,8 @@ while ($row = $topLikedGamesResult->fetch_assoc()) {
 
         <!-- Game Terpopuler -->
         <div class="content-box mt-4">
-            <h3>3 Game dengan Like Count Terbanyak</h3>
-            <table class="table table-hover">
+            <h3 class="pb-4">3 Game dengan Jumlah Like Terbanyak</h3>
+            <table class="table table-hover table-secondary">
                 <thead>
                     <tr>
                         <th>Game</th>
