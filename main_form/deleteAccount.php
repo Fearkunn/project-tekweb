@@ -67,27 +67,79 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Delete Account</title>
+    <link rel="icon" href="../assets/UAP.ico" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background-color: #2C2C2C; color: white; font-family: Arial, sans-serif; }
-        .container { display: flex; justify-content: center; align-items: center; height: 100vh; }
-        .delete-account-box { background-color: rgba(0, 0, 0, 0.8); padding: 30px 25px; border-radius: 10px; width: 100%; max-width: 400px; }
+       body { 
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #2C2C2C; 
+        }
+        #delete-section{
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-image: url('../assets/Background.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center top;
+            margin: 0;
+            padding: 0;
+        }
+        .navbar {
+            background-color: #2C2C2C;
+            font-family: Arial, sans-serif;
+            padding: 10px 20px;
+        }
+        .navbar-brand, .nav-link {
+            color: #FFFFFF !important;
+        }
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        .delete-account-box { 
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 30px 25px;
+            border-radius: 10px;
+            color: white;
+            width: 100%;
+            max-width: 400px;
+            margin: 10px 0; 
+        }
+        .container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
         .btn-danger { background-color: #dc3545; border: none; width: 100%; }
         .btn-danger:hover { background-color: #b02a37; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="delete-account-box">
-            <h2>Delete Account</h2>
-            <?php if ($error): ?>
-                <div class="alert alert-danger"><?php echo $error; ?></div>
-            <?php endif; ?>
-            <form method="POST">
-                <p>Are you sure you want to delete your account? This action is permanent.</p>
-                <button type="submit" class="btn btn-danger">Delete Account</button>
-            </form>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand mx-auto" href="../main_form/mainForm.php">
+                <img src="../assets/UapLogoText.svg" alt="UapLogo">
+            </a>
         </div>
-    </div>
+    </nav>
+
+    <section id="delete-section">
+        <div class="container">
+            <div class="delete-account-box">
+                <h2 class="pb-3">Delete Account</h2>
+                <?php if ($error): ?>
+                    <div class="alert alert-danger"><?php echo $error; ?></div>
+                <?php endif; ?>
+                <form method="POST">
+                    <p class="pb-2">Are you sure you want to delete your account? This action is permanent.</p>
+                    <button type="submit" class="btn btn-danger">Delete Account</button>
+                </form>
+            </div>
+        </div>
+    </section>
 </body>
 </html>
