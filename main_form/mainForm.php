@@ -88,13 +88,12 @@ include('../auth/cookieValidation.php');
         background-color: #FF4C4C; /* Tombol berubah merah terang saat hover */
         color: #FFFFFF; /* Font tetap putih */
     }
-    #MainSection {
+    body{
         background-image: url('../assets/Background.png');
         background-size: cover;
         background-repeat: no-repeat;
         background-position: center top;
         height: 100vh;
-        display: flex;
         align-items: center; /* Agar teks di tengah secara vertikal */
         justify-content: center; /* Agar teks di tengah secara horizontal */
         color: #FFFFFF;
@@ -158,8 +157,6 @@ include('../auth/cookieValidation.php');
         background-color: #ff6666;
     }
 
-
-
     #gameSlider{
         display: flex;
         justify-content: center;
@@ -179,17 +176,54 @@ include('../auth/cookieValidation.php');
         text-transform: capitalize;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         transition: transform 0.2s;
+        background-color: #2C2C2C;
     }
 
     .badge:hover {
         transform: scale(1.1);
-        background-color: #ff4444;
-        color: #fff;
+    }
+        .card {
+        background-color: #333;
+        border-radius: 8px;
+        border: none;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        display: flex;
+        flex-direction: row;
+    }
+
+    .card:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-img-left {
+        border-radius: 8px;
+        width: 350px; /* Size gambar yang lebih besar */
+        height: 200px; /* Ukuran tinggi gambar */
+        object-fit: cover;
+    }
+
+    .card-body {
+        flex: 1;
+        padding: 20px;
+    }
+
+    .card-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #e60000;
+    }
+
+    .card-text {
+        font-size: 1rem;
+        color: #ccc;
+        margin-bottom: 15px;
     }
 
     </style>
 </head>
-<body>
+<header>
     <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
             <a class="navbar-brand logo" href="#" >
@@ -272,16 +306,17 @@ include('../auth/cookieValidation.php');
             </div>
         </nav>
     </section>
-
-    
-    <section id="MainSection">
-        <!-- FITUR REKOMENDASI GAME  -->
-        <div class="container mt-5">
-            <h1 class="text-center mb-4">Featured Free Games</h1>
+</header>
+<body>
+<section id="carousel">
+    <!-- FITUR REKOMENDASI GAME -->
+    <div class="container mt-5">
+        <h1 class="text-center mb-4 text-warning">Featured Free Games</h1>
             <div id="gameCarousel" class="carousel slide" data-bs-ride="carousel">
                 <div class="carousel-inner">
                     <?php
                     $isFirst = true;
+                    $games = [];
                     $query = "
                         SELECT g.id_game, g.game_name, g.games_image, g.game_desc, g.release_date, g.like_count,
                             GROUP_CONCAT(genre.genre_name SEPARATOR ', ') AS genres
@@ -289,13 +324,19 @@ include('../auth/cookieValidation.php');
                         LEFT JOIN detail_genre dg ON g.id_game = dg.id_game
                         LEFT JOIN genre ON dg.id_genre = genre.id_genre
                         GROUP BY g.id_game;
-                     ";
+                    ";
                     $result = $conn->query($query);
                     if ($result && $result->num_rows > 0):
                         while ($game = $result->fetch_assoc()):
                             $genres = explode(',', $game['genres']);
+                            $games[] = $game;
+                        endwhile;
+
+                        // Loop untuk menampilkan setiap game dalam satu carousel-item
+                        foreach ($games as $index => $game):
+                            $isActive = ($index === 0) ? 'active' : ''; // Set active di item pertama
                     ?>
-                            <div class="carousel-item <?= $isFirst ? 'active' : '' ?>">
+                            <div class="carousel-item <?= $isActive ?>">
                                 <div class="row">
                                     <!-- Gambar Game -->
                                     <div class="col-md-7">
@@ -309,20 +350,20 @@ include('../auth/cookieValidation.php');
                                         <p><?= htmlspecialchars($game['game_desc']) ?></p>
                                         <p>Released: <?= date('d M Y', strtotime($game['release_date'])) ?></p>
                                         <p>Likes: <?= $game['like_count'] ?></p>
-                                    <div class="mt-2">
-                                    <h5 class="text-light">Genres:</h5>
-                                        <div div class="d-flex flex-wrap gap-2">
-                                            <?php foreach ($genres as $genre): ?>
-                                                <span class="badge bg-secondary"><?= htmlspecialchars(trim($genre)) ?></span>
-                                            <?php endforeach; ?>
+                                        <div class="mt-2">
+                                            <h5 class="text-light">Genres:</h5>
+                                            <div class="d-flex flex-wrap gap-2">
+                                                <?php foreach ($genres as $genre): ?>
+                                                    <span class="badge bg-secondary"><?= htmlspecialchars(trim($genre)) ?></span>
+                                                <?php endforeach; ?>
+                                            </div>
+                                            <button class="btn btn-danger btn-sm mt-3">Play Now</button>
                                         </div>
-                                        <button class="btn btn-danger btn-sm mt-3">Play Now</button>
                                     </div>
                                 </div>
                             </div>
                     <?php
-                            $isFirst = false;
-                        endwhile;
+                        endforeach;
                     else:
                     ?>
                         <div class="carousel-item active">
@@ -345,6 +386,61 @@ include('../auth/cookieValidation.php');
             </div>
         </div>
     </section>
+
+
+    <section>
+        <div class="container mt-5" >
+            <h2 class="text-center mb-4">All Free Games</h2>
+            <div class="row">
+                <?php
+                // Query untuk menampilkan semua game dengan genre
+                $query = "
+                    SELECT g.id_game, g.game_name, g.games_image, g.game_desc, g.release_date, g.like_count,
+                        GROUP_CONCAT(genre.genre_name SEPARATOR ', ') AS genres
+                    FROM games g
+                    LEFT JOIN detail_genre dg ON g.id_game = dg.id_game
+                    LEFT JOIN genre ON dg.id_genre = genre.id_genre
+                    GROUP BY g.id_game
+                ";
+                $result = $conn->query($query);
+
+                if ($result && $result->num_rows > 0):
+                    while ($game = $result->fetch_assoc()):
+                        $genres = $game['genres'] ? explode(',', $game['genres']) : [];
+                ?>
+                        <div class="col-12 mb-2"> <!-- Full width for a larger display -->
+                            <div class="card d-flex flex-row h-100">
+                                <img src="<?= $game['games_image'] ?>" class="card-img-left" alt="<?= $game['game_name'] ?>" style="object-fit: cover; border-radius: 8px;padding:2px">
+                                <div class="card-body p-2">
+                                    <h5 class="card-title" style="font-size: 1.3rem;"><?= htmlspecialchars($game['game_name']) ?></h5>
+                                    <p class="card-text" style="font-size: 0.75rem;">Released: <?= date('d M Y', strtotime($game['release_date'])) ?></p>
+                                    <p class="card-text" style="font-size: 0.75rem;">Likes: <?= $game['like_count'] ?></p>
+                                    
+                                    <!-- Genre Section -->
+                                    <div class="mb-2">
+                                        <h6 style="color:white;">Genres:</h6>
+                                        <div class="d-flex flex-wrap gap-2">
+                                            <?php foreach ($genres as $genre): ?>
+                                                <span class="badge bg-secondary"><?= htmlspecialchars(trim($genre)) ?></span>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    </div>
+                                    <a href="play_game.php?id=<?= $game['id_game'] ?>" class="btn btn-danger btn-sm">Play Now</a>
+                                </div>
+                            </div>
+                        </div>
+                <?php
+                    endwhile;
+                else:
+                ?>
+                    <div class="col-12">
+                        <p class="text-center">No games available. Please add games to the database.</p>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </section>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>
