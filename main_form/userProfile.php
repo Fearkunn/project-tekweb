@@ -1,3 +1,4 @@
+
 <?php
 // Start session and include database connection
 if (session_status() === PHP_SESSION_NONE) {
@@ -16,8 +17,10 @@ $is_logged_in = isset($_SESSION['username']) && !empty($_SESSION['username']);
 $user_id = $is_logged_in ? $_SESSION['username'] : '';
 
 $role = $_SESSION['role_user'];
+echo '<script>console.log($user_id);</script>';
 
 if (!$is_logged_in) {
+    echo '<script>console.log($user_id);</script>';
     header("Location: ../auth/login.php");
     exit;
 }

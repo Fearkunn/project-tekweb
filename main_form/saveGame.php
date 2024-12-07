@@ -18,28 +18,39 @@ if ($game_id > 0) {
     // Periksa apakah game sudah ada di library user
     $query_check = "SELECT * FROM library WHERE id_user = ? AND id_game = ?";
     $stmt_check = $conn->prepare($query_check);
-    $stmt_check->bind_param("ii", $user_id, $game_id);
-    $stmt_check->execute();
-    $result_check = $stmt_check->get_result();
+    if ($stmt_check) {
+        $stmt_check->bind_param("ii", $user_id, $game_id);
+        $stmt_check->execute();
+        $result_check = $stmt_check->get_result();
 
-    if ($result_check->num_rows > 0) {
-        // Jika game sudah ada di library
-        $_SESSION['message'] = "Game sudah ada di library Anda!";
-    } else {
-        // Jika belum, simpan game ke library
-        $query_save = "INSERT INTO library (id_user, id_game) VALUES (?, ?)";
-        $stmt_save = $conn->prepare($query_save);
-        $stmt_save->bind_param("ii", $user_id, $game_id);
-
-        if ($stmt_save->execute()) {
-            $_SESSION['message'] = "Game berhasil disimpan ke library Anda!";
+        if ($result_check->num_rows > 0) {
+            // Jika game sudah ada di library
+            $_SESSION['message'] = "Game sudah ada di library Anda!";
         } else {
-            $_SESSION['message'] = "Terjadi kesalahan saat menyimpan game.";
-        }
-    }
+            // Jika belum, simpan game ke library
+            $query_save = "INSERT INTO library (id_user, id_game) VALUES (?, ?)";
+            $stmt_save = $conn->prepare($query_save);
+            if ($stmt_save) {
+                $stmt_save->bind_param("ii", $user_id, $game_id);
 
-    $stmt_check->close();
-    $stmt_save->close();
+                if ($stmt_save->execute()) {
+                    $_SESSION['message'] = "Game berhasil disimpan ke library Anda!";
+                } else {
+                    $_SESSION['message'] = "Terjadi kesalahan saat menyimpan game.";
+                }
+
+                // Close stmt_save if it was created
+                $stmt_save->close();
+            } else {
+                $_SESSION['message'] = "Gagal menyiapkan query untuk menyimpan game.";
+            }
+        }
+
+        // Close stmt_check if it was created
+        $stmt_check->close();
+    } else {
+        $_SESSION['message'] = "Gagal menyiapkan query untuk memeriksa game di library.";
+    }
 }
 
 header("Location: store.php");

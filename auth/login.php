@@ -1,4 +1,3 @@
-
 <?php
 session_start();
 include('../db_connect/DatabaseConnection.php');
@@ -22,6 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if($user && password_verify($password, $user['publisher_password'])){
         $_SESSION['user_id'] = $user['id_publisher'];
         $_SESSION['username'] = $user['publisher_name'];
+        $_SESSION['role_user'] = 'PUBLISHER';
         header("Location: ../main_form/mainForm.php");
     }else{
 
@@ -34,6 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($user && password_verify($password, $user['user_password'])) {
             $_SESSION['user_id'] = $user['id_user'];
             $_SESSION['username'] = $user['username'];
+            $_SESSION['role_user'] = 'USER';
     
             if (isset($_POST['remember_me'])) {
                 $user_id = $user['id_user'];
