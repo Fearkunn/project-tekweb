@@ -83,17 +83,33 @@ if ($user_result->num_rows > 0) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #2C2C2C;
+        }
+        #profile-section{
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
             background-image: url('../assets/Background.png');
             background-size: cover;
             background-repeat: no-repeat;
             background-position: center top;
-            color: #FFFFFF;
+            margin: 0;
+            padding: 0;
         }
         .navbar {
             background-color: #2C2C2C;
+            font-family: Arial, sans-serif;
+            padding: 10px 20px;
         }
         .navbar-brand, .nav-link {
             color: #FFFFFF !important;
+        }
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
         }
         .user-profile {
             text-align: center;
@@ -115,32 +131,35 @@ if ($user_result->num_rows > 0) {
 <body>
     <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
-            <a class="navbar-brand" href="mainForm.php">Profile</a>
-            <a href="../auth/logout.php" class="btn btn-danger">Logout</a>
+            <a class="navbar-brand mx-auto" href="../main_form/mainForm.php">
+                <img src="../assets/UapLogoText.svg" alt="UapLogo">
+            </a>
         </div>
     </nav>
 
-    <div class="container">
-            
-    <!-- User Profile Section -->
-        <div class="user-profile">
-            <img src="<?php echo $profile_picture; ?>" alt="Profile Picture">
-            <h1><?php echo $username; ?></h1>
-            <p>Role: <?php echo $role; ?></p>
-        </div>
+    <section id="profile-section">
+        <div class="container text-light">
+                
+        <!-- User Profile Section -->
+            <div class="user-profile">
+                <img src="<?php echo $profile_picture; ?>" alt="Profile Picture">
+                <h1><?php echo $username; ?></h1>
+                <p>Role: <?php echo $role; ?></p>
+            </div>
 
-        <div class="text-center">
-            <a href="changeProfilePicture.php" class="btn btn-primary">Edit Profile</a>
-            <a href="changePassword.php" class="btn btn-warning">Change Password</a>
-            <a href="changeUsername.php" class="btn btn-info">Change Username</a>
-            <a href="deleteAccount.php" class="btn btn-danger">Delete Account</a>
-        </div>
+            <div class="text-center">
+                <a href="changeProfilePicture.php" class="btn btn-primary">Edit Profile</a>
+                <a href="changePassword.php" class="btn btn-warning">Change Password</a>
+                <a href="changeUsername.php" class="btn btn-info">Change Username</a>
+                <a href="deleteAccount.php" class="btn btn-danger">Delete Account</a>
+            </div>
 
 
-        <!-- Stats Section -->
-        <div class="stats text-center">
-            <p><strong>Total Games Owned:</strong> <?php echo $total_games; ?></p>
+            <!-- Stats Section -->
+            <div class="stats text-center">
+                <p><strong>Total Games Owned:</strong> <?php echo $total_games; ?></p>
+            </div>
         </div>
-    </div>
+    </section>
 </body>
 </html>
