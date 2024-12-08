@@ -220,6 +220,42 @@ include('../auth/cookieValidation.php');
         color: #ccc;
         margin-bottom: 15px;
     }
+    .search-bar-container {
+    max-width: 960px;
+    margin: 0 auto;
+    }
+
+    .search-form {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+
+    .search-bar {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        max-width: 600px;
+        background-color: #1b1b1b; /* Hitam pekat */
+        border: 1px solid #d81e1e; /* Merah */
+        border-radius: 4px;
+        padding: 8px;
+    }
+
+    .search-icon {
+        color: #d81e1e; /* Merah */
+        font-size: 16px;
+        margin-right: 10px;
+    }
+
+    .search-input {
+        flex: 1;
+        background: none;
+        border: none;
+        outline: none;
+        color: #ffffff; /* Putih */
+        font-size: 14px;
+    }
 
     </style>
 </head>
@@ -279,46 +315,40 @@ include('../auth/cookieValidation.php');
         </div>
     </section>
 
-    <!-- Navbar Kedua -->
-    <section id="subnavbar-game" style="position: absolute; top: 100px; left: 0; width: 100%; z-index: 2;">
-    <nav class="navbar navbar-expand-lg mt-3 mx-auto" style="max-width: 960px; padding: 0;">
-        <div class="container-fluid navbar-custom">
-            <form class="d-flex mx-auto w-100" role="search" style="max-width: 600px; position: relative;">
+  <!-- Navbar Kedua -->
+  <section id="subnavbar-game" style="position: absolute; top: 100px; left: 0; width: 100%; z-index: 2;">
+    <div class="search-bar-container" style="max-width: 960px; margin: 0 auto;">
+        <form class="search-form" action="search_results.php" method="GET" style="width: 100%; display: flex; justify-content: center;">
+            <div class="search-bar" style="
+                display: flex; 
+                align-items: center; 
+                width: 100%; 
+                max-width: 600px; 
+                background-color: #1b1b1b; /* Warna hitam pekat */
+                border: 1px solid #d81e1e; /* Border merah */
+                border-radius: 4px; 
+                padding: 8px;">
                 <!-- Ikon Pencarian -->
-                <div style="
-                    position: absolute; 
-                    top: 50%; 
-                    left: 15px; 
-                    transform: translateY(-50%); 
-                    width: 24px; 
-                    height: 24px; 
-                    background-color: #99c9f7; /* Biru muda untuk ikon */ 
-                    display: flex; 
-                    justify-content: center; 
-                    align-items: center; 
-                    border-radius: 50%; 
-                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);">
-                    <img src="https://img.icons8.com/ios-filled/50/ffffff/search.png" alt="Search Icon" style="width: 12px; height: 12px;">
-                </div>
+                <i class="bi bi-search search-icon" style="
+                    color: #d81e1e; /* Warna merah untuk ikon */
+                    font-size: 16px; 
+                    margin-right: 10px;"></i>
                 <!-- Input Pencarian -->
                 <input 
-                    class="form-control" 
-                    type="search" 
+                    type="text" 
+                    name="q" 
+                    class="search-input" 
                     placeholder="Search for games, genres, or publishers..." 
-                    aria-label="Search" 
                     style="
-                        width: 100%; 
-                        padding: 10px 20px; 
-                        padding-left: 60px; 
-                        font-size: 16px; 
+                        flex: 1; 
+                        background: none; 
                         border: none; 
-                        border-radius: 25px; 
-                        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
-                        background-color: #d7e9f7; /* Biru muda untuk background input */ 
-                        color: #333333;">
-            </form>
-        </div>
-    </nav>
+                        outline: none; 
+                        color: #ffffff; /* Warna teks putih */
+                        font-size: 14px;">
+            </div>
+        </form>
+    </div>
 </section>
 
 
