@@ -73,17 +73,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $update_stmt = $conn->prepare($update_query);
                 $update_stmt->bind_param("ss", $hashed_password, $current_username);
                 if ($update_stmt->execute()) {
-                    $success = "Password successfully updated!";
-                    unset($_POST);
-                    echo '<script>window.history.replaceState(null, null, window.location.href);</script>';
+                    $_SESSION['Send'] = ['type' => 'success', 'message' => 'Change Password Success', 'redirect' => 'mainForm.php'];
                 } else {
-                    $error = "Failed to update password.";
+                    $_SESSION['Send'] = ['type' => 'error', 'message' => 'Failed to update password.'];
+                    header("Location: ../main_form/changePassword.php");
+                    exit();
                 }
             } else {
-                $error = "Incorrect current password!";
+                $_SESSION['Send'] = ['type' => 'error', 'message' => 'Incorrect current password!'];
+                header("Location: ../main_form/changePassword.php");
+                exit();
             }
         } else {
-            $error = "User not found!";
+            $_SESSION['Send'] = ['type' => 'error', 'message' => 'User not found!'];
+            header("Location: ../main_form/changePassword.php");
+            exit();
         }
     }
 }
@@ -95,6 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Change Password</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="icon" href="../assets/UAP.ico" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
@@ -149,6 +154,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </style>
 </head>
 <body>
+    <?php if (isset($_SESSION['Send'])): ?>
+                <script>
+                    Swal.fire({
+                        title: "<?= $_SESSION['Send']['type'] === 'success' ? 'Berhasil!' : 'Gagal!' ?>",
+                        text: "<?= $_SESSION['Send']['message'] ?>",
+                        icon: "<?= $_SESSION['Send']['type'] ?>",
+                        confirmButtonText: "OK"
+                    }).then(() => {
+                        <?php if ($_SESSION['Send']['type'] === 'success' && isset($_SESSION['Send']['redirect'])): ?>
+                            window.location.href = "<?= $_SESSION['Send']['redirect'] ?>";
+                        <?php endif; ?>
+                    });
+                </script>
+            <?php unset($_SESSION['Send']); ?>
+        <?php endif; ?>
     <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
             <a class="navbar-brand mx-auto" href="../main_form/mainForm.php">
@@ -161,13 +181,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="container">
             <div class="form-box">
                 <h2 class="pb-3">Change Password</h2>
-                <?php if ($error): ?>
-                    <div class="alert alert-danger"><?php echo $error; ?></div>
-                <?php endif; ?>
-                <?php if ($success): ?>
-                    <div class="alert alert-success"><?php echo $success; ?></div>
-                    <a href="userProfile.php" class="btn btn-secondary">Back to Profile</a>
-                <?php endif; ?>
                 <form method="POST">
                     <div class="mb-3">
                         <label for="current_password" class="form-label">Current Password</label>
