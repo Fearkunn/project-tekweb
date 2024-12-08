@@ -370,7 +370,6 @@ include('../auth/cookieValidation.php');
                         <div class="carousel-item <?= $isActive ?>">
                             <div class="row">
                                 <div class="col-md-4">
-                                    <a href="gameDetail.php?game_id=<?= $game['id_game'] ?>" class="game-image-link">
                                     <div class="game-image-container" style="height: 400px; overflow: hidden;">
                                         <img src="<?= htmlspecialchars($game['games_image']) ?>" 
                                              class="d-block mx-auto" 
