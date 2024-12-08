@@ -325,11 +325,10 @@ include('../auth/cookieValidation.php');
         <div id="gameCarousel" class="carousel slide" data-bs-ride="carousel">
             <div class="carousel-inner">
                 <?php
-                $isFirst = true;
                 $games = [];
                 $query = "
                     SELECT g.id_game, g.game_name, g.games_image, g.game_desc, g.release_date, g.like_count,
-                        GROUP_CONCAT(genre.genre_name SEPARATOR ', ') AS genres
+                        GROUP_CONCAT(DISTINCT genre.genre_name SEPARATOR ', ') AS genres
                     FROM games g
                     LEFT JOIN detail_genre dg ON g.id_game = dg.id_game
                     LEFT JOIN genre ON dg.id_genre = genre.id_genre
@@ -341,19 +340,22 @@ include('../auth/cookieValidation.php');
                 $result = $conn->query($query);
                 if ($result && $result->num_rows > 0):
                     while ($game = $result->fetch_assoc()):
-                        $genres = explode(',', $game['genres']);
                         $games[] = $game;
                     endwhile;
 
                     // Loop untuk menampilkan setiap game dalam satu carousel-item
                     foreach ($games as $index => $game):
                         $isActive = ($index === 0) ? 'active' : ''; // Set active di item pertama
+                        $genres = explode(',', $game['genres']); // Memproses genre di dalam loop
                 ?>
                         <div class="carousel-item <?= $isActive ?>">
                             <div class="row">
                                 <div class="col-md-7">
                                     <div class="game-image-container" style="height: 400px; overflow: hidden; background: #000;">
-                                        <img src="<?= $game['games_image'] ?>" class="d-block w-100" alt="<?= $game['game_name'] ?>" style="object-fit: cover; border-radius: 8px;">
+                                        <img src="<?= htmlspecialchars($game['games_image']) ?>" 
+                                             class="d-block w-100" 
+                                             alt="<?= htmlspecialchars($game['game_name']) ?>" 
+                                             style="object-fit: cover; border-radius: 8px;">
                                     </div>
                                 </div>
                                 <div class="col-md-5 d-flex flex-column justify-content-center bg-dark text-white p-4" style="border-radius: 8px;">
@@ -385,6 +387,7 @@ include('../auth/cookieValidation.php');
                     </div>
                 <?php endif; ?>
             </div>
+            <!-- Tombol navigasi carousel -->
             <button class="carousel-control-prev" type="button" data-bs-target="#gameCarousel" data-bs-slide="prev">
                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                 <span class="visually-hidden">Previous</span>
@@ -396,6 +399,7 @@ include('../auth/cookieValidation.php');
         </div>
     </div>
 </section>
+
 
 <section>
     <div class="container mt-5">
