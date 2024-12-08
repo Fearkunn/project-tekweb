@@ -369,12 +369,14 @@ include('../auth/cookieValidation.php');
                         <div class="carousel-item <?= $isActive ?>">
                             <div class="row">
                                 <div class="col-md-7">
+                                    <a href="gameDetail.php?game_id=<?= $game['id_game'] ?>" class="game-image-link">
                                     <div class="game-image-container" style="height: 400px; overflow: hidden; background: #000;">
                                         <img src="<?= htmlspecialchars($game['games_image']) ?>" 
                                              class="d-block w-100" 
                                              alt="<?= htmlspecialchars($game['game_name']) ?>" 
                                              style="object-fit: cover; border-radius: 8px;">
                                     </div>
+                                    </a>
                                 </div>
                                 <div class="col-md-5 d-flex flex-column justify-content-center bg-dark text-white p-4" style="border-radius: 8px;">
                                     <h3 class="text-warning"><?= htmlspecialchars($game['game_name']) ?></h3>
@@ -388,13 +390,14 @@ include('../auth/cookieValidation.php');
                                                 <span class="badge bg-secondary"><?= htmlspecialchars(trim($genre)) ?></span>
                                             <?php endforeach; ?>
                                         </div>
-                                        <?php if (!$is_publisher && !$is_in_library): ?>
+                                        <a href="gameDetail.php?game_id=<?= $game['id_game'] ?>" class="btn btn-primary btn-sm mt-3">View Details</a>
+                                        <?php if (!$is_publisher && !$is_in_library && $is_logged_in): ?>
                                             <!-- Form to add to library directly in this page -->
                                             <form method="POST">
                                                 <input type="hidden" name="id_game" value="<?= $game['id_game'] ?>">
                                                 <button type="submit" name="add_to_library" class="btn btn-danger btn-sm mt-3">Add to Library</button>
                                             </form>
-                                        <?php elseif (!$is_publisher): ?>
+                                        <?php elseif (!$is_publisher && $is_logged_in): ?>
                                             <button class="btn btn-success btn-sm mt-3" disabled>Already in Library</button>
                                         <?php endif; ?>
                                     </div>
@@ -467,6 +470,7 @@ include('../auth/cookieValidation.php');
                     }
             ?>
                     <div class="col-12 mb-2">
+                        <a href="gameDetail.php?game_id=<?= $game['id_game'] ?>" style="text-decoration: none; color: inherit;">
                         <div class="card d-flex flex-row h-100">
                             <img src="<?= $game['games_image'] ?>" class="card-img-left" alt="<?= $game['game_name'] ?>" style="object-fit: cover; border-radius: 8px; padding: 2px">
                             <div class="card-body p-2">
@@ -481,17 +485,18 @@ include('../auth/cookieValidation.php');
                                         <?php endforeach; ?>
                                     </div>
                                 </div>
-                                <?php if (!$is_publisher && !$is_in_library): ?>
+                                <?php if (!$is_publisher && !$is_in_library && $is_logged_in): ?>
                                     <!-- Form to add to library directly in this page -->
                                     <form method="POST">
                                         <input type="hidden" name="id_game" value="<?= $game['id_game'] ?>">
                                         <button type="submit" name="add_to_library" class="btn btn-danger btn-sm mt-3">Add to Library</button>
                                     </form>
-                                <?php elseif (!$is_publisher): ?>
+                                <?php elseif (!$is_publisher && $is_logged_in): ?>
                                     <button class="btn btn-success btn-sm mt-3" disabled>Already in Library</button>
                                 <?php endif; ?>
                             </div>
                         </div>
+                        </a>
                     </div>
             <?php
                 endwhile;
