@@ -366,6 +366,7 @@ include('../auth/cookieValidation.php');
                             }
                         }
                 ?>
+                <!-- CAROUSEL -->
                         <div class="carousel-item <?= $isActive ?>">
                             <div class="row">
                                 <div class="col-md-4">
