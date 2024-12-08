@@ -219,6 +219,21 @@ $games = $gamesStmt->get_result();
     </style>
 </head>
 <body>
+    <?php if (isset($_SESSION['Send'])): ?>
+                <script>
+                    Swal.fire({
+                        title: "<?= $_SESSION['Send']['type'] === 'success' ? 'Berhasil!' : 'Gagal!' ?>",
+                        text: "<?= $_SESSION['Send']['message'] ?>",
+                        icon: "<?= $_SESSION['Send']['type'] ?>",
+                        confirmButtonText: "OK"
+                    }).then(() => {
+                        <?php if ($_SESSION['Send']['type'] === 'success' && isset($_SESSION['Send']['redirect'])): ?>
+                            window.location.href = "<?= $_SESSION['Send']['redirect'] ?>";
+                        <?php endif; ?>
+                    });
+                </script>
+        <?php unset($_SESSION['Send']); ?>
+    <?php endif; ?>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
