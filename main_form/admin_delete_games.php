@@ -210,29 +210,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             <?php endwhile; ?>
         </div>
     </div>
-    <script>
-        document.getElementById('delete-btn').addEventListener('click', function(event) {
-            event.preventDefault();
-            // SweetAlert confirmation
-            Swal.fire({
-                title: 'Are you sure?',
-                text: 'This game will be deleted permanently!',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, delete it!',
-                cancelButtonText: 'No, cancel!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // If confirmed, directly submit the form to delete the game
-                    document.getElementById('delete-form').submit();  // Submit the form
-                }
-            });
-        });
-    </script>
-
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
