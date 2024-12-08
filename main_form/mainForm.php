@@ -283,23 +283,44 @@ include('../auth/cookieValidation.php');
     <section id="subnavbar-game" style="position: absolute; top: 100px; left: 0; width: 100%; z-index: 2;">
     <nav class="navbar navbar-expand-lg mt-3 mx-auto" style="max-width: 960px; padding: 0;">
         <div class="container-fluid navbar-custom">
-            <form class="d-flex mx-auto w-100" role="search" style="max-width: 600px;">
+            <form class="d-flex mx-auto w-100" role="search" style="max-width: 600px; position: relative;">
+                <!-- Ikon Pencarian -->
+                <div style="
+                    position: absolute; 
+                    top: 50%; 
+                    left: 15px; 
+                    transform: translateY(-50%); 
+                    width: 24px; 
+                    height: 24px; 
+                    background-color: #99c9f7; /* Biru muda untuk ikon */ 
+                    display: flex; 
+                    justify-content: center; 
+                    align-items: center; 
+                    border-radius: 50%; 
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);">
+                    <img src="https://img.icons8.com/ios-filled/50/ffffff/search.png" alt="Search Icon" style="width: 12px; height: 12px;">
+                </div>
+                <!-- Input Pencarian -->
                 <input 
-                    class="form-control me-2" 
+                    class="form-control" 
                     type="search" 
                     placeholder="Search for games, genres, or publishers..." 
                     aria-label="Search" 
-                    style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);">
-                <button 
-                    class="btn btn-secondary" 
-                    type="submit" 
-                    style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);">
-                    Search
-                </button>
+                    style="
+                        width: 100%; 
+                        padding: 10px 20px; 
+                        padding-left: 60px; 
+                        font-size: 16px; 
+                        border: none; 
+                        border-radius: 25px; 
+                        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+                        background-color: #d7e9f7; /* Biru muda untuk background input */ 
+                        color: #333333;">
             </form>
         </div>
     </nav>
 </section>
+
 
 </header>
 <body>
@@ -307,90 +328,11 @@ include('../auth/cookieValidation.php');
     <!-- FITUR REKOMENDASI GAME -->
     <div class="container mt-5">
         <h1 class="text-center mb-4 text-warning">Featured Free Games</h1>
-            <div id="gameCarousel" class="carousel slide" data-bs-ride="carousel">
-                <div class="carousel-inner">
-                    <?php
-                    $isFirst = true;
-                    $games = [];
-                    $query = "
-                        SELECT g.id_game, g.game_name, g.games_image, g.game_desc, g.release_date, g.like_count,
-                            GROUP_CONCAT(genre.genre_name SEPARATOR ', ') AS genres
-                        FROM games g
-                        LEFT JOIN detail_genre dg ON g.id_game = dg.id_game
-                        LEFT JOIN genre ON dg.id_genre = genre.id_genre
-                        WHERE g.is_admit = 1
-                        GROUP BY g.id_game
-                        LIMIT 5;
-                    ";
-                    $result = $conn->query($query);
-                    if ($result && $result->num_rows > 0):
-                        while ($game = $result->fetch_assoc()):
-                            $genres = explode(',', $game['genres']);
-                            $games[] = $game;
-                        endwhile;
-
-                        // Loop untuk menampilkan setiap game dalam satu carousel-item
-                        foreach ($games as $index => $game):
-                            $isActive = ($index === 0) ? 'active' : ''; // Set active di item pertama
-                    ?>
-                            <div class="carousel-item <?= $isActive ?>">
-                                <div class="row">
-                                    <!-- Gambar Game -->
-                                    <div class="col-md-7">
-                                        <div class="game-image-container" style="height: 400px; overflow: hidden; background: #000;">
-                                            <img src="<?= $game['games_image'] ?>" class="d-block w-100" alt="<?= $game['game_name'] ?>" style="object-fit: cover; border-radius: 8px;">
-                                        </div>
-                                    </div>
-                                    <!-- Detail Game -->
-                                    <div class="col-md-5 d-flex flex-column justify-content-center bg-dark text-white p-4" style="border-radius: 8px;">
-                                        <h3 class="text-warning"><?= htmlspecialchars($game['game_name']) ?></h3>
-                                        <p><?= htmlspecialchars($game['game_desc']) ?></p>
-                                        <p>Released: <?= date('d M Y', strtotime($game['release_date'])) ?></p>
-                                        <p>Likes: <?= $game['like_count'] ?></p>
-                                        <div class="mt-2">
-                                            <h5 class="text-light">Genres:</h5>
-                                            <div class="d-flex flex-wrap gap-2">
-                                                <?php foreach ($genres as $genre): ?>
-                                                    <span class="badge bg-secondary"><?= htmlspecialchars(trim($genre)) ?></span>
-                                                <?php endforeach; ?>
-                                            </div>
-                                            <button class="btn btn-danger btn-sm mt-3">Play Now</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                    <?php
-                        endforeach;
-                    else:
-                    ?>
-                        <div class="carousel-item active">
-                            <div class="text-center p-5" style="background: #121212; color: #fff;">
-                                <h5>No Games Available</h5>
-                                <p>Please add games to the database.</p>
-                            </div>
-                        </div>
-                    <?php endif; ?>
-                </div>
-                <!-- Carousel controls -->
-                <button class="carousel-control-prev" type="button" data-bs-target="#gameCarousel" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Previous</span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#gameCarousel" data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Next</span>
-                </button>
-            </div>
-        </div>
-    </section>
-
-
-    <section>
-        <div class="container mt-5" >
-            <h2 class="text-center mb-4">All Free Games</h2>
-            <div class="row">
+        <div id="gameCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
                 <?php
-                // Query untuk menampilkan semua game dengan genre
+                $isFirst = true;
+                $games = [];
                 $query = "
                     SELECT g.id_game, g.game_name, g.games_image, g.game_desc, g.release_date, g.like_count,
                         GROUP_CONCAT(genre.genre_name SEPARATOR ', ') AS genres
@@ -398,46 +340,120 @@ include('../auth/cookieValidation.php');
                     LEFT JOIN detail_genre dg ON g.id_game = dg.id_game
                     LEFT JOIN genre ON dg.id_genre = genre.id_genre
                     WHERE g.is_admit = 1
-                    GROUP BY g.id_game;
+                    GROUP BY g.id_game
+                    ORDER BY g.like_count DESC
+                    LIMIT 5;
                 ";
                 $result = $conn->query($query);
-
                 if ($result && $result->num_rows > 0):
                     while ($game = $result->fetch_assoc()):
-                        $genres = $game['genres'] ? explode(',', $game['genres']) : [];
+                        $genres = explode(',', $game['genres']);
+                        $games[] = $game;
+                    endwhile;
+
+                    // Loop untuk menampilkan setiap game dalam satu carousel-item
+                    foreach ($games as $index => $game):
+                        $isActive = ($index === 0) ? 'active' : ''; // Set active di item pertama
                 ?>
-                        <div class="col-12 mb-2"> <!-- Full width for a larger display -->
-                            <div class="card d-flex flex-row h-100">
-                                <img src="<?= $game['games_image'] ?>" class="card-img-left" alt="<?= $game['game_name'] ?>" style="object-fit: cover; border-radius: 8px;padding:2px">
-                                <div class="card-body p-2">
-                                    <h5 class="card-title" style="font-size: 1.3rem;"><?= htmlspecialchars($game['game_name']) ?></h5>
-                                    <p class="card-text" style="font-size: 0.75rem;">Released: <?= date('d M Y', strtotime($game['release_date'])) ?></p>
-                                    <p class="card-text" style="font-size: 0.75rem;">Likes: <?= $game['like_count'] ?></p>
-                                    
-                                    <!-- Genre Section -->
-                                    <div class="mb-2">
-                                        <h6 style="color:white;">Genres:</h6>
+                        <div class="carousel-item <?= $isActive ?>">
+                            <div class="row">
+                                <div class="col-md-7">
+                                    <div class="game-image-container" style="height: 400px; overflow: hidden; background: #000;">
+                                        <img src="<?= $game['games_image'] ?>" class="d-block w-100" alt="<?= $game['game_name'] ?>" style="object-fit: cover; border-radius: 8px;">
+                                    </div>
+                                </div>
+                                <div class="col-md-5 d-flex flex-column justify-content-center bg-dark text-white p-4" style="border-radius: 8px;">
+                                    <h3 class="text-warning"><?= htmlspecialchars($game['game_name']) ?></h3>
+                                    <p><?= htmlspecialchars($game['game_desc']) ?></p>
+                                    <p>Released: <?= date('d M Y', strtotime($game['release_date'])) ?></p>
+                                    <p>Likes: <?= $game['like_count'] ?></p>
+                                    <div class="mt-2">
+                                        <h5 class="text-light">Genres:</h5>
                                         <div class="d-flex flex-wrap gap-2">
                                             <?php foreach ($genres as $genre): ?>
                                                 <span class="badge bg-secondary"><?= htmlspecialchars(trim($genre)) ?></span>
                                             <?php endforeach; ?>
                                         </div>
+                                        <button class="btn btn-danger btn-sm mt-3">Play Now</button>
                                     </div>
-                                    <a href="play_game.php?id=<?= $game['id_game'] ?>" class="btn btn-danger btn-sm">Play Now</a>
                                 </div>
                             </div>
                         </div>
                 <?php
-                    endwhile;
+                    endforeach;
                 else:
                 ?>
-                    <div class="col-12">
-                        <p class="text-center">No games available. Please add games to the database.</p>
+                    <div class="carousel-item active">
+                        <div class="text-center p-5" style="background: #121212; color: #fff;">
+                            <h5>No Games Available</h5>
+                            <p>Please add games to the database.</p>
+                        </div>
                     </div>
                 <?php endif; ?>
             </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#gameCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#gameCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
         </div>
-    </section>
+    </div>
+</section>
+
+<section>
+    <div class="container mt-5">
+        <h2 class="text-center mb-4">All Free Games</h2>
+        <div class="row">
+            <?php
+            $query = "
+                SELECT g.id_game, g.game_name, g.games_image, g.game_desc, g.release_date, g.like_count,
+                    GROUP_CONCAT(genre.genre_name SEPARATOR ', ') AS genres
+                FROM games g
+                LEFT JOIN detail_genre dg ON g.id_game = dg.id_game
+                LEFT JOIN genre ON dg.id_genre = genre.id_genre
+                WHERE g.is_admit = 1
+                GROUP BY g.id_game
+                ORDER BY g.like_count DESC
+                LIMIT 15 OFFSET 5;
+            ";
+            $result = $conn->query($query);
+            if ($result && $result->num_rows > 0):
+                while ($game = $result->fetch_assoc()):
+                    $genres = $game['genres'] ? explode(',', $game['genres']) : [];
+            ?>
+                    <div class="col-12 mb-2">
+                        <div class="card d-flex flex-row h-100">
+                            <img src="<?= $game['games_image'] ?>" class="card-img-left" alt="<?= $game['game_name'] ?>" style="object-fit: cover; border-radius: 8px; padding: 2px">
+                            <div class="card-body p-2">
+                                <h5 class="card-title" style="font-size: 1.3rem;"><?= htmlspecialchars($game['game_name']) ?></h5>
+                                <p class="card-text" style="font-size: 0.75rem;">Released: <?= date('d M Y', strtotime($game['release_date'])) ?></p>
+                                <p class="card-text" style="font-size: 0.75rem;">Likes: <?= $game['like_count'] ?></p>
+                                <div class="mb-2">
+                                    <h6 style="color: white;">Genres:</h6>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <?php foreach ($genres as $genre): ?>
+                                            <span class="badge bg-secondary"><?= htmlspecialchars(trim($genre)) ?></span>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                                <a href="play_game.php?id=<?= $game['id_game'] ?>" class="btn btn-danger btn-sm">Play Now</a>
+                            </div>
+                        </div>
+                    </div>
+            <?php
+                endwhile;
+            else:
+            ?>
+                <div class="col-12">
+                    <p class="text-center">No games available. Please add games to the database.</p>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+</section>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
