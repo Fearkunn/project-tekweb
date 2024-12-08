@@ -1,4 +1,3 @@
-
 <?php
 // Start session and include database connection
 if (session_status() === PHP_SESSION_NONE) {
@@ -79,7 +78,7 @@ if ($user_result->num_rows > 0) {
         : "../assets/login.png";
 
         $username = htmlspecialchars($publisher_data['publisher_name']);
-        $total_games = "N/A"; // Publisher doesn't have a games library
+        
     }
     $total_games_query = "
     SELECT COUNT(*) AS total_games
@@ -88,7 +87,7 @@ if ($user_result->num_rows > 0) {
         SELECT id_publisher
         FROM publisher
         WHERE publisher_name = ?
-    )
+    ) AND is_admit = 1
     ";
     $total_games_stmt = $conn->prepare($total_games_query);
     $total_games_stmt->bind_param("s", $user_id);
