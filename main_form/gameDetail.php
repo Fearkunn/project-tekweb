@@ -54,8 +54,13 @@ while ($row = $result_reviews->fetch_assoc()) {
 }
 
 // Check if user is logged in
-$is_logged_in = isset($_SESSION['username']) && !empty($_SESSION['username']);
-$username = $is_logged_in ? $_SESSION['username'] : '';
+$is_logged_in = isset($_SESSION['username']) && !empty($_SESSION['username']); //set is logged in
+
+if($is_logged_in){ //jika ada is logged_in jika ga ada username kosong
+    $username = $_SESSION['username'];
+}else{
+    $username = '';
+}
 
 // Include cookie validation
 include('../auth/cookieValidation.php');
@@ -70,78 +75,241 @@ include('../auth/cookieValidation.php');
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        .navbar {
-            background-color: #2C2C2C; /* Dark grey */
+    .navbar {
+        background-color: #2C2C2C; /* Tetap abu-abu gelap */
+        font-family: Arial, sans-serif;
+    }
+    .navbar-brand, .nav-link {
+        color: #FFFFFF !important; /* Font putih untuk kontras */
+    }
+    .navbar-brand {
+        font-weight: bold;
+        font-size: 1.25rem;
+    }
+    .navbar-abc .nav-link:hover {
+        color: #FF4C4C !important; /* Merah terang saat hover */
+    }
+    .nav-link {
+        margin-right: 1.5rem;
+    }
+    .navbar-toggler {
+        border-color: #FFFFFF; /* Tanda toggle putih */
+    }
+    .login-btn {
+        background-color: #000000; /* Tombol hitam */
+        border: 2px solid #FF4C4C; /* Garis tepi merah */
+        padding: 5px 10px;
+        border-radius: 3px;
+        color: #FFFFFF; /* Font putih */
+        text-decoration: none;
+    }
+    .login-btn:hover {
+        background-color: #FF4C4C; /* Tombol berubah merah terang saat hover */
+        color: #FFFFFF; /* Font tetap putih */
+    }
+    body{
+        background-image: url('../assets/Background.png');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center top;
+        height: 100vh;
+        align-items: center; /* Agar teks di tengah secara vertikal */
+        justify-content: center; /* Agar teks di tengah secara horizontal */
+        color: #FFFFFF;
+    }
+    .LoginText {
+        font-size: 50px;
+        font-family: Arial, sans-serif;
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8); /* Memastikan teks tetap jelas */
+    }
+    .dropdown-toggle::after {
+    display: none;
+    }
+    .dropdown{
+        padding-right: 5rem;
+    }
+    .dropdown-item{
+        color: white;
+    }
+    .dropdown-divider{
+        border-color:white;
+    }
+
+    .navbar-custom{
+        background: linear-gradient( rgba(200, 14, 49, 0.8), rgba(125, 7, 23, 0.8));
+    }
+
+    .navbar-custom a:hover{
+        background-color: #c51d3a; /* Darker red background on hover */
+        border-radius: 4px; /* Optional: Rounded corners on hover */
+        color: white !important;
+    }
+    .hero-game {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        background: linear-gradient(to right, #4e54c8, #8f94fb);
+        padding: 20px;
+        border-radius: 10px;
+        color: white;
+        margin-bottom: 30px;
+    }
+
+    .game-container {
+            max-width: 1200px;
+            margin: 100px auto;
+            padding: 20px;
+            background-color: #333;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
-        .navbar-brand, .nav-link {
-            color: #FFFFFF !important; /* White font for contrast */
+
+        .hero-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
         }
-        .game-image {
-            max-width: 100%; /* Make sure image is responsive */
+
+        .hero-image {
+            flex: 2;
+        }
+
+        .hero-image img {
+            width: 100%; /* Gambar tetap responsif */
+            min-width: 300px; /* Lebar minimum */
+            min-height: 200px; /* Tinggi minimum */
+            max-width: 600px; /* Lebar maksimum (opsional) */
+            max-height: 400px; /* Tinggi maksimum (opsional) */
+            object-fit: cover; /* Gambar akan menyesuaikan tanpa distorsi */
+            border-radius: 10px; /* Sudut gambar melengkung */
+        }
+
+        .game-details {
+            flex: 3;
+            padding: 20px;
             border-radius: 10px;
         }
+
+        .game-title {
+            color: #ffffff;
+            font-size: 2rem;
+            margin-bottom: 15px;
+        }
+
         .game-description {
-            font-size: 1.1rem;
             margin-top: 15px;
         }
-        .like-count {
-            color: #FF4C4C; /* Bright red for likes */
-            font-weight: bold;
+
+        .tags {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
         }
-        .review {
-            margin-top: 20px;
-            border: 1px solid #ddd;
-            padding: 10px;
+
+        .tag {
+            background-color: #4c6b8a;
+            padding: 5px 10px;
             border-radius: 5px;
-            background-color: #f9f9f9;
+            font-size: 0.9rem;
+            color: white;
+        }
+
+        .actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn-custom {
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-wishlist {
+            background-color: #5c7e10;
+            color: white;
+        }
+
+        .btn-follow {
+            background-color: #46698c;
+            color: white;
+        }
+
+        .reviews-section {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .review {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #34495e;
+            border-radius: 5px;
+        }
+
+        .review strong {
+            color: #ffffff;
         }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="../index.php">Game Store</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarScroll">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="../index.php">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#storeSection">Store</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Library</a>
-                    </li>
-                    <?php if ($is_logged_in): ?>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#"><?php echo htmlspecialchars($username); ?></a>
-                        </li>
-                    <?php endif; ?>
-                </ul>
-                <?php if ($is_logged_in): ?>
-                    <a href="../auth/logout.php" class="btn btn-danger">Logout</a>
-                <?php else: ?>
-                    <a href="../auth/login.php" class="btn btn-success">Login</a>
-                <?php endif; ?>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand logo" href="mainForm.php">
+            <img src="..\assets\Logo.svg" alt="UapLogo">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-center navbar-abc" id="navbarScroll">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link active" aria-current="page" href="store.php">Store</a></li>
+                <li class="nav-item"><a class="nav-link" href="../main_form/library.php">Library</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Community</a></li>
+                <li class="nav-item"><a class="nav-link disabled" aria-disabled="true" href="#"><?php echo $username; ?></a></li>
+            </ul>
+            <?php if ($is_logged_in): ?>
+                <div class="dropdown" style="background-color: #2C2C2C;">
+                    <button class=" btn btn-secondary dropdown-toggle bi bi-person-circle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" style="font-size: 1.3rem; background-color: #2C2C2C;" aria-expanded="false">
+                        <?php echo " ", $username; ?>
+                    </button>
+                    <ul class="dropdown-menu bg-dark" aria-labelledby="dropdownMenuButton1">
+                        <li><a class="dropdown-item" href="userProfile.php">Profile</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="../auth/logout.php">Logout</a></li>
+                    </ul>
+                </div>
+            <?php else: ?>
+                <a href="..\auth\login.php" class="btn btn-danger">Login</a>
+            <?php endif; ?>
+        </div>
+    </div>
+</nav>
+
+<div class="container game-container">
+    <div class="hero-section">
+        <div class="hero-image">
+            <img src="<?php echo htmlspecialchars($game['games_image']); ?>" alt="<?php echo htmlspecialchars($game['game_name']); ?>">
+        </div>
+        <div class="game-details">
+            <h1 class="game-title"><?php echo htmlspecialchars($game['game_name']); ?></h1>
+            <p><strong>Publisher:</strong> <?php echo htmlspecialchars($game['publisher_name']); ?></p>
+            <p><strong>Release Date:</strong> <?php echo date('F j, Y', strtotime($game['release_date'])); ?></p>
+            <p class="game-description"><?php echo nl2br(htmlspecialchars($game['game_desc'])); ?></p>
+            <p><strong>Genres:</strong></p>
+            <div class="tags">
+                <?php foreach ($genres as $genre): ?>
+                    <span class="tag"><?php echo htmlspecialchars($genre); ?></span>
+                <?php endforeach; ?>
             </div>
         </div>
-    </nav>
+    </div>
 
-    <div class="container my-5">
-        <h1><?php echo htmlspecialchars($game['game_name']); ?></h1>
-        <img src="<?php echo htmlspecialchars($game['games_image']); ?>" alt="<?php echo htmlspecialchars($game['game_name']); ?>" class="game-image">
-        <p class="like-count">Likes: <?php echo htmlspecialchars($game['like_count']); ?></p>
-        <p class="game-description"><?php echo nl2br(htmlspecialchars($game['game_desc'])); ?></p>
-        <p><strong>Publisher:</strong> <?php echo htmlspecialchars($game['publisher_name']); ?></p>
-        <?php if ($game['publisher_logo']): ?>
-            <img src="<?php echo htmlspecialchars($game['publisher_logo']); ?>" alt="Publisher Logo" class="game-image" style="max-width: 100px;">
-        <?php endif; ?>
-        <p><strong>Release Date:</strong> <?php echo date('F j, Y', strtotime($game['release_date'])); ?></p>
-        <p><strong>Genres:</strong> <?php echo implode(', ', $genres); ?></p>
-
+    <div class="reviews-section">
         <h2>Reviews</h2>
         <?php if (!empty($reviews)): ?>
             <?php foreach ($reviews as $review): ?>
@@ -154,7 +322,8 @@ include('../auth/cookieValidation.php');
             <p>No reviews yet.</p>
         <?php endif; ?>
     </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
