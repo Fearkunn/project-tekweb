@@ -51,7 +51,7 @@ include('../auth/cookieValidation.php');
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Uap</title>
     <link rel="icon" href= "../assets/UAP.ico" type="image/x-icon"> 
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <style>
@@ -396,6 +396,9 @@ include('../auth/cookieValidation.php');
                                             <form method="POST">
                                                 <input type="hidden" name="id_game" value="<?= $game['id_game'] ?>">
                                                 <button type="submit" name="add_to_library" class="btn btn-danger btn-sm mt-3">Add to Library</button>
+                                                <script>
+
+                                                </script>
                                             </form>
                                         <?php elseif (!$is_publisher && $is_logged_in): ?>
                                             <button class="btn btn-success btn-sm mt-3" disabled>Already in Library</button>
