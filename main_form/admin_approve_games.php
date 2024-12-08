@@ -38,10 +38,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $updateStmt = $conn->prepare($updateQuery);
     $updateStmt->bind_param("i", $gameId);
     if ($updateStmt->execute()) {
+        $_SESSION['Send'] = ['type' => 'success', 'message' => 'Game disetujui'];
         header('Location: ' . $_SERVER['PHP_SELF']);
         exit;
     } else {
         $errorMessage = "Gagal menyetujui game: " . $conn->error;
+        $_SESSION['Send'] = ['type' => 'error', 'message' => 'Gagal menyetujui game: '. $conn->error];
+        header('Location: ' . $_SERVER['PHP_SELF']);
+        exit;
     }
 }
 ?>
@@ -52,6 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Admin - Approve Games</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="icon" href="../assets/UAP.ico" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
@@ -123,11 +128,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     <div class="container py-5">
         <h2 class="text-center mb-4">Approve Games</h2>
 
-        <?php if (isset($errorMessage)): ?>
-            <div class="alert alert-danger" role="alert">
-                <?php echo $errorMessage; ?>
-            </div>
-        <?php endif; ?>
 
         <h3 class="py-5">Daftar Game:</h3>
         <div class="row">
