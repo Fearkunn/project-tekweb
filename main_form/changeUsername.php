@@ -181,9 +181,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="container">
             <div class="form-box">
                 <h2 class="pb-3">Change Username</h2>
-                <?php if ($error): ?>
-                    <div class="alert alert-danger"><?php echo $error; ?></div>
-                <?php endif; ?>
                 <form method="POST">
                     <div class="mb-3 pb-2">
                         <label for="new_username" class="form-label">New Username</label>

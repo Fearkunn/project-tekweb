@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['user_profile'])) {
 
         $response = curl_exec($ch);
         if (curl_errno($ch)) {
-            $errorMessage = 'cURL Error: ' . curl_error($ch);
+            $_SESSION['Send'] = ['type' => 'error', 'message' => 'cURL Error: ' . curl_error($ch)];
         }
         curl_close($ch);
 
@@ -47,10 +47,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['user_profile'])) {
         if (isset($responseData['data']['url'])) {
             $ImagePath = $responseData['data']['url']; // URL gambar yang diunggah
         } else {
-            $errorMessage = "Gagal mengupload gambar: " . ($responseData['error']['message'] ?? 'Unknown error');
+            $_SESSION['Send'] = ['type' => 'error', 'message' => "Gagal mengupload gambar: " . ($responseData['error']['message'] ?? 'Unknown error')];
+            header("Location: ../main_form/changeProfilePictuere.php");
+            exit();
         }
     } else {
-        $errorMessage = "File tidak valid. Harap unggah gambar.";
+        $_SESSION['Send'] = ['type' => 'error', 'message' => "File tidak valid. Harap unggah gambar."];
+        header("Location: ../main_form/changeProfilePictuere.php");
+        exit();
     }
 
     // Simpan URL gambar ke database
@@ -91,14 +95,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['user_profile'])) {
             $update_stmt = $conn->prepare($update_query);
             $update_stmt->bind_param("si", $ImagePath, $_SESSION['user_id']);
             if ($update_stmt->execute()) {
-                $success = "Foto profil berhasil diperbarui!";
-                unset($_POST);
-                echo '<script>window.history.replaceState(null, null, window.location.href);</script>';
+                $_SESSION['Send'] = ['type' => 'success', 'message' => 'Foto profil berhasil diperbarui!', 'redirect' => 'userProfile.php'];
             } else {
-                $errorMessage = "Gagal memperbarui foto profil di database.";
+                $_SESSION['Send'] = ['type' => 'error', 'message' => 'Gagal memperbarui foto profil di database.'];
+                header("Location: ../main_form/changeProfilePictuere.php");
+                exit();
             }
         } else {
-            $errorMessage = "Akun tidak ditemukan di sistem.";
+            $_SESSION['Send'] = ['type' => 'error', 'message' => 'Akun tidak ditemukan di sistem.'];
+            header("Location: ../main_form/changeProfilePictuere.php");
+            exit();
         }
     }
 }
@@ -109,6 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['user_profile'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Edit Profile</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="icon" href="../assets/UAP.ico" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
@@ -163,6 +170,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['user_profile'])) {
     </style>
 </head>
 <body>
+    <?php if (isset($_SESSION['Send'])): ?>
+            <script>
+                Swal.fire({
+                    title: "<?= $_SESSION['Send']['type'] === 'success' ? 'Berhasil!' : 'Gagal!' ?>",
+                    text: "<?= $_SESSION['Send']['message'] ?>",
+                    icon: "<?= $_SESSION['Send']['type'] ?>",
+                    confirmButtonText: "OK"
+                }).then(() => {
+                    <?php if ($_SESSION['Send']['type'] === 'success' && isset($_SESSION['Send']['redirect'])): ?>
+                        window.location.href = "<?= $_SESSION['Send']['redirect'] ?>";
+                    <?php endif; ?>
+                });
+            </script>
+            <?php unset($_SESSION['Send']); ?>
+        <?php endif; ?>
     <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
             <a class="navbar-brand mx-auto" href="../main_form/mainForm.php">
@@ -175,13 +197,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['user_profile'])) {
         <div class="container">
             <div class="form-box">
                 <h2 class="pb-3">Edit Profile Picture</h2>
-                <?php if ($errorMessage): ?>
-                    <div class="alert alert-danger"><?php echo $errorMessage; ?></div>
-                <?php endif; ?>
-                <?php if ($success): ?>
-                    <div class="alert alert-success"><?php echo $success; ?></div>
-                    <a href="userProfile.php" class="btn btn-secondary">Back to Profile</a>
-                <?php endif; ?>
                 <form method="POST" enctype="multipart/form-data">
                     <div class="mb-3 pb-2">
                         <label for="user_profile" class="form-label">Upload New Profile Picture</label>
