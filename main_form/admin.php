@@ -62,7 +62,7 @@ while ($row = $topLikedGamesResult->fetch_assoc()) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Admin Dashboard</title>
+    <title>Admin - Dashboard</title>
     <link rel="icon" href="../assets/UAP.ico" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
@@ -146,7 +146,7 @@ while ($row = $topLikedGamesResult->fetch_assoc()) {
 <body>
     <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
-            <a class="navbar-brand logo" href="#">
+            <a class="navbar-brand logo" href="admin.php">
                 <img src="..\assets\Logo.svg" alt="UapLogo">
             </a>
             <div class="collapse navbar-collapse justify-content-center navbar-abc" id="navbarScroll">

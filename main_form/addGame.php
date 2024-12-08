@@ -141,7 +141,20 @@ if ($result && $result->num_rows > 0) {
     die("Publisher tidak ditemukan untuk pengguna ini.");
 }
 
-$gamesStmt = $conn->prepare("SELECT id_game, game_name, game_desc, games_image, is_admit FROM games WHERE id_publisher = ?");
+$gamesStmt = $conn->prepare("
+    SELECT 
+        g.id_game, 
+        g.game_name, 
+        g.game_desc, 
+        g.games_image, 
+        g.is_admit, 
+        GROUP_CONCAT(gen.genre_name SEPARATOR ', ') AS genres
+    FROM games g
+    LEFT JOIN detail_genre dg ON g.id_game = dg.id_game
+    LEFT JOIN genre gen ON dg.id_genre = gen.id_genre
+    WHERE g.id_publisher = ?
+    GROUP BY g.id_game
+");
 $gamesStmt->bind_param("i", $idPublisher);
 $gamesStmt->execute();
 $games = $gamesStmt->get_result();
@@ -293,12 +306,12 @@ $games = $gamesStmt->get_result();
             <?php
             while ($game = $games->fetch_assoc()) {
                 echo "<div class='col mb-4 mt-3'>";
-                echo "<div class='card h-100'>";
+                echo "<div class='card text-bg-dark h-100'>";
                 echo "<img src='" . $game['games_image'] . "' alt='Cover' class='card-img-top' style='height: 200px; object-fit: cover;'>";
                 echo "<div class='card-body'>";
                 echo "<h5 class='card-title'>" . $game['game_name'] . "</h5>";
                 echo "<p class='card-text'>" . $game['game_desc'] . "</p>";
-                
+                echo "<p class='card-text'>Genre: " . (htmlspecialchars($game['genres']) ?: 'No genre specified') . "</p>";
                 // Indikator Status
                 $statusClass = $game['is_admit'] ? 'text-success' : 'text-danger'; // Menggunakan warna hijau untuk approved dan merah untuk rejected
                 $statusText = $game['is_admit'] ? 'Sudah Diterima' : 'Belum Diterima';
