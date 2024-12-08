@@ -184,10 +184,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php if ($error): ?>
                     <div class="alert alert-danger"><?php echo $error; ?></div>
                 <?php endif; ?>
-                <?php if ($success): ?>
-                    <div class="alert alert-success"><?php echo $success; ?></div>
-                    <a href="userProfile.php" class="btn btn-secondary">Back to Profile</a>
-                <?php endif; ?>
                 <form method="POST">
                     <div class="mb-3 pb-2">
                         <label for="new_username" class="form-label">New Username</label>
