@@ -315,10 +315,10 @@ $games = $gamesStmt->get_result();
                 // Indikator Status
                 $statusClass = $game['is_admit'] ? 'text-success' : 'text-danger'; // Menggunakan warna hijau untuk approved dan merah untuk rejected
                 $statusText = $game['is_admit'] ? 'Sudah Diterima' : 'Belum Diterima';
-                echo "<p class='$statusClass'>$statusText</p>";
+                echo "<p class='$statusClass pb-3'>$statusText</p>";
 
                 echo "<form method='POST'>";
-                echo "<button type='submit' name='delete_game_id' value='" . $game['id_game'] . "' class='btn btn-danger btn-sm'>Hapus</button>";
+                echo "<button type='submit' name='delete_game_id' value='" . $game['id_game'] . "' class='btn btn-danger'>Hapus</button>";
                 echo "</form>";
                 echo "</div></div></div>";
             }
