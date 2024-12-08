@@ -368,17 +368,17 @@ include('../auth/cookieValidation.php');
                 ?>
                         <div class="carousel-item <?= $isActive ?>">
                             <div class="row">
-                                <div class="col-md-7">
+                                <div class="col-md-4">
                                     <a href="gameDetail.php?game_id=<?= $game['id_game'] ?>" class="game-image-link">
-                                    <div class="game-image-container" style="height: 400px; overflow: hidden; background: #000;">
+                                    <div class="game-image-container" style="height: 400px; overflow: hidden;">
                                         <img src="<?= htmlspecialchars($game['games_image']) ?>" 
-                                             class="d-block w-100" 
+                                             class="d-block mx-auto" 
                                              alt="<?= htmlspecialchars($game['game_name']) ?>" 
-                                             style="object-fit: cover; border-radius: 8px;">
+                                             style="width:100%;object-fit: fill;object-position:top; border-radius: 8px;">
                                     </div>
                                     </a>
                                 </div>
-                                <div class="col-md-5 d-flex flex-column justify-content-center bg-dark text-white p-4" style="border-radius: 8px;">
+                                <div class="col-md-8 d-flex flex-column justify-content-center bg-dark text-white p-4" style="border-radius: 8px;">
                                     <h3 class="text-warning"><?= htmlspecialchars($game['game_name']) ?></h3>
                                     <p><?= htmlspecialchars($game['game_desc']) ?></p>
                                     <p>Released: <?= date('d M Y', strtotime($game['release_date'])) ?></p>
