@@ -69,8 +69,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Delete Account</title>
     <link rel="icon" href="../assets/UAP.ico" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-       body { 
+        body { 
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
@@ -134,12 +135,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php if ($error): ?>
                     <div class="alert alert-danger"><?php echo $error; ?></div>
                 <?php endif; ?>
-                <form method="POST">
+                <form id="delete-form" method="POST">
                     <p class="pb-2">Are you sure you want to delete your account? This action is permanent.</p>
-                    <button type="submit" class="btn btn-danger">Delete Account</button>
+                    <button type="button" class="btn btn-danger" id="confirm-delete-btn">Delete Account</button>
                 </form>
             </div>
         </div>
     </section>
+
+    <script>
+        document.getElementById('confirm-delete-btn').addEventListener('click', function() {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'This action is permanent and cannot be undone.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'No, cancel!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // If user confirms, submit the form
+                    document.getElementById('delete-form').submit();
+                }
+            });
+        });
+    </script>
 </body>
 </html>
