@@ -46,7 +46,7 @@ if (isset($_POST['search'])) {
         g.game_desc,
         g.games_image,
         p.publisher_name,
-        GROUP_CONCAT(gen.genre_name SEPARATOR ', ') AS genres
+        GROUP_CONCAT(DISTINCT gen.genre_name SEPARATOR ', ') AS genres
     FROM games g
     JOIN publisher p ON g.id_publisher = p.id_publisher
     LEFT JOIN detail_genre dg ON g.id_game = dg.id_game

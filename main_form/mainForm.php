@@ -408,7 +408,7 @@ include('../auth/cookieValidation.php');
             <?php
             $query = "
                 SELECT g.id_game, g.game_name, g.games_image, g.game_desc, g.release_date, g.like_count,
-                    GROUP_CONCAT(genre.genre_name SEPARATOR ', ') AS genres
+                    GROUP_CONCAT(DISTINCT genre.genre_name SEPARATOR ', ') AS genres
                 FROM games g
                 LEFT JOIN detail_genre dg ON g.id_game = dg.id_game
                 LEFT JOIN genre ON dg.id_genre = genre.id_genre

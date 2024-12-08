@@ -166,7 +166,7 @@ $gamesStmt = $conn->prepare("
         g.game_desc, 
         g.games_image, 
         g.is_admit, 
-        GROUP_CONCAT(gen.genre_name SEPARATOR ', ') AS genres
+        GROUP_CONCAT(DISTINCT gen.genre_name SEPARATOR ', ') AS genres
     FROM games g
     LEFT JOIN detail_genre dg ON g.id_game = dg.id_game
     LEFT JOIN genre gen ON dg.id_genre = gen.id_genre
