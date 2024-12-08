@@ -103,6 +103,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 </head>
 
 <body>
+<?php if (isset($_SESSION['Send'])): ?>
+            <script>
+                Swal.fire({
+                    title: "<?= $_SESSION['Send']['type'] === 'success' ? 'Berhasil!' : 'Gagal!' ?>",
+                    text: "<?= $_SESSION['Send']['message'] ?>",
+                    icon: "<?= $_SESSION['Send']['type'] ?>",
+                    confirmButtonText: "OK"
+                }).then(() => {
+                    <?php if ($_SESSION['Send']['type'] === 'success' && isset($_SESSION['Send']['redirect'])): ?>
+                        window.location.href = "<?= $_SESSION['Send']['redirect'] ?>";
+                    <?php endif; ?>
+                });
+            </script>
+            <?php unset($_SESSION['Send']); ?>
+        <?php endif; ?>
 <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
             <a class="navbar-brand logo" href="admin.php">
