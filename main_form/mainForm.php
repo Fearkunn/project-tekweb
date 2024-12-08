@@ -41,7 +41,6 @@ if ($is_logged_in) {
 //$query = "SELECT id_game, game_name, game_desc, games_image, release_date, like_count FROM games WHERE is_admit = 1";
 //$result = $conn->query($query);
 
-
 // Check if the user is logged in via session
 include('../auth/cookieValidation.php');
 ?>
@@ -318,6 +317,7 @@ include('../auth/cookieValidation.php');
 
 </header>
 <body>
+
 <section id="carousel">
     <!-- FITUR REKOMENDASI GAME -->
     <div class="container mt-5">
@@ -343,10 +343,28 @@ include('../auth/cookieValidation.php');
                         $games[] = $game;
                     endwhile;
 
-                    // Loop untuk menampilkan setiap game dalam satu carousel-item
                     foreach ($games as $index => $game):
-                        $isActive = ($index === 0) ? 'active' : ''; // Set active di item pertama
-                        $genres = explode(',', $game['genres']); // Memproses genre di dalam loop
+                        $isActive = ($index === 0) ? 'active' : '';
+                        $genres = explode(',', $game['genres']);
+
+                        // Pengecekan apakah game sudah ada di library
+                        $query = "SELECT * FROM library WHERE id_user = ? AND id_game = ?";
+                        $stmt = $conn->prepare($query);
+                        $stmt->bind_param("ii", $_SESSION['user_id'], $game['id_game']);
+                        $stmt->execute();
+                        $is_in_library = $stmt->get_result()->num_rows > 0;
+
+                        // Handle form submission (Add to Library)
+                        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_library']) && $_POST['id_game'] == $game['id_game']) {
+                            // Add game to library if not already there
+                            if (!$is_in_library) {
+                                $query = "INSERT INTO library (id_user, id_game) VALUES (?, ?)";
+                                $stmt = $conn->prepare($query);
+                                $stmt->bind_param("ii", $_SESSION['user_id'], $game['id_game']);
+                                $stmt->execute();
+                                $is_in_library = true; // Mark as added to library after insertion
+                            }
+                        }
                 ?>
                         <div class="carousel-item <?= $isActive ?>">
                             <div class="row">
@@ -370,7 +388,15 @@ include('../auth/cookieValidation.php');
                                                 <span class="badge bg-secondary"><?= htmlspecialchars(trim($genre)) ?></span>
                                             <?php endforeach; ?>
                                         </div>
-                                        <button class="btn btn-danger btn-sm mt-3">Play Now</button>
+                                        <?php if (!$is_publisher && !$is_in_library): ?>
+                                            <!-- Form to add to library directly in this page -->
+                                            <form method="POST">
+                                                <input type="hidden" name="id_game" value="<?= $game['id_game'] ?>">
+                                                <button type="submit" name="add_to_library" class="btn btn-danger btn-sm mt-3">Add to Library</button>
+                                            </form>
+                                        <?php elseif (!$is_publisher): ?>
+                                            <button class="btn btn-success btn-sm mt-3" disabled>Already in Library</button>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             </div>
@@ -387,7 +413,6 @@ include('../auth/cookieValidation.php');
                     </div>
                 <?php endif; ?>
             </div>
-            <!-- Tombol navigasi carousel -->
             <button class="carousel-control-prev" type="button" data-bs-target="#gameCarousel" data-bs-slide="prev">
                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                 <span class="visually-hidden">Previous</span>
@@ -408,7 +433,7 @@ include('../auth/cookieValidation.php');
             <?php
             $query = "
                 SELECT g.id_game, g.game_name, g.games_image, g.game_desc, g.release_date, g.like_count,
-                    GROUP_CONCAT(DISTINCT genre.genre_name SEPARATOR ', ') AS genres
+                    GROUP_CONCAT(distinct genre.genre_name SEPARATOR ', ') AS genres
                 FROM games g
                 LEFT JOIN detail_genre dg ON g.id_game = dg.id_game
                 LEFT JOIN genre ON dg.id_genre = genre.id_genre
@@ -421,6 +446,25 @@ include('../auth/cookieValidation.php');
             if ($result && $result->num_rows > 0):
                 while ($game = $result->fetch_assoc()):
                     $genres = $game['genres'] ? explode(',', $game['genres']) : [];
+
+                    // Pengecekan apakah game sudah ada di library
+                    $query = "SELECT * FROM library WHERE id_user = ? AND id_game = ?";
+                    $stmt = $conn->prepare($query);
+                    $stmt->bind_param("ii", $_SESSION['user_id'], $game['id_game']);
+                    $stmt->execute();
+                    $is_in_library = $stmt->get_result()->num_rows > 0;
+
+                    // Handle form submission (Add to Library)
+                    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_library']) && $_POST['id_game'] == $game['id_game']) {
+                        // Add game to library if not already there
+                        if (!$is_in_library) {
+                            $query = "INSERT INTO library (id_user, id_game) VALUES (?, ?)";
+                            $stmt = $conn->prepare($query);
+                            $stmt->bind_param("ii", $_SESSION['user_id'], $game['id_game']);
+                            $stmt->execute();
+                            $is_in_library = true; // Mark as added to library after insertion
+                        }
+                    }
             ?>
                     <div class="col-12 mb-2">
                         <div class="card d-flex flex-row h-100">
@@ -437,7 +481,15 @@ include('../auth/cookieValidation.php');
                                         <?php endforeach; ?>
                                     </div>
                                 </div>
-                                <a href="play_game.php?id=<?= $game['id_game'] ?>" class="btn btn-danger btn-sm">Play Now</a>
+                                <?php if (!$is_publisher && !$is_in_library): ?>
+                                    <!-- Form to add to library directly in this page -->
+                                    <form method="POST">
+                                        <input type="hidden" name="id_game" value="<?= $game['id_game'] ?>">
+                                        <button type="submit" name="add_to_library" class="btn btn-danger btn-sm mt-3">Add to Library</button>
+                                    </form>
+                                <?php elseif (!$is_publisher): ?>
+                                    <button class="btn btn-success btn-sm mt-3" disabled>Already in Library</button>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
