@@ -31,7 +31,9 @@
                                      VALUES ('$new_publisher_id', '$username', '$hashed_password')"; // You can set a default logo or allow uploading
                     if (mysqli_query($conn, $insert_query)) {
                         echo "<script>console.log('Publisher insert query done');</script>";
+                        $_SESSION['user_id'] = $new_publisher_id;
                         $_SESSION['username'] = $username; // Save username in session
+                        $_SESSION['role_user'] = 'PUBLISHER';
                         header("Location: ..\main_form\mainForm.php"); // Redirect to main form
                         exit();
                     } else {
@@ -61,7 +63,9 @@
                                          VALUES ('$new_user_id', '$username', '$email', '$hashed_password','USER')";
                         if (mysqli_query($conn, $insert_query)) {
                             echo "<script>console.log('User insert query done');</script>";
+                            $_SESSION['user_id'] = $new_user_id;
                             $_SESSION['username'] = $username; // Save username in session
+                            $_SESSION['role_user'] = 'USER';
                             header("Location: ..\main_form\mainForm.php"); // Redirect to main form
                             exit();
                         } else {
