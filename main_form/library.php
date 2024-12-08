@@ -32,7 +32,7 @@ if (isset($_GET['sort'])) {
 }
 
 $query = "
-    SELECT l.id_library, g.game_name, g.games_image, g.like_count
+    SELECT l.id_library, g.game_name, g.games_image, g.like_count, g.id_game
     FROM library l
     INNER JOIN games g ON l.id_game = g.id_game
     WHERE l.id_user = ?
@@ -193,11 +193,9 @@ $userLiked = '';
                                             <?php echo $userLiked ? 'checked' : ''; ?>>
                                         <label for="like-<?php echo $game['id_library']; ?>">Like</label>
                                     </div>
-                                    
-                                    <!-- Review Button -->
-                                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#reviewModal-<?php echo $game['id_library']; ?>">
-                                        Review
-                                    </button>
+                            
+                                    <a href="gameDetail.php?game_id=<?php echo $game['id_game']; ?>" class="btn btn-info btn-sm">Review</a>
+
                                 </div>
                             </div>
                         </div>
