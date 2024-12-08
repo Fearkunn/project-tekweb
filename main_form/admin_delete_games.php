@@ -1,3 +1,4 @@
+
 <?php
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -70,9 +71,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $stmt = $conn->prepare("DELETE FROM games WHERE id_game = ?");
     $stmt->bind_param("i", $gameId);
     if ($stmt->execute()) {
-        $successMessage = "Game berhasil dihapus.";
+        $_SESSION['Send'] = ['type' => 'success', 'message' => 'Game berhasil dihapus.','redirect' => 'admin_delete_games.php'];
+        header('Location: ../main_form/admin_delete_games.php');
+        exit();
     } else {
         $errorMessage = "Gagal menghapus game: " . $conn->error;
+        $_SESSION['Send'] = ['type' => 'error', 'message' => 'Gagal menghapus game: ' . $conn -> error];
+        header('Location: ../main_form/admin_delete_games.php');
+        exit();
     }
 }
 ?>
@@ -83,6 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Admin - Delete Games</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="icon" href="../assets/UAP.ico" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
@@ -129,6 +136,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 </head>
 
 <body>
+    <?php if (isset($_SESSION['Send'])): ?>
+            <script>
+                Swal.fire({
+                    title: "<?= $_SESSION['Send']['type'] === 'success' ? 'Berhasil!' : 'Gagal!' ?>",
+                    text: "<?= $_SESSION['Send']['message'] ?>",
+                    icon: "<?= $_SESSION['Send']['type'] ?>",
+                    confirmButtonText: "OK"
+                }).then(() => {
+                    <?php if ($_SESSION['Send']['type'] === 'success' && isset($_SESSION['Send']['redirect'])): ?>
+                        window.location.href = "<?= $_SESSION['Send']['redirect'] ?>";
+                    <?php endif; ?>
+                });
+            </script>
+        <?php unset($_SESSION['Send']); ?>
+    <?php endif; ?>
     <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
             <a class="navbar-brand logo" href="admin.php">

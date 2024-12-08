@@ -88,9 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['gameName'])) {
                     $stmt->bind_param("ii", $lastInsertId, $genreId);
                     $stmt->execute();
                 }
-                $_SESSION['Send'] = ['type' => 'success', 'message' => 'Game berhasil ditambahkan.'];
-                header('Location: ../main_form/addGame.php');
-                exit();
+                $_SESSION['Send'] = ['type' => 'success', 'message' => 'Game berhasil ditambahkan.','redirect' => 'addGame.php'];
             }
         } else {   
             $_SESSION['Send'] = ['type' => 'error', 'message' => 'Gagal menambahkan game:' . $conn->error];
@@ -114,9 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_game_id'])) {
     $stmt = $conn->prepare("DELETE FROM games WHERE id_game = ?");
     $stmt->bind_param("i", $deleteGameId);
     if ($stmt->execute()) {
-        $_SESSION['Send'] = ['type' => 'success', 'message' => 'Game berhasil dihapus.'];
-        header('Location: ../main_form/addGame.php');
-        exit();
+        $_SESSION['Send'] = ['type' => 'success', 'message' => 'Game berhasil dihapus.','redirect' => 'addGame.php'];
     } else {
         $errorMessage = "Gagal menghapus game: " . $conn->error;
         $_SESSION['Send'] = ['type' => 'error', 'message' => 'Gagal menghapus game: ' . $conn->error];
@@ -135,9 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_game_id'])) {
     $stmt = $conn->prepare("UPDATE games SET game_name = ?, game_desc = ?, is_admit = ? WHERE id_game = ?");
     $stmt->bind_param("ssii", $gameName, $gameDesc, $isAdmit, $editGameId);
     if ($stmt->execute()) {
-        $_SESSION['Send'] = ['type' => 'success', 'message' => 'Game berhasil diperbarui.'];
-        header('Location: ../main_form/addGame.php');
-        exit();
+        $_SESSION['Send'] = ['type' => 'success', 'message' => 'Game berhasil diperbarui.','redirect' => 'addGame.php'];
     } else {
         $_SESSION['Send'] = ['type' => 'error', 'message' => 'Gagal memperbarui game:' . $conn->error];
         header('Location: ../main_form/addGame.php');

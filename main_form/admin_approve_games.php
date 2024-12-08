@@ -38,9 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $updateStmt = $conn->prepare($updateQuery);
     $updateStmt->bind_param("i", $gameId);
     if ($updateStmt->execute()) {
-        $_SESSION['Send'] = ['type' => 'success', 'message' => 'Game disetujui'];
-        header('Location: ' . $_SERVER['PHP_SELF']);
-        exit;
+        $_SESSION['Send'] = ['type' => 'success', 'message' => 'Game disetujui','redirect' => 'admin_approve_games.php'];
     } else {
         $errorMessage = "Gagal menyetujui game: " . $conn->error;
         $_SESSION['Send'] = ['type' => 'error', 'message' => 'Gagal menyetujui game: '. $conn->error];
