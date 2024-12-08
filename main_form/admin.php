@@ -210,7 +210,7 @@ while ($row = $topLikedGamesResult->fetch_assoc()) {
         <!-- Publisher Teratas -->
         <div class="content-box mt-4">
             <h3 class="pb-4">3 Publisher dengan Game Terbanyak</h3>
-            <table class="table table-hover table-secondary">
+            <table class="table table-hover table-secondary table-bordered">
                 <thead>
                     <tr>
                         <th>Publisher</th>
@@ -231,7 +231,7 @@ while ($row = $topLikedGamesResult->fetch_assoc()) {
         <!-- Game Terpopuler -->
         <div class="content-box mt-4">
             <h3 class="pb-4">3 Game dengan Jumlah Like Terbanyak</h3>
-            <table class="table table-hover table-secondary">
+            <table class="table table-hover table-secondary table-bordered">
                 <thead>
                     <tr>
                         <th>Game</th>
