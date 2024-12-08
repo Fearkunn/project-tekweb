@@ -220,43 +220,7 @@ include('../auth/cookieValidation.php');
         color: #ccc;
         margin-bottom: 15px;
     }
-    .search-bar-container {
-    max-width: 960px;
-    margin: 0 auto;
-    }
-
-    .search-form {
-        width: 100%;
-        display: flex;
-        justify-content: center;
-    }
-
-    .search-bar {
-        display: flex;
-        align-items: center;
-        width: 100%;
-        max-width: 600px;
-        background-color: #1b1b1b; /* Hitam pekat */
-        border: 1px solid #d81e1e; /* Merah */
-        border-radius: 4px;
-        padding: 8px;
-    }
-
-    .search-icon {
-        color: #d81e1e; /* Merah */
-        font-size: 16px;
-        margin-right: 10px;
-    }
-
-    .search-input {
-        flex: 1;
-        background: none;
-        border: none;
-        outline: none;
-        color: #ffffff; /* Putih */
-        font-size: 14px;
-    }
-
+  
     </style>
 </head>
 <header>
@@ -324,7 +288,7 @@ include('../auth/cookieValidation.php');
                 align-items: center; 
                 width: 100%; 
                 max-width: 600px; 
-                background-color: #1b1b1b; /* Warna hitam pekat */
+                background-color:  #1b1b1b;/* Warna hitam pekat */
                 border: 1px solid #d81e1e; /* Border merah */
                 border-radius: 4px; 
                 padding: 8px;">
