@@ -61,7 +61,19 @@ if($is_logged_in){ //jika ada is logged_in jika ga ada username kosong
 }else{
     $username = '';
 }
-
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['review_content'])) {
+    // Handle review submission
+    $review_content = trim($_POST['review_content']);
+    $user_id = $_SESSION['user_id']; // Assuming id_user is stored in the session
+    if ($is_logged_in && !empty($review_content)) {
+        $query_insert_review = "INSERT INTO review (review_content, id_user, id_game) VALUES (?, ?, ?)";
+        $stmt_insert_review = $conn->prepare($query_insert_review);
+        $stmt_insert_review->bind_param("sii", $review_content, $user_id, $game_id);
+        $stmt_insert_review->execute();
+        header("Location: gameDetail.php?game_id=$game_id"); // Refresh to display the new review
+        exit();
+    }
+}
 // Include cookie validation
 include('../auth/cookieValidation.php');
 ?>
@@ -310,18 +322,36 @@ include('../auth/cookieValidation.php');
     </div>
 
     <div class="reviews-section">
-        <h2>Reviews</h2>
-        <?php if (!empty($reviews)): ?>
-            <?php foreach ($reviews as $review): ?>
-                <div class="review">
-                    <p><strong><?php echo htmlspecialchars($review['username']); ?>:</strong></p>
-                    <p><?php echo nl2br(htmlspecialchars($review['review_content'])); ?></p>
-                </div>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <p>No reviews yet.</p>
-        <?php endif; ?>
-    </div>
+    <h2>Reviews</h2>
+    <?php if ($is_logged_in): ?>
+        <!-- Add Review Form -->
+        <button class="btn btn-primary my-3 " id="toggle-review-form">Add Review</button>
+        <form method="POST" class="mt-3" id="review-form" style="display: none;">
+            <textarea name="review_content" class="form-control mb-2" rows="4" placeholder="Write your review here..."></textarea>
+            <button type="submit" class="btn btn-success my-2">Submit Review</button>
+        </form>
+        <script>
+            document.getElementById('toggle-review-form').addEventListener('click', function () {
+                const form = document.getElementById('review-form');
+                form.style.display = form.style.display === 'none' ? 'block' : 'none';
+            });
+        </script>
+    <?php else: ?>
+        <p>You must <a href="../auth/login.php">log in</a> to add a review.</p>
+    <?php endif; ?>
+    <?php if (!empty($reviews)): ?>
+        <?php foreach ($reviews as $review): ?>
+            <div class="review">
+                <p><strong><?php echo htmlspecialchars($review['username']); ?>:</strong></p>
+                <p><?php echo nl2br(htmlspecialchars($review['review_content'])); ?></p>
+            </div>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <p>No reviews yet.</p>
+    <?php endif; ?>
+
+    
+</div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
