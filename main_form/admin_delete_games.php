@@ -1,4 +1,3 @@
-
 <?php
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -203,7 +202,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                             <p class="card-text pb-3">Genre: <?php echo $row['genres']; ?></p>
                             <form method="POST">
                                 <input type="hidden" name="game_id" value="<?php echo $row['id_game']; ?>">
-                                <button type="submit" name="action" value="delete" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this game?');">Hapus</button>
+                                <button type="submit" name="action" value="delete" class="btn btn-danger delete-btn">Hapus</button>
                             </form>
                         </div>
                     </div>
@@ -211,6 +210,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             <?php endwhile; ?>
         </div>
     </div>
+    <script>
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();  // Prevent default form submission
+
+                // SweetAlert confirmation
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: 'This game will be deleted permanently!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, delete it!',
+                    cancelButtonText: 'No, cancel!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // If confirmed, directly submit the form to delete the game
+                        this.closest('form').submit();  // Submit the form
+                    }
+                });
+            });
+        });
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
