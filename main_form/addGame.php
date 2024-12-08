@@ -61,10 +61,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['gameName'])) {
         if (isset($responseData['data']['url'])) {
             $coverImagePath = $responseData['data']['url']; // Get the URL of the uploaded image
         } else {
-            $errorMessage = "Gagal mengupload gambar: " . $responseData['message'];
+            $_SESSION['Send'] = ['type' => 'error', 'message' => 'Gagal mengupload gambar:' .responseData['message']];
+            header('Location: ../main_form/addGame.php');
+            exit();
         }
     } else {
-        $errorMessage = "Gambar tidak valid.";
+        $_SESSION['Send'] = ['type' => 'error', 'message' => 'Gambar tidak valid.'];
+        header('Location: ../main_form/addGame.php');
+        exit();
     }
 
     // Simpan game ke database jika gambar berhasil diupload
@@ -84,10 +88,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['gameName'])) {
                     $stmt->bind_param("ii", $lastInsertId, $genreId);
                     $stmt->execute();
                 }
-                $successMessage = "Game berhasil ditambahkan.";
+                $_SESSION['Send'] = ['type' => 'success', 'message' => 'Game berhasil ditambahkan.'];
+                header('Location: ../main_form/addGame.php');
+                exit();
             }
-        } else {
-            $errorMessage = "Gagal menambahkan game: " . $conn->error;
+        } else {   
+            $_SESSION['Send'] = ['type' => 'error', 'message' => 'Gagal menambahkan game:' . $conn->error];
+            header('Location: ../main_form/addGame.php');
+            exit();
         }
     }
 }
@@ -166,6 +174,7 @@ $games = $gamesStmt->get_result();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="../assets/UAP.ico" type="image/x-icon">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <title>Add Game</title>
