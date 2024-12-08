@@ -49,7 +49,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $new_username = $_POST['new_username'];
 
     if (empty($new_username)) {
-        $error = "Username cannot be empty!";
+        $_SESSION['Send'] = ['type' => 'error', 'message' => 'Username cannot be empty!'];
+        header("Location: ../main_form/changeUsername.php");
+        exit();
     } else {
         // Cek apakah username baru sudah digunakan di tabel `users`
         $check_user_query = "SELECT * FROM users WHERE username = ?";
@@ -66,7 +68,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $publisher_exists = $check_publisher_stmt->get_result()->num_rows > 0;
 
         if ($user_exists || $publisher_exists) {
-            $error = "Username already taken!";
+            $_SESSION['Send'] = ['type' => 'error', 'message' => 'Username already taken!'];
+            header("Location: ../main_form/changeUsername.php");
+            exit();
         } else {
             // Lakukan update username
             $update_stmt = $conn->prepare($update_query);
@@ -75,14 +79,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($update_stmt->execute()) {
                 // Perbarui sesi dengan username baru
                 $_SESSION['username'] = $new_username;
-                $success = "Username successfully updated!";
-                unset($_POST);
-                echo '<script>window.history.replaceState(null, null, window.location.href);</script>';
+                $_SESSION['Send'] = ['type' => 'success', 'message' => 'Username berhasil diperbarui!','redirect' => '../main_form/mainForm.php'];
+                
             } else {
-                $error = "Failed to update username.";
+                $_SESSION['Send'] = ['type' => 'error', 'message' => 'Terjadi kesalahan saat memperbarui username.'];
+                header("Location: ../main_form/changeusername.php");
+                exit();
             }
         }
     }
+
 }
 ?>
 
@@ -93,6 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Change Username</title>
     <link rel="icon" href="../assets/UAP.ico" type="image/x-icon">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body { 
@@ -146,6 +153,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </style>
 </head>
 <body>
+    <?php if (isset($_SESSION['Send'])): ?>
+            <script>
+                Swal.fire({
+                    title: "<?= $_SESSION['Send']['type'] === 'success' ? 'Berhasil!' : 'Gagal!' ?>",
+                    text: "<?= $_SESSION['Send']['message'] ?>",
+                    icon: "<?= $_SESSION['Send']['type'] ?>",
+                    confirmButtonText: "OK"
+                }).then((result) => { //jika berhasil redirect kesini
+                    <?php if ($_SESSION['Send']['type'] === 'success' && isset($_SESSION['Send']['redirect'])): ?>  
+                        window.location.href = "<?= $_SESSION['Send']['redirect'] ?>";
+                    <?php endif; ?>
+                });
+            </script>
+        <?php unset($_SESSION['Send']); ?>
+    <?php endif; ?>
+
     <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
             <a class="navbar-brand mx-auto" href="../main_form/mainForm.php">
