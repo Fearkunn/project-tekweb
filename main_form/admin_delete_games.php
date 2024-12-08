@@ -212,6 +212,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     </div>
     <script>
         document.getElementById('delete-btn').addEventListener('click', function(event) {
+            event.preventDefault();
             // SweetAlert confirmation
             Swal.fire({
                 title: 'Are you sure?',
