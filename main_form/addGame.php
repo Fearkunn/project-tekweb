@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['gameName'])) {
         if (isset($responseData['data']['url'])) {
             $coverImagePath = $responseData['data']['url']; // Get the URL of the uploaded image
         } else {
-            $_SESSION['Send'] = ['type' => 'error', 'message' => 'Gagal mengupload gambar:' .responseData['message']];
+            $_SESSION['Send'] = ['type' => 'error', 'message' => 'Gagal mengupload gambar:' . $responseData['message']];
             header('Location: ../main_form/addGame.php');
             exit();
         }
