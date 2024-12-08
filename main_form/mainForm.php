@@ -88,7 +88,7 @@ include('../auth/cookieValidation.php');
         color: #FFFFFF; /* Font tetap putih */
     }
     body{
-        background-image: url('../assets/Background.png');
+        background-image: url('../assets/Backgrounds.png');
         background-size: cover;
         background-repeat: no-repeat;
         background-position: center top;
