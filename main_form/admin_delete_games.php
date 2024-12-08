@@ -202,7 +202,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                             <p class="card-text pb-3">Genre: <?php echo $row['genres']; ?></p>
                             <form method="POST">
                                 <input type="hidden" name="game_id" value="<?php echo $row['id_game']; ?>">
-                                <button type="submit" name="action" value="delete" class="btn btn-danger delete-btn">Hapus</button>
+                                <button type="submit" name="action" value="delete" class="btn btn-danger delete-btn" id="delete-btn">Hapus</button>
                             </form>
                         </div>
                     </div>
@@ -212,8 +212,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     </div>
     <script>
         document.getElementById('delete-btn').addEventListener('click', function(event) {
-            event.preventDefault();  // Prevent default form submission
-
             // SweetAlert confirmation
             Swal.fire({
                 title: 'Are you sure?',
