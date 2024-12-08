@@ -107,15 +107,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_game_id'])) {
     $stmt->bind_param("i", $deleteGameId);
     if ($stmt->execute()) {
         $successMessage = "Detail berhasil dihapus.";
+        
     } else {
         $errorMessage = "Gagal menghapus detail: " . $conn->error;
     }
     $stmt = $conn->prepare("DELETE FROM games WHERE id_game = ?");
     $stmt->bind_param("i", $deleteGameId);
     if ($stmt->execute()) {
-        $successMessage = "Game berhasil dihapus.";
+        $_SESSION['Send'] = ['type' => 'success', 'message' => 'Game berhasil dihapus.'];
+        header('Location: ../main_form/addGame.php');
+        exit();
     } else {
         $errorMessage = "Gagal menghapus game: " . $conn->error;
+        $_SESSION['Send'] = ['type' => 'error', 'message' => 'Gagal menghapus game: ' . $conn->error];
+        header('Location: ../main_form/addGame.php');
+        exit();
     }
 }
 
@@ -129,9 +135,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_game_id'])) {
     $stmt = $conn->prepare("UPDATE games SET game_name = ?, game_desc = ?, is_admit = ? WHERE id_game = ?");
     $stmt->bind_param("ssii", $gameName, $gameDesc, $isAdmit, $editGameId);
     if ($stmt->execute()) {
-        $successMessage = "Game berhasil diperbarui.";
+        $_SESSION['Send'] = ['type' => 'success', 'message' => 'Game berhasil diperbarui.'];
+        header('Location: ../main_form/addGame.php');
+        exit();
     } else {
-        $errorMessage = "Gagal memperbarui game: " . $conn->error;
+        $_SESSION['Send'] = ['type' => 'error', 'message' => 'Gagal memperbarui game:' . $conn->error];
+        header('Location: ../main_form/addGame.php');
+        exit();
     }
 }
 
