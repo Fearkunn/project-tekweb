@@ -22,14 +22,22 @@ if($is_logged_in){ //jika ada is logged_in jika ga ada username kosong
 }
 
 // Fetch user's games from the database
-$order_by = isset($_GET['sort']) && $_GET['sort'] === 'asc' ? 'ASC' : 'DESC'; // Default sorting
+$order_by = '';
+if (isset($_GET['sort'])) {
+    if ($_GET['sort'] === 'asc') {
+        $order_by = 'ASC';
+    } elseif ($_GET['sort'] === 'desc') {
+        $order_by = 'DESC';
+    }
+}
+
 $query = "
     SELECT l.id_library, g.game_name, g.games_image, g.like_count
     FROM library l
     INNER JOIN games g ON l.id_game = g.id_game
     WHERE l.id_user = ?
-    ORDER BY g.game_name $order_by
-";
+" . ($order_by ? " ORDER BY g.game_name $order_by" : '');
+
 $stmt = $conn->prepare($query);
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
@@ -37,8 +45,8 @@ $result = $stmt->get_result();
 
 $library = $result->fetch_all(MYSQLI_ASSOC);
 $userLiked = '';
-
 ?>
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -113,14 +121,14 @@ $userLiked = '';
         .sort-button {
             margin-top: 20px;
             margin-bottom: 20px;
-        }
+      }
     </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
-            <a class="navbar-brand logo" href="mainForm.php" >
-                    <img src="..\assets\Logo.svg" alt="UapLogo">
+            <a class="navbar-brand logo" href="mainForm.php">
+                <img src="..\assets\Logo.svg" alt="UapLogo">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -131,17 +139,17 @@ $userLiked = '';
                         <a class="nav-link active" aria-current="page" href="store.php">Store</a>
                     </li>
                     <li class="nav-item">
-                       <a class="nav-link" href="../main_form/library.php">Library</a>
-                    </li>  
+                        <a class="nav-link" href="../main_form/library.php">Library</a>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">Community</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link disabled" aria-disabled="true" href="#"><?php echo $username; ?></a>
-                    </li>   
+                    </li>
                 </ul>
                 <div class="dropdown" style="background-color: #2C2C2C;">
-                    <button class=" btn btn-secondary dropdown-toggle bi bi-person-circle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" style="font-size: 1.3rem; background-color: #2C2C2C;" aria-expanded="false"><?php echo " ",$username; ?></button>
+                    <button class="btn btn-secondary dropdown-toggle bi bi-person-circle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" style="font-size: 1.3rem; background-color: #2C2C2C;" aria-expanded="false"><?php echo " ",$username; ?></button>
                     <ul class="dropdown-menu bg-dark" aria-labelledby="dropdownMenuButton1">
                         <li><a class="dropdown-item" href="userProfile.php">Profile</a></li>
                         <li><hr class="dropdown-divider"></li>
@@ -155,7 +163,18 @@ $userLiked = '';
     <div class="container mt-5">
         <div class="d-flex justify-content-between align-items-center">
             <h1>Your Library</h1>
-            <a href="?sort=asc" class="btn btn-secondary sort-button">Sort Ascending</a>
+            <!-- Toggle between Ascending, Descending and No Sorting -->
+            <a href="?sort=<?php echo $order_by === 'ASC' ? 'desc' : ($order_by === 'DESC' ? '' : 'asc'); ?>" class="btn btn-secondary sort-button">
+                <?php 
+                    if ($order_by === 'ASC') {
+                        echo 'Sort Descending';
+                    } elseif ($order_by === 'DESC') {
+                        echo 'Order By History';
+                    } else {
+                        echo 'Sort Ascending';
+                    }
+                ?>
+            </a>
         </div>
         
         <div class="row py-5">
@@ -182,7 +201,6 @@ $userLiked = '';
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 <?php endforeach; ?>
             <?php else: ?>
@@ -195,11 +213,10 @@ $userLiked = '';
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script>
-            document.querySelectorAll('.like-checkbox').forEach(checkbox => {
+        document.querySelectorAll('.like-checkbox').forEach(checkbox => {
             checkbox.addEventListener('change', function() {
                 const gameId = this.getAttribute('data-game-id');
                 const isLiked = this.checked;
-                console.log(isLiked);
 
                 fetch('likeGame.php', {
                     method: 'POST',
@@ -212,10 +229,9 @@ $userLiked = '';
                 .then(data => {
                     alert(data.message);
 
-                    // Update jumlah like di UI
+                    // Update like count in UI
                     const likeCountElement = this.closest('.card').querySelector('.card-text');
                     let currentLikeCount = parseInt(likeCountElement.innerText.replace('Likes: ', ''));
-                    console.log(currentLikeCount);
 
                     if (isLiked) {
                         likeCountElement.innerText = `Likes: ${currentLikeCount + 1}`;
@@ -225,7 +241,6 @@ $userLiked = '';
                 });
             });
         });
-
     </script>
 </body>
 </html>
