@@ -21,6 +21,31 @@ if($is_logged_in){ //jika ada is logged_in jika ga ada username kosong
     $username = '';
 }
 
+// Handle Like/Unlike action
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['like_game_id'])) {
+    $likedGameId = intval($_POST['like_game_id']);
+    $isLiked = isset($_POST['liked']) ? 1 : 0;
+
+    // Update is_like in the library table
+    $updateLikeQuery = "UPDATE library SET is_like = ? WHERE id_user = ? AND id_game = ?";
+    $stmt = $conn->prepare($updateLikeQuery);
+    $stmt->bind_param("iii", $isLiked, $user_id, $likedGameId);
+    $stmt->execute();
+
+    // Update like count in the games table
+    if ($isLiked) {
+        $incrementQuery = "UPDATE games SET like_count = like_count + 1 WHERE id_game = ?";
+        $stmt = $conn->prepare($incrementQuery);
+        $stmt->bind_param("i", $likedGameId);
+        $stmt->execute();
+    } else {
+        $decrementQuery = "UPDATE games SET like_count = like_count - 1 WHERE id_game = ?";
+        $stmt = $conn->prepare($decrementQuery);
+        $stmt->bind_param("i", $likedGameId);
+        $stmt->execute();
+    }
+}
+
 // Fetch user's games from the database
 $order_by = '';
 if (isset($_GET['sort'])) {
@@ -32,7 +57,7 @@ if (isset($_GET['sort'])) {
 }
 
 $query = "
-    SELECT l.id_library, g.game_name, g.games_image, g.like_count, g.id_game
+    SELECT l.id_library, g.id_game, g.game_name, g.games_image, g.like_count, l.is_like
     FROM library l
     INNER JOIN games g ON l.id_game = g.id_game
     WHERE l.id_user = ?
@@ -187,15 +212,14 @@ $userLiked = '';
                                 <h5 class="card-title"><?php echo htmlspecialchars($game['game_name']); ?></h5>
                                 <p class="card-text">Likes: <?php echo htmlspecialchars($game['like_count']); ?></p>
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <!-- Like Checkbox -->
-                                    <div>
-                                        <input type="checkbox" class="form-check-input like-checkbox" data-game-id="<?php echo $game['id_library']; ?>" id="like-<?php echo $game['id_library']; ?>" 
-                                            <?php echo $userLiked ? 'checked' : ''; ?>>
-                                        <label for="like-<?php echo $game['id_library']; ?>">Like</label>
-                                    </div>
-                            
+                                    <form method="POST" action="">
+                                        <input type="hidden" name="like_game_id" value="<?php echo $game['id_game']; ?>">
+                                        <input type="checkbox" class="form-check-input" name="liked" id="like-<?php echo $game['id_game']; ?>" 
+                                            onchange="this.form.submit()" 
+                                            <?php echo $game['is_like'] == 1 ? 'checked' : ''; ?>>
+                                        <label for="like-<?php echo $game['id_game']; ?>">Like</label>
+                                    </form>
                                     <a href="gameDetail.php?game_id=<?php echo $game['id_game']; ?>" class="btn btn-info btn-sm">Review</a>
-
                                 </div>
                             </div>
                         </div>
@@ -210,35 +234,5 @@ $userLiked = '';
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    <script>
-        document.querySelectorAll('.like-checkbox').forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                const gameId = this.getAttribute('data-game-id');
-                const isLiked = this.checked;
-
-                fetch('likeGame.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ game_id: gameId, liked: isLiked })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    alert(data.message);
-
-                    // Update like count in UI
-                    const likeCountElement = this.closest('.card').querySelector('.card-text');
-                    let currentLikeCount = parseInt(likeCountElement.innerText.replace('Likes: ', ''));
-
-                    if (isLiked) {
-                        likeCountElement.innerText = `Likes: ${currentLikeCount + 1}`;
-                    } else {
-                        likeCountElement.innerText = `Likes: ${currentLikeCount - 1}`;
-                    }
-                });
-            });
-        });
-    </script>
 </body>
 </html>
