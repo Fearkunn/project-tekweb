@@ -51,6 +51,7 @@ include('../auth/cookieValidation.php');
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Uap</title>
     <link rel="icon" href= "../assets/UAP.ico" type="image/x-icon"> 
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
@@ -364,6 +365,7 @@ include('../auth/cookieValidation.php');
                                 $stmt->execute();
                                 $is_in_library = true; // Mark as added to library after insertion
                             }
+                            $_SESSION['game_added'] = true;
                         }
                 ?>
                 <!-- CAROUSEL -->
@@ -376,7 +378,6 @@ include('../auth/cookieValidation.php');
                                              alt="<?= htmlspecialchars($game['game_name']) ?>" 
                                              style="width:100%;object-fit: fill;object-position:top; border-radius: 8px;">
                                     </div>
-                                    </a>
                                 </div>
                                 <div class="col-md-8 d-flex flex-column justify-content-center bg-dark text-white p-4" style="border-radius: 8px;">
                                     <h3 class="text-warning"><?= htmlspecialchars($game['game_name']) ?></h3>
@@ -393,13 +394,25 @@ include('../auth/cookieValidation.php');
                                         <a href="gameDetail.php?game_id=<?= $game['id_game'] ?>" class="btn btn-primary btn-sm mt-3">View Details</a>
                                         <?php if (!$is_publisher && !$is_in_library && $is_logged_in): ?>
                                             <!-- Form to add to library directly in this page -->
-                                            <form method="POST">
+                                            <form method="POST" id="addToLibraryForm">
                                                 <input type="hidden" name="id_game" value="<?= $game['id_game'] ?>">
                                                 <button type="submit" name="add_to_library" class="btn btn-danger btn-sm mt-3">Add to Library</button>
-                                                <script>
-
-                                                </script>
                                             </form>
+                                            <?php if (isset($_SESSION['game_added']) && $_SESSION['game_added']): ?>
+                                                <script>
+                                                    // SweetAlert after game is added
+                                                    document.addEventListener('DOMContentLoaded', function() {
+                                                        Swal.fire({
+                                                            title: "Good job!",
+                                                            text: "Game added to your library!",
+                                                            icon: "success"
+                                                        });
+                                                        header("Location: ../main_form/mainForm.php")
+                                                        
+                                                    });
+                                                </script>
+                                                <?php unset($_SESSION['game_added']); ?>
+                                            <?php endif; ?> 
                                         <?php elseif (!$is_publisher && $is_logged_in): ?>
                                             <button class="btn btn-success btn-sm mt-3" disabled>Already in Library</button>
                                         <?php endif; ?>
@@ -430,7 +443,6 @@ include('../auth/cookieValidation.php');
         </div>
     </div>
 </section>
-
 
 <section>
     <div class="container mt-5">
@@ -470,6 +482,7 @@ include('../auth/cookieValidation.php');
                             $stmt->execute();
                             $is_in_library = true; // Mark as added to library after insertion
                         }
+                        $_SESSION['game_added'] = true;
                     }
             ?>
                     <div class="col-12 mb-2">
@@ -513,6 +526,7 @@ include('../auth/cookieValidation.php');
     </div>
 </section>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>
