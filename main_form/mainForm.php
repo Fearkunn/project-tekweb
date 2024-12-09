@@ -391,30 +391,37 @@ include('../auth/cookieValidation.php');
                                                 <span class="badge bg-secondary"><?= htmlspecialchars(trim($genre)) ?></span>
                                             <?php endforeach; ?>
                                         </div>
-                                        <a href="gameDetail.php?game_id=<?= $game['id_game'] ?>" class="btn btn-primary btn-sm mt-3">View Details</a>
-                                        <?php if (!$is_publisher && !$is_in_library && $is_logged_in): ?>
-                                            <!-- Form to add to library directly in this page -->
-                                            <form method="POST" id="addToLibraryForm">
-                                                <input type="hidden" name="id_game" value="<?= $game['id_game'] ?>">
-                                                <button type="submit" name="add_to_library" class="btn btn-danger btn-sm mt-3">Add to Library</button>
-                                            </form>
-                                            <?php if (isset($_SESSION['game_added']) && $_SESSION['game_added']): ?>
-                                                <script>
-                                                    // SweetAlert after game is added
-                                                    document.addEventListener('DOMContentLoaded', function() {
-                                                        Swal.fire({
-                                                            title: "Good job!",
-                                                            text: "Game added to your library!",
-                                                            icon: "success"
-                                                        });
-                                                        header("Location: ../main_form/mainForm.php")
-                                                    });
-                                                </script>
-                                                <?php unset($_SESSION['game_added']); ?>
-                                            <?php endif; ?> 
-                                        <?php elseif (!$is_publisher && $is_logged_in): ?>
-                                            <button class="btn btn-success btn-sm mt-3" disabled>Already in Library</button>
-                                        <?php endif; ?>
+
+                                        <!-- Tombol-tombol disusun berdampingan -->
+                                        <div class="d-flex justify-content-start gap-2 mt-3">
+                                            <a href="gameDetail.php?game_id=<?= $game['id_game'] ?>" class="btn btn-primary btn-sm">View Details</a>
+                                            <?php if (!$is_publisher && !$is_in_library && $is_logged_in): ?>
+                                                <!-- Form to add to library directly in this page -->
+                                                <form method="POST" id="addToLibraryForm">
+                                                    <input type="hidden" name="id_game" value="<?= $game['id_game'] ?>">
+                                                    <button type="submit" name="add_to_library" class="btn btn-danger btn-sm">Add to Library</button>
+                                                </form>
+                                            <?php elseif (!$is_publisher && $is_logged_in): ?>
+                                                <button class="btn btn-success btn-sm" disabled>Already in Library</button>
+                                            <?php endif; ?>
+                                        </div>
+                                        
+                                        <!-- SweetAlert setelah game ditambahkan -->
+                                        <?php if (isset($_SESSION['game_added']) && $_SESSION['game_added']): ?>
+                                            <script>
+                                                document.addEventListener('DOMContentLoaded', function() {
+                                                    Swal.fire({
+                                                        title: "Good job!",
+                                                        text: "Game added to your library!",
+                                                        icon: "success"
+                                                    });then(() => {
+                                                  
+                                                    window.location.href = "../main_form/mainForm.php";
+                                                });
+                                              });
+                                            </script>
+                                            <?php unset($_SESSION['game_added']); ?>
+                                        <?php endif; ?> 
                                     </div>
                                 </div>
                             </div>
@@ -442,6 +449,7 @@ include('../auth/cookieValidation.php');
         </div>
     </div>
 </section>
+
 
 <section>
     <div class="container mt-5">
