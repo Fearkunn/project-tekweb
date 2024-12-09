@@ -341,6 +341,7 @@ if ($is_logged_in) {
     </form>
 </div>
 
+
 <!-- Game Cards -->
 <div class="container">
     <div class="row g-2">
@@ -355,7 +356,7 @@ if ($is_logged_in) {
                             <p class="card-text"><small>Genres: <?php echo htmlspecialchars($row['genres']); ?></small></p>
                             <p class="card-text"><small>Publisher: <?php echo htmlspecialchars($row['publisher_name']); ?></small></p>
                             <a href="gameDetail.php?game_id=<?php echo $row['id_game']; ?>" class="btn btn-primary">View Details</a>
-                            <?php if (!in_array($row['id_game'], $libraryGames)): ?>
+                            <?php if (!$is_publisher && !in_array($row['id_game'], $libraryGames)): ?>
                                 <a href="saveGame.php?game_id=<?php echo $row['id_game']; ?>" class="btn btn-success">Save Game</a>
                             <?php endif; ?>
                         </div>
