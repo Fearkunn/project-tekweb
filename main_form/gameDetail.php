@@ -40,7 +40,7 @@ while ($row = $result_genres->fetch_assoc()) {
 }
 
 // Fetch reviews
-$query_reviews = "SELECT r.review_content, u.username 
+$query_reviews = "SELECT r.id_review, r.review_content, u.username 
                   FROM review r
                   JOIN users u ON r.id_user = u.id_user
                   WHERE r.id_game = ?";
@@ -74,6 +74,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['review_content'])) {
         exit();
     }
 }
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_review_id'])) {
+    // Validasi pengguna dan hapus ulasan
+    $review_id = intval($_POST['delete_review_id']);
+    $user_id = $_SESSION['user_id']; // ID pengguna dari sesi
+
+    // Periksa apakah ulasan milik pengguna
+    $query_check_review = "SELECT id_review FROM review WHERE id_review = ? AND id_user = ?";
+    $stmt_check_review = $conn->prepare($query_check_review);
+    $stmt_check_review->bind_param("ii", $review_id, $user_id);
+    $stmt_check_review->execute();
+    $result_check = $stmt_check_review->get_result();
+
+    if ($result_check->num_rows > 0) {
+        // Hapus ulasan
+        $query_delete_review = "DELETE FROM review WHERE id_review = ?";
+        $stmt_delete_review = $conn->prepare($query_delete_review);
+        $stmt_delete_review->bind_param("i", $review_id);
+        $stmt_delete_review->execute();
+        header("Location: gameDetail.php?game_id=$game_id"); // Refresh halaman
+        exit();
+    } else {
+        echo "<script>alert('You can only delete your own reviews.');</script>";
+    }
+}
+
 // Include cookie validation
 include('../auth/cookieValidation.php');
 ?>
@@ -88,8 +113,8 @@ include('../auth/cookieValidation.php');
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <style>
     .navbar {
-        background-color: #2C2C2C; /* Tetap abu-abu gelap */
-        font-family: Arial, sans-serif;
+    background-color: #2C2C2C; /* Tetap abu-abu gelap */
+    font-family: Arial, sans-serif;
     }
     .navbar-brand, .nav-link {
         color: #FFFFFF !important; /* Font putih untuk kontras */
@@ -120,7 +145,7 @@ include('../auth/cookieValidation.php');
         color: #FFFFFF; /* Font tetap putih */
     }
     body{
-        background-image: url('../assets/Background.png');
+        background-image: url('../assets/Backgrounds.png');
         background-size: cover;
         background-repeat: no-repeat;
         background-position: center top;
@@ -156,20 +181,10 @@ include('../auth/cookieValidation.php');
         border-radius: 4px; /* Optional: Rounded corners on hover */
         color: white !important;
     }
-    .hero-game {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-        background: linear-gradient(to right, #4e54c8, #8f94fb);
-        padding: 20px;
-        border-radius: 10px;
-        color: white;
-        margin-bottom: 30px;
-    }
 
     .game-container {
             max-width: 1200px;
-            margin: 100px auto;
+            margin: 60px auto;
             padding: 20px;
             background-color: #333;
             border-radius: 10px;
@@ -238,17 +253,6 @@ include('../auth/cookieValidation.php');
             border: none;
             cursor: pointer;
         }
-
-        .btn-wishlist {
-            background-color: #5c7e10;
-            color: white;
-        }
-
-        .btn-follow {
-            background-color: #46698c;
-            color: white;
-        }
-
         .reviews-section {
             margin-top: 30px;
             padding: 20px;
@@ -269,7 +273,7 @@ include('../auth/cookieValidation.php');
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg">
     <div class="container-fluid">
         <a class="navbar-brand logo" href="mainForm.php">
             <img src="..\assets\Logo.svg" alt="UapLogo">
@@ -341,9 +345,18 @@ include('../auth/cookieValidation.php');
     <?php endif; ?>
     <?php if (!empty($reviews)): ?>
         <?php foreach ($reviews as $review): ?>
-            <div class="review">
-                <p><strong><?php echo htmlspecialchars($review['username']); ?>:</strong></p>
-                <p><?php echo nl2br(htmlspecialchars($review['review_content'])); ?></p>
+            <div class="review d-flex justify-content-between align-items-start">
+                <div class="review-content">
+                    <p><strong><?php echo htmlspecialchars($review['username']); ?>:</strong></p>
+                    <p><?php echo nl2br(htmlspecialchars($review['review_content'])); ?></p>
+                </div>
+                <?php if ($is_logged_in && $username === $review['username']): ?>
+                    <!-- Tombol Hapus untuk Ulasan Milik Pengguna -->
+                    <form method="POST">
+                        <input type="hidden" name="delete_review_id" value="<?php echo htmlspecialchars($review['id_review']); ?>">
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                <?php endif; ?>
             </div>
         <?php endforeach; ?>
     <?php else: ?>
