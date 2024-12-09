@@ -102,18 +102,10 @@ if ($is_logged_in) {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Store</title>
+    <link rel="icon" href="../assets/UAP.ico" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        .card-game {
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        .card-game img {
-            height: 200px;
-            object-fit: cover;
-        }
         .navbar {
         background-color: #2C2C2C; /* Tetap abu-abu gelap */
         font-family: Arial, sans-serif;
@@ -185,27 +177,84 @@ if ($is_logged_in) {
         }
 
         .search-bar {
-            width: 50%;
-            margin: 20px auto;
-        }
-        .search-bar input {
-            border-radius: 25px;
-            padding: 10px 20px;
-            border: 1px solid #ccc;
-            width: calc(100% - 50px);
-            display: inline-block;
-        }
-        .search-bar button {
-            background-color: #c51d3a;
-            color: white;
-            border: none;
-            border-radius: 25px;
-            padding: 10px 20px;
-            cursor: pointer;
-        }
-        .search-bar button:hover {
-            background-color: #a4162a;
-        }
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 30px;
+        margin-bottom: 20px;
+        width: 100%; /* Menggunakan full width */
+    }
+    
+    .search-bar form {
+        display: flex;
+        gap: 10px;
+        width: 80%; /* Atur lebar form untuk memastikan input lebih panjang */
+        max-width: 900px; /* Batas maksimum lebar */
+        margin: 0 auto; /* Memastikan form berada di tengah */
+    }
+    
+    .search-bar input {
+        flex: 1; /* Input akan mengambil sisa ruang yang tersedia */
+        padding: 12px 20px;
+        border-radius: 25px;
+        border: 1px solid #ccc;
+        font-size: 1.1rem;
+    }
+
+    .search-bar button {
+        border-radius: 25px;
+        padding: 12px 20px;
+        background-color: #c51d3a;
+        color: white;
+        border: none;
+        font-size: 1.1rem;
+        cursor: pointer;
+    }
+
+    .search-bar button:hover {
+        background-color: #a4162a;
+    }
+    /* Filter Buttons: Smaller size */
+    .filter-button {
+        font-size: 0.9rem; /* Perkecil ukuran teks */
+        padding: 5px 10px;
+    }
+    .card {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    width: 100%;
+}
+
+.card-body {
+    flex-grow: 1; /* Membuat konten card mengisi ruang yang tersedia */
+}
+
+.card-img-top {
+    height: 200px; /* Menentukan tinggi gambar */
+    object-fit: cover; /* Membuat gambar menutupi area yang tersedia */
+}
+
+.btn {
+    margin-top: auto; /* Menjaga agar tombol tetap di bawah */
+    transition: transform 0.2s; /* Memberikan efek hover pada tombol */
+}
+
+.btn:hover {
+    transform: scale(1.05); /* Efek zoom saat hover */
+}
+
+.card-text {
+        font-size: 1rem; /* Ukuran teks lebih kecil */
+        height: 50px; /* Batasi tinggi untuk memastikan teks tidak terlalu panjang */
+        overflow: hidden; /* Menyembunyikan teks yang melampaui batas */
+        text-overflow: ellipsis; /* Tampilkan "..." jika teks terlalu panjang */
+        line-height: 1rem; /* Mengatur jarak antar baris teks agar lebih kompak */
+    }
+
+.card-footer {
+    text-align: center; /* Mengatur footer untuk tombol agar rata tengah */
+}
     </style>
 </head>
 <body>
@@ -264,9 +313,9 @@ if ($is_logged_in) {
     </div>
 
     <!-- Filter Genre dan Publisher -->
-<div class="container my-3">
+<div class="container my-3 d-flex justify-content-center">
     <form method="GET" action="" class="row">
-        <div class="col-md-4">
+        <div class="col-md-5">
             <select name="genre" class="form-select">
                 <option value="">All Genres</option>
                 <?php while ($row = $genresResult->fetch_assoc()): ?>
@@ -276,7 +325,7 @@ if ($is_logged_in) {
                 <?php endwhile; ?>
             </select>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-5">
             <select name="publisher" class="form-select">
                 <option value="">All Publishers</option>
                 <?php while ($row = $publishersResult->fetch_assoc()): ?>
@@ -286,7 +335,7 @@ if ($is_logged_in) {
                 <?php endwhile; ?>
             </select>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-2">
             <button type="submit" class="btn btn-primary w-100">Filter</button>
         </div>
     </form>
@@ -294,7 +343,7 @@ if ($is_logged_in) {
 
 <!-- Game Cards -->
 <div class="container">
-    <div class="row">
+    <div class="row g-2">
         <?php if ($result->num_rows > 0): ?>
             <?php while ($row = $result->fetch_assoc()): ?>
                 <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
