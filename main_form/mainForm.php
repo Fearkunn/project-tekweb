@@ -408,7 +408,6 @@ include('../auth/cookieValidation.php');
                                                             icon: "success"
                                                         });
                                                         header("Location: ../main_form/mainForm.php")
-                                                        
                                                     });
                                                 </script>
                                                 <?php unset($_SESSION['game_added']); ?>
@@ -507,6 +506,19 @@ include('../auth/cookieValidation.php');
                                         <input type="hidden" name="id_game" value="<?= $game['id_game'] ?>">
                                         <button type="submit" name="add_to_library" class="btn btn-danger btn-sm mt-3">Add to Library</button>
                                     </form>
+                                    <?php if (isset($_SESSION['game_added']) && $_SESSION['game_added']): ?>
+                                        <script>
+                                            document.addEventListener('DOMContentLoaded', function() {
+                                                Swal.fire({
+                                                    title: "Good job!",
+                                                    text: "Game added to your library!",
+                                                    icon: "success"
+                                                });
+                                                header("Location: ../main_form/mainForm.php")
+                                            });
+                                        </script>
+                                    <?php unset($_SESSION['game_added']); ?>
+                                    <?php endif; ?>
                                 <?php elseif (!$is_publisher && $is_logged_in): ?>
                                     <button class="btn btn-success btn-sm mt-3" disabled>Already in Library</button>
                                 <?php endif; ?>
