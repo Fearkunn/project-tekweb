@@ -279,41 +279,7 @@ include('../auth/cookieValidation.php');
         </div>
     </section>
 
-  <!-- Navbar Kedua -->
-  <section id="subnavbar-game" style="position: absolute; top: 100px; left: 0; width: 100%; z-index: 2;">
-    <div class="search-bar-container" style="max-width: 960px; margin: 0 auto;">
-        <form class="search-form" action="search_results.php" method="GET" style="width: 100%; display: flex; justify-content: center;">
-            <div class="search-bar" style="
-                display: flex; 
-                align-items: center; 
-                width: 100%; 
-                max-width: 600px; 
-                background-color:  #1b1b1b;/* Warna hitam pekat */
-                border: 1px solid #d81e1e; /* Border merah */
-                border-radius: 4px; 
-                padding: 8px;">
-                <!-- Ikon Pencarian -->
-                <i class="bi bi-search search-icon" style="
-                    color: #d81e1e; /* Warna merah untuk ikon */
-                    font-size: 16px; 
-                    margin-right: 10px;"></i>
-                <!-- Input Pencarian -->
-                <input 
-                    type="text" 
-                    name="q" 
-                    class="search-input" 
-                    placeholder="Search for games, genres, or publishers..." 
-                    style="
-                        flex: 1; 
-                        background: none; 
-                        border: none; 
-                        outline: none; 
-                        color: #ffffff; /* Warna teks putih */
-                        font-size: 14px;">
-            </div>
-        </form>
-    </div>
-</section>
+  
 
 
 </header>
