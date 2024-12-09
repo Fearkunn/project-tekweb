@@ -5,73 +5,97 @@ if (session_status() === PHP_SESSION_NONE) {
 
 include('../db_connect/DatabaseConnection.php');
 
-$is_logged_in = isset($_SESSION['username']) && !empty($_SESSION['username']); //set is logged in
+// Periksa login
+$is_logged_in = isset($_SESSION['username']) && !empty($_SESSION['username']);
+$username = $is_logged_in ? $_SESSION['username'] : '';
 
-if($is_logged_in){ //jika ada is logged_in jika ga ada username kosong
-    $username = $_SESSION['username'];
-}else{
-    $username = '';
-}
-
+// Periksa apakah user adalah publisher
 $is_publisher = false;
-
 if ($is_logged_in) {
-    // Siapkan query
-    $query = "SELECT publisher_name FROM publisher WHERE publisher_name = ?";
+    $query = "SELECT id_publisher FROM publisher WHERE publisher_name = ?";
     $stmt = $conn->prepare($query);
-
-    if ($stmt) {
-       $stmt->bind_param("s", $username);
-        $stmt->execute();
-    
-        $result = $stmt->get_result();
-        $publisher = $result->fetch_assoc(); //untuk di cek di isset($publisher['publisher_name'])
-
-        //jika isset mengeluarkan hasil null maka is publisher akan jadi false
-        if (isset($publisher['publisher_name']) && $publisher['publisher_name'] === $username) {
-            $is_publisher = true;
-        }else{
-            $is_publisher = false;
-        }
-    }
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $stmt->store_result();
+    $is_publisher = $stmt->num_rows > 0;
 }
 
-// Search filter
+// Genre dan Publisher Filter
+$selectedGenre = isset($_GET['genre']) ? $_GET['genre'] : '';
+$selectedPublisher = isset($_GET['publisher']) ? $_GET['publisher'] : '';
 $search = isset($_GET['search']) ? $_GET['search'] : '';
 
-// Query semua game
-$query = "SELECT * FROM games";
-if (!empty($search)) {
-    $query .= " WHERE game_name LIKE ?";
-}
-$stmt = $conn->prepare($query);
+// Ambil data genre
+$genresQuery = "SELECT id_genre, genre_name FROM genre";
+$genresResult = $conn->query($genresQuery);
 
-if (!empty($search)) {
-    $searchParam = "%" . $search . "%";
-    $stmt->bind_param("s", $searchParam);
-}
-$stmt->execute();
-$result = $stmt->get_result();
+// Ambil data publisher
+$publishersQuery = "SELECT id_publisher, publisher_name FROM publisher";
+$publishersResult = $conn->query($publishersQuery);
 
-
-$gamesStmt = $conn->prepare("
-    SELECT 
-        g.id_game, 
-        g.game_name, 
-        g.game_desc, 
-        g.games_image, 
-        g.is_admit, 
-        GROUP_CONCAT(DISTINCT gen.genre_name SEPARATOR ', ') AS genres
+// Query untuk games dengan filter
+$query = "
+    SELECT g.*, 
+           GROUP_CONCAT(DISTINCT gen.genre_name SEPARATOR ', ') AS genres, 
+           p.publisher_name
     FROM games g
     LEFT JOIN detail_genre dg ON g.id_game = dg.id_game
     LEFT JOIN genre gen ON dg.id_genre = gen.id_genre
-    WHERE g.id_publisher = ?
-    GROUP BY g.id_game
-");
-$gamesStmt->bind_param("i", $idPublisher);
-$gamesStmt->execute();
-$games = $gamesStmt->get_result();
+    LEFT JOIN publisher p ON g.id_publisher = p.id_publisher
+    WHERE 1=1
+";
+
+$params = [];
+$types = "";
+
+// Filter genre
+if (!empty($selectedGenre)) {
+    $query .= " AND dg.id_genre = ?";
+    $params[] = $selectedGenre;
+    $types .= "i";
+}
+
+// Filter publisher
+if (!empty($selectedPublisher)) {
+    $query .= " AND g.id_publisher = ?";
+    $params[] = $selectedPublisher;
+    $types .= "i";
+}
+
+// Filter search
+if (!empty($search)) {
+    $query .= " AND g.game_name LIKE ?";
+    $params[] = "%" . $search . "%";
+    $types .= "s";
+}
+
+$query .= " GROUP BY g.id_game";
+
+$stmt = $conn->prepare($query);
+
+if ($types) {
+    $stmt->bind_param($types, ...$params);
+}
+
+$stmt->execute();
+$result = $stmt->get_result();
+
+// Ambil game di library
+$libraryGames = [];
+if ($is_logged_in) {
+    $libraryQuery = "SELECT id_game FROM library WHERE id_user = (SELECT id_user FROM users WHERE username = ?)";
+    $libraryStmt = $conn->prepare($libraryQuery);
+    $libraryStmt->bind_param("s", $username);
+    $libraryStmt->execute();
+    $libraryResult = $libraryStmt->get_result();
+    while ($libRow = $libraryResult->fetch_assoc()) {
+        $libraryGames[] = $libRow['id_game'];
+    }
+}
 ?>
+
+
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -239,29 +263,62 @@ $games = $gamesStmt->get_result();
         </form>
     </div>
 
-    <!-- Game Cards -->
-    <div class="container">
-        <div class="row">
-            <?php if ($result->num_rows > 0): ?>
-                <?php while ($row = $result->fetch_assoc()): ?>
-                    <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                        <div class="card card-game text-bg-dark">
-                            <img src="<?php echo htmlspecialchars($row['games_image']); ?>" alt="<?php echo htmlspecialchars($row['game_name']); ?>" class="card-img-top">
-                            <div class="card-body">
-                                <h5 class="card-title"><?php echo htmlspecialchars($row['game_name']); ?></h5>
-                                <p class="card-text"><?php echo htmlspecialchars(substr($row['game_desc'], 0, 50)) . '...'; ?></p>
-                                <a href="gameDetail.php?game_id=<?php echo $row['id_game']; ?>"  class="btn btn-primary">View Details</a>
-                                <a href="saveGame.php?game_id=<?php echo $row['id_game']; ?>" class="btn btn-success">Save Game</a>
+    <!-- Filter Genre dan Publisher -->
+<div class="container my-3">
+    <form method="GET" action="" class="row">
+        <div class="col-md-4">
+            <select name="genre" class="form-select">
+                <option value="">All Genres</option>
+                <?php while ($row = $genresResult->fetch_assoc()): ?>
+                    <option value="<?php echo $row['id_genre']; ?>" <?php echo $selectedGenre == $row['id_genre'] ? 'selected' : ''; ?>>
+                        <?php echo htmlspecialchars($row['genre_name']); ?>
+                    </option>
+                <?php endwhile; ?>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <select name="publisher" class="form-select">
+                <option value="">All Publishers</option>
+                <?php while ($row = $publishersResult->fetch_assoc()): ?>
+                    <option value="<?php echo $row['id_publisher']; ?>" <?php echo $selectedPublisher == $row['id_publisher'] ? 'selected' : ''; ?>>
+                        <?php echo htmlspecialchars($row['publisher_name']); ?>
+                    </option>
+                <?php endwhile; ?>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <button type="submit" class="btn btn-primary w-100">Filter</button>
+        </div>
+    </form>
+</div>
 
-                            </div>
+<!-- Game Cards -->
+<div class="container">
+    <div class="row">
+        <?php if ($result->num_rows > 0): ?>
+            <?php while ($row = $result->fetch_assoc()): ?>
+                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                    <div class="card card-game text-bg-dark">
+                        <img src="<?php echo htmlspecialchars($row['games_image']); ?>" alt="<?php echo htmlspecialchars($row['game_name']); ?>" class="card-img-top">
+                        <div class="card-body">
+                            <h5 class="card-title"><?php echo htmlspecialchars($row['game_name']); ?></h5>
+                            <p class="card-text"><?php echo htmlspecialchars(substr($row['game_desc'], 0, 50)) . '...'; ?></p>
+                            <p class="card-text"><small>Genres: <?php echo htmlspecialchars($row['genres']); ?></small></p>
+                            <p class="card-text"><small>Publisher: <?php echo htmlspecialchars($row['publisher_name']); ?></small></p>
+                            <a href="gameDetail.php?game_id=<?php echo $row['id_game']; ?>" class="btn btn-primary">View Details</a>
+                            <?php if (!in_array($row['id_game'], $libraryGames)): ?>
+                                <a href="saveGame.php?game_id=<?php echo $row['id_game']; ?>" class="btn btn-success">Save Game</a>
+                            <?php endif; ?>
                         </div>
                     </div>
-                <?php endwhile; ?>
-            <?php else: ?>
-                <p class="text-center">Tidak ada game yang ditemukan.</p>
-            <?php endif; ?>
-        </div>
+                </div>
+            <?php endwhile; ?>
+        <?php else: ?>
+            <p class="text-center">Tidak ada game yang ditemukan.</p>
+        <?php endif; ?>
     </div>
+</div>
+
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
