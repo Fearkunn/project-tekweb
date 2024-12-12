@@ -41,8 +41,7 @@ if ($is_logged_in) {
 //$query = "SELECT id_game, game_name, game_desc, games_image, release_date, like_count FROM games WHERE is_admit = 1";
 //$result = $conn->query($query);
 
-// Check if the user is logged in via session
-include('../auth/cookieValidation.php');
+
 ?>
 <!doctype html>
 <html lang="en">
@@ -247,9 +246,6 @@ include('../auth/cookieValidation.php');
                         </li>
                     <?php endif; ?>  
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Community</a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link disabled" aria-disabled="true" href="#"><?php echo $username; ?></a>
                     </li>   
                 </ul>
@@ -273,7 +269,7 @@ include('../auth/cookieValidation.php');
     <section id="loop-video" style="position:relative;">
         <div class="video-section " style="z-index:1; position:relative;height:500px;">
             <video autoplay muted loop class="w-100" style="height: 500px; object-fit: cover; z-index:1; position:relative;">
-                <source src="https://shared.fastly.steamstatic.com/store_item_assets/steam/clusters/frontpage/b04ec5ca66d2105a0fccc116/webm_page_bg_indonesian.webm?t=1731704947" type="video/mp4">
+                <source src="https://shared.cloudflare.steamstatic.com/store_item_assets/steam/clusters/frontpage/208fc14a272e0d69ee83b286/webm_page_bg_english.webm?t=1732662057" type="video/mp4">
                 Browser Anda tidak mendukung video HTML5.
             </video>
         </div>

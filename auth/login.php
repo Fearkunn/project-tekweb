@@ -34,32 +34,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($user && password_verify($password, $user['user_password'])) {
             $_SESSION['user_id'] = $user['id_user'];
             $_SESSION['username'] = $user['username'];
-            $_SESSION['role_user'] = 'USER';
-    
-            if (isset($_POST['remember_me'])) {
-                $user_id = $user['id_user'];
-                $expiry = time() + (30 * 24 * 60 * 60); // 30 hari
-                $secret_key = 'your_secret_key';
-            
-                $data = "$user_id|$expiry";
-                $signature = hash_hmac('sha256', $data, $secret_key);
-                $token = base64_encode("$data|$signature");
-            
-                setcookie('remember_me_token', $token, $expiry, "/", "", false, true); // Buat cookie
-                error_log("Cookie dibuat: $token");
-    
-            } 
-            if (isset($_COOKIE['remember_me_token'])) {
-                $token = $_COOKIE['remember_me_token'];
-                error_log("Cookie diterima: $token");
-            } else {
-                error_log("Cookie tidak ditemukan");
-            }
-                       
+            $_SESSION['role_user'] = 'USER';          
             header("Location: ../main_form/mainForm.php");
             exit();
         } else {
-            $error_message = "Username atau password salah.";
+            $_SESSION['error_message'] = "username atau password salah";
+            header("Location: " . $_SERVER['PHP_SELF']);
+            exit();
         }
     }
 }
@@ -73,6 +54,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Login</title>
     <link rel="icon" href= "../assets/UAP.ico" type="image/x-icon"> 
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <style>
 
@@ -109,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     .container {
-        flex: 1; /* Agar section login menyesuaikan tinggi */
+        flex: 1;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -124,7 +107,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         max-width: 400px;
         margin: 10px 0;
     }
-
     section {
         font-size: 1rem;
         line-height: 1.6;
@@ -141,22 +123,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         margin-bottom: 15px;
     }
     section .btn-primary {
-        background-color: #007bff;
-        border: none;
         padding: 10px 20px;
         font-size: 1rem;
         border-radius: 5px;
     }
-    section .btn-primary:hover {
-        background-color: #0056b3;
-    }
-
-    .text-section {
-        padding: 40px 20px;
-    }
-
-    footer {
     
+    footer {
         font-size: 0.9rem;
         color: #AAA;
         text-align: center;
@@ -172,19 +144,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         
     }
 
-        /* Efek saat hover */
     .register-btn:hover {
-        background: linear-gradient(90deg, #004ba0, #1b73e8); /* Gradien berbalik */
-        transform: scale(1.05); /* Sedikit memperbesar tombol */
-    }
-
-    /* Menghilangkan padding khusus footer*/
-    section.text-white-5py{
-        margin-bottom: 0;
-    }
-
-    .register{
-        padding-bottom: 20px;
+        background: linear-gradient(90deg, #004ba0, #1b73e8);
+        transform: scale(1.05);
     }
 
 </style>
@@ -214,11 +176,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <label for="password" class="form-label">Password</label>
                         <input type="password" class="form-control" id="password" name="user_password" placeholder="Masukkan password Anda" required>
                     </div>
-                    <div class="form-check mb-3">
-                        <input type="checkbox" class="form-check-input" id="remember" name="remember_me">
-                        <label class="form-check-label" for="remember">Ingat Saya</label>
+                    <div class="pt-4">
+                        <button type="submit" class="btn btn-primary w-100">Login</button>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Login</button>
                 </form>
                 <div class="text-center mt-4">
                     <a href="..\auth\forgotPassword.php" class="text-decoration-none text-info">Lupa Password?</a>
@@ -229,16 +189,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <!-- Baru di UAP Section -->
 <section class="text-white pt-5 pb-1" style="background-color: #1C1C1C;">
-    <div class="container register">
+    <div class="container">
         <div class="row">
-            <!-- Kolom 1 -->
             <div class="col-md-9 d-flex flex-column justify-content-center">
                 <h3 class="mb-3" style="font-size: 1.5rem; font-weight: bold;">Baru di UAP?</h3>
                 <p style="color: #ccc; font-size: 1.1rem;">
                     Gratis dan mudah. Temukan ribuan game untuk dimainkan dengan jutaan teman baru.
                 </p>
             </div>
-            <!-- Kolom 2 -->
             <div class="col-md-3 d-flex flex-column justify-content-center">
             <a href="..\auth\Register.php" class="btn btn-primary mb-3  py-3 register-btn">
                 Buat Akun
@@ -259,7 +217,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </div>
 
     </footer>
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.min.js"></script>
+    <script>
+        <?php if (isset($_SESSION['error_message'])): ?>
+            let errorMessage = "<?php echo $_SESSION['error_message']; ?>";
+            Swal.fire({
+                icon: 'error',
+                title: 'Login Gagal!',
+                text: errorMessage,
+            });
+            <?php unset($_SESSION['error_message']); ?>
+        <?php endif; ?>
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>

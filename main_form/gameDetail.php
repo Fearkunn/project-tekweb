@@ -99,8 +99,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_review_id'])) 
     }
 }
 
-// Include cookie validation
-include('../auth/cookieValidation.php');
 ?>
 <!doctype html>
 <html lang="en">

@@ -1,115 +1,55 @@
 <?php
 session_start();
 
-// Jika pengguna sudah login, arahkan ke halaman dashboard
-if (isset($_SESSION['user_id'])) {
-    header("Location: ../main_form/mainForm.php");
-    exit();
-}
-
-// Include koneksi database
+// Koneksi ke database
 include('../db_connect/DatabaseConnection.php');
 
-// Include PHPMailer
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
+// Jika form dikirimkan
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = $_POST['user_email'];
+    $new_password = $_POST['new_password'];
+    $confirm_password = $_POST['confirm_password'];
 
-require '../PHPMailer/src/Exception.php';
-require '../PHPMailer/src/PHPMailer.php';
-require '../PHPMailer/src/SMTP.php';
+    // Validasi apakah password baru cocok dengan konfirmasi
+    if ($new_password !== $confirm_password) {
+        $_SESSION['reset_status'] = 'password_mismatch';
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit();
+    } else {
+        // Query untuk memeriksa apakah email ada
+        $sql = "SELECT * FROM users WHERE user_email = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $stmt->store_result();
 
-// Atur langkah proses
-if (!isset($_SESSION['step'])) {
-    $_SESSION['step'] = 1; // Default untuk langkah pertama
-}
+        if ($stmt->num_rows > 0) {
+            // Jika email ditemukan, update password
+            $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
+            $update_sql = "UPDATE users SET user_password = ? WHERE user_email = ?";
+            $update_stmt = $conn->prepare($update_sql);
+            $update_stmt->bind_param("ss", $hashed_password, $email);
 
-$error = ''; // Pesan error
-
-// Proses jika form telah dikirim
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Langkah 1: Memeriksa email
-    if ($_SESSION['step'] == 1 && isset($_POST['user_email'])) {
-        $email = $_POST['user_email'];
-
-        // Validasi email
-        if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            // Periksa apakah email ada di database
-            $stmt = $conn->prepare("SELECT * FROM users WHERE user_email = ?");
-            $stmt->bind_param("s", $email);
-            $stmt->execute();
-            $result = $stmt->get_result();
-
-            if ($result->num_rows > 0) {
-                // Jika email ditemukan, buat kode reset password
-                $Kode = random_int(100000, 999999);
-
-                // Simpan kode dan waktu ke session
-                $_SESSION['reset_Kode'] = $Kode;
-                $_SESSION['reset_Kode_time'] = time();
-                $_SESSION['email'] = $email;
-
-                // Kirim email dengan PHPMailer
-                $mail = new PHPMailer(true);
-                try {
-                    $mail->isSMTP();
-                    $mail->Host = 'smtp.gmail.com';
-                    $mail->SMTPAuth = true;
-                    $mail->Username = 'uap.company2023@gmail.com';
-                    $mail->Password = 'lmjz izih evfk pbve';
-                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-                    $mail->Port = 587;
-
-                    $mail->setFrom('uap.company2023@gmail.com', 'Uap');
-                    $mail->addAddress($email);
-
-                    $mail->isHTML(true);
-                    $mail->Subject = "Reset Password Request - Your Verification Code";
-                    $mail->Body = "
-                        <p>Halo,</p>
-                        <p>Kode verifikasi Anda adalah:</p>
-                        <h1 style='text-align: center; color: #007bff;'>{$Kode}</h1>
-                        <p>Gunakan kode ini untuk melanjutkan proses reset password.</p>
-                    ";
-
-                    $mail->send();
-                    $_SESSION['step'] = 2; // Beralih ke langkah kedua
-                } catch (Exception $e) {
-                    $error = "Gagal mengirim email: {$mail->ErrorInfo}";
-                }
-            } else {
-                $error = "Email tidak ditemukan.";
-            }
-        } else {
-            $error = "Format email tidak valid.";
-        }
-    }
-
-    // Langkah 2: Memeriksa kode
-    if ($_SESSION['step'] == 2 && isset($_POST['Kode'])) {
-        $Kode = $_POST['Kode'];
-
-        // Validasi kode
-        if (isset($_SESSION['reset_Kode']) && $Kode == $_SESSION['reset_Kode']) {
-            if (time() - $_SESSION['reset_Kode_time'] < 600) { // 600 detik = 10 menit
-                // Hapus data session terkait kode
-                $_SESSION['reset_Kode'] = null;
-                $_SESSION['reset_Kode_time'] = null;
-                $_SESSION['step'] = null;
-                //$_SESSION['user_email'] = $email;
-
-                // Redirect ke halaman reset password
-                header("Location: resetPassword.php");
+            if ($update_stmt->execute()) {
+                $_SESSION['reset_status'] = 'success';
+                header("Location: " . $_SERVER['PHP_SELF']);
                 exit();
             } else {
-                $error = "Kode telah kadaluarsa.";
+                $_SESSION['reset_status'] = 'failed';
+                header("Location: " . $_SERVER['PHP_SELF']);
+                exit();
             }
+            $update_stmt->close();
         } else {
-            $error = "Kode tidak valid.";
+            // Jika email tidak ditemukan
+            $_SESSION['reset_status'] = 'email_not_found';
+            header("Location: " . $_SERVER['PHP_SELF']);
+            exit();
         }
+        $stmt->close();
     }
 }
 ?>
-
 
 <!doctype html>
 <html lang="en">
@@ -117,128 +57,71 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Forgot Password</title>
-    <link rel="icon" href= "../assets/UAP.ico" type="image/x-icon"> 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="icon" href="../assets/UAP.ico" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #2C2C2C;
+            color: white;
+        }
 
-    body {
-        margin: 0;
-        padding: 0;
-        font-family: Arial, sans-serif;
-        background-color: #2C2C2C;
-        color: white;
-    }
+        #forgot-password-section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-image: url('../assets/Background.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center top;
+        }
+        .navbar {
+            background-color: #2C2C2C;
+            font-family: Arial, sans-serif;
+            padding: 10px 20px;
+        }
 
-    #forgot-password-section {
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        background-image: url('../assets/Background.png');
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-position: center top;
-        margin: 0;
-        padding: 0;
-    }
+        .navbar-brand, .nav-link {
+            color: #FFFFFF !important;
+        }
 
-    .navbar {
-        background-color: #2C2C2C;
-        font-family: Arial, sans-serif;
-        padding: 10px 20px;
-    }
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
 
-    .navbar-brand, .nav-link {
-        color: #FFFFFF !important;
-    }
+        .container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-    .navbar-brand {
-        font-weight: bold;
-        font-size: 1.5rem;
-    }
+        .forgot-password-box {
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 30px 25px;
+            border-radius: 10px;
+            color: white;
+            width: 100%;
+            max-width: 400px;
+        }
 
-    .container {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .forgot-password-box {
-        background-color: rgba(0, 0, 0, 0.8);
-        padding: 30px 25px;
-        border-radius: 10px;
-        color: white;
-        width: 100%;
-        max-width: 400px;
-        margin: 10px 0;
-    }
-
-    section {
-        font-size: 1rem;
-        line-height: 1.6;
-        padding: 30px 0;
-        margin:0;
-    }
-
-    section h3 {
-        font-size: 1.5rem;
-        font-weight: bold;
-        margin-bottom: 20px;
-    }
-
-    section p {
-        color: #AAA;
-        margin-bottom: 15px;
-    }
-
-    section .btn-primary {
-        background-color: #007bff;
-        border: none;
-        padding: 10px 20px;
-        font-size: 1rem;
-        border-radius: 5px;
-    }
-
-    section .btn-primary:hover {
-        background-color: #0056b3;
-    }
-
-    .text-section {
-        padding: 40px 20px;
-    }
-
-    footer {
-        font-size: 0.9rem;
-        color: #AAA;
-        text-align: center;
-        padding: 30px;
-        background-color: #1C1C1C;
-    }
-
-    .register-btn {
-        background: linear-gradient(90deg, #1b73e8, #004ba0);
-        border: none;
-        color: white;
-        transition: background-color 0.3s ease, transform 0.3s ease;
-    }
-
-    .register-btn:hover {
-        background: linear-gradient(90deg, #004ba0, #1b73e8);
-        transform: scale(1.05);
-    }
-
-    section.text-white-5py {
-        margin-bottom: 0;
-    }
-
-    .register {
-        padding-bottom: 20px;
-    }
-
-</style>
-
+        footer {
+            font-size: 0.9rem;
+            color: #AAA;
+            text-align: center;
+            padding: 30px;
+            background-color: #1C1C1C;
+        }
+    </style>
 </head>
 <body>
+
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
@@ -247,31 +130,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </a>
         </div>
     </nav>
-
+    
     <!-- Section Forgot Password -->
     <section id="forgot-password-section">
         <div class="container">
             <div class="forgot-password-box">
                 <h2 class="pb-3">Lupa Password</h2>
-                <?php if ($_SESSION['step'] == 1): ?>
-                    <form action="#" method="POST">
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="user_email" placeholder="Masukkan email Anda" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100">Kirim</button>
-                    </form>
-                <?php elseif ($_SESSION['step'] == 2): ?>
-                    <form action="#" method="POST">
-                        <div class="mb-3">
-                            <label for="Kode" class="form-label">Kode</label>
-                            <input type="text" class="form-control" id="Kode" name="Kode" placeholder="Masukkan kode" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100">Kirim</button>
-                    </form>
-                <?php endif; ?>
-
-
+                <form action="#" method="POST">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="user_email" placeholder="Masukkan email Anda" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="new_password" class="form-label">Password Baru</label>
+                        <input type="password" class="form-control" id="new_password" name="new_password" placeholder="Masukkan password baru" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirm_password" class="form-label">Confirm Password Baru</label>
+                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Konfirmasi password baru" required>
+                    </div>
+                    <div class="pt-4">
+                        <button type="submit" class="btn btn-primary w-100">Reset Password</button>
+                    </div>
+                </form>
                 <div class="text-center mt-4">
                     <a href="..\auth\Login.php" class="text-decoration-none text-info">Ingat password Anda? Login</a>
                 </div>
@@ -280,12 +161,48 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </section>
 
     <!-- Footer -->
-    <footer class="text-center text-white" style="background-color: #1C1C1C;">
+    <footer class="text-center text-white">
         <div class="container">
             <p>© 2024 UAP Corporation. Hak cipta dilindungi Undang-Undang. Semua game gratis</p>
         </div>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.min.js"></script>
+    <script>
+        // Periksa session dan tampilkan SweetAlert berdasarkan status
+        <?php if (isset($_SESSION['reset_status'])): ?>
+            <?php if ($_SESSION['reset_status'] == 'success'): ?>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Reset Password Berhasil!',
+                    text: 'silakan melakukan login',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = 'Login.php'; // Redirect ke halaman login
+                    }
+                });
+            <?php elseif ($_SESSION['reset_status'] == 'failed'): ?>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Reset Password Gagal!',
+                    text: 'terjadi kesalahan, silakan coba lagi',
+                });
+            <?php elseif ($_SESSION['reset_status'] == 'password_mismatch'): ?>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Reset Password Gagal!',
+                    text: 'password tidak sama',
+                });
+            <?php elseif ($_SESSION['reset_status'] == 'email_not_found'): ?>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Reset Password Gagal!',
+                    text: 'email tidak terdaftar',
+                });
+            <?php endif; ?>
+            <?php unset($_SESSION['reset_status']); // Hapus status setelah ditampilkan ?>
+        <?php endif; ?>
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>

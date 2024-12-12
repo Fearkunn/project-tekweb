@@ -9,67 +9,77 @@
         $confirm_password = mysqli_real_escape_string($conn, $_POST['confirm_password']);
 
         if ($confirm_password !== $password) {
-            $error_message = "Password Tidak Sama.";
+            $_SESSION['error_message'] = "password tidak sama";
+            header("Location: " . $_SERVER['PHP_SELF']);
+            exit();
         } else {
-            // Check if the email contains "@publisher"
             if (strpos($email, '@publisher') !== false) {
-                // Publisher registration logic
-                $query = "SELECT * FROM publisher WHERE publisher_name = '$username' OR publisher_name = '$email'";
+                $query = "SELECT * FROM publisher WHERE publisher_email = '$email'";
                 $result = mysqli_query($conn, $query);
                 if (mysqli_num_rows($result) > 0) {
-                    $error_message = "Publisher with this name or email already exists.";
+                    $_SESSION['error_message'] = "publisher dengan email yang sama sudah ada";
+                    header("Location: " . $_SERVER['PHP_SELF']);
+                    exit();
                 } else {
-                    // Get the max publisher ID
-                    $id_query = "SELECT MAX(id_publisher) AS max_id FROM publisher";
-                    $id_result = mysqli_query($conn, $id_query);
-                    $id_row = mysqli_fetch_assoc($id_result);
-                    $new_publisher_id = $id_row['max_id'] + 1;
-
-                    // Hash the password before inserting
-                    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-                    $insert_query = "INSERT INTO publisher (id_publisher, publisher_name, publisher_password) 
-                                     VALUES ('$new_publisher_id', '$username', '$hashed_password')"; // You can set a default logo or allow uploading
-                    if (mysqli_query($conn, $insert_query)) {
-                        echo "<script>console.log('Publisher insert query done');</script>";
-                        $_SESSION['user_id'] = $new_publisher_id;
-                        $_SESSION['username'] = $username; // Save username in session
-                        $_SESSION['role_user'] = 'PUBLISHER';
-                        header("Location: ..\main_form\mainForm.php"); // Redirect to main form
+                    $query = "SELECT * FROM publisher WHERE publisher_name = '$username'";
+                    $result = mysqli_query($conn, $query);
+                    if (mysqli_num_rows($result) > 0) {
+                        $_SESSION['error_message'] = "publisher dengan nama yang sama sudah ada";
+                        header("Location: " . $_SERVER['PHP_SELF']);
                         exit();
                     } else {
-                        $error_message = "Terjadi kesalahan, coba lagi nanti.";
+                        $id_query = "SELECT MAX(id_publisher) AS max_id FROM publisher";
+                        $id_result = mysqli_query($conn, $id_query);
+                        $id_row = mysqli_fetch_assoc($id_result);
+                        $new_publisher_id = $id_row['max_id'] + 1;
+                        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+                        $insert_query = "INSERT INTO publisher (id_publisher, publisher_name, publisher_password, publisher_email) 
+                                        VALUES ('$new_publisher_id', '$username', '$hashed_password', '$email')";
+                        if (mysqli_query($conn, $insert_query)) {
+                            $_SESSION['user_id'] = $new_publisher_id;
+                            $_SESSION['username'] = $username; 
+                            $_SESSION['role_user'] = 'PUBLISHER';
+                            header("Location: ..\main_form\mainForm.php");
+                            exit();
+                        } else {
+                            $_SESSION['error_message'] = "terjadi kesalahan, silakan coba lagi";
+                            header("Location: " . $_SERVER['PHP_SELF']);
+                            exit();
+                        }
                     }
-                }
-            } else {
-                // Regular user registration logic
+            }
+         } else {
                 $query = "SELECT * FROM users WHERE user_email = '$email'";
                 $result = mysqli_query($conn, $query);
                 if (mysqli_num_rows($result) > 0) {
-                    $error_message = "Email sudah terdaftar";
+                    $_SESSION['error_message'] = "user dengan email yang sama sudah ada";
+                    header("Location: " . $_SERVER['PHP_SELF']);
+                    exit();
                 } else {
                     $query = "SELECT * FROM users WHERE username = '$username'";
                     $result = mysqli_query($conn, $query);
                     if (mysqli_num_rows($result) > 0) {
-                        $error_message = "Username sudah ada";
+                        $_SESSION['error_message'] = "user dengan nama yang sama sudah ada";
+                        header("Location: " . $_SERVER['PHP_SELF']);
+                        exit();
                     } else {
                         $id_query = "SELECT MAX(id_user) AS max_id FROM users";
                         $id_result = mysqli_query($conn, $id_query);
                         $id_row = mysqli_fetch_assoc($id_result);
                         $new_user_id = $id_row['max_id'] + 1;
-                        
-                        // Hash the password before inserting
                         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
                         $insert_query = "INSERT INTO users (id_user, username, user_email, user_password,role_user) 
                                          VALUES ('$new_user_id', '$username', '$email', '$hashed_password','USER')";
                         if (mysqli_query($conn, $insert_query)) {
-                            echo "<script>console.log('User insert query done');</script>";
                             $_SESSION['user_id'] = $new_user_id;
-                            $_SESSION['username'] = $username; // Save username in session
+                            $_SESSION['username'] = $username; 
                             $_SESSION['role_user'] = 'USER';
-                            header("Location: ..\main_form\mainForm.php"); // Redirect to main form
+                            header("Location: ..\main_form\mainForm.php");
                             exit();
                         } else {
-                            $error_message = "Terjadi kesalahan, coba lagi nanti.";
+                            $_SESSION['error_message'] = "terjadi kesalahan, silakan coba lagi";
+                            header("Location: " . $_SERVER['PHP_SELF']);
+                            exit();
                         }
                     }
                 }
@@ -85,6 +95,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Register</title>
     <link rel="icon" href= "../assets/UAP.ico" type="image/x-icon"> 
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <style>
 
@@ -159,19 +171,9 @@
     }
 
     section .btn-primary {
-        background-color: #007bff;
-        border: none;
         padding: 10px 20px;
         font-size: 1rem;
         border-radius: 5px;
-    }
-
-    section .btn-primary:hover {
-        background-color: #0056b3;
-    }
-
-    .text-section {
-        padding: 40px 20px;
     }
 
     footer {
@@ -180,26 +182,6 @@
         text-align: center;
         padding: 30px;
         background-color: #1C1C1C;
-    }
-
-    .register-btn {
-        background: linear-gradient(90deg, #1b73e8, #004ba0);
-        border: none;
-        color: white;
-        transition: background-color 0.3s ease, transform 0.3s ease;
-    }
-
-    .register-btn:hover {
-        background: linear-gradient(90deg, #004ba0, #1b73e8);
-        transform: scale(1.05);
-    }
-
-    section.text-white-5py {
-        margin-bottom: 0;
-    }
-
-    .register {
-        padding-bottom: 20px;
     }
 
 </style>
@@ -233,11 +215,13 @@
                         <label for="password" class="form-label">Password</label>
                         <input type="password" class="form-control" id="password" name="user_password" placeholder="Masukkan password Anda" required>
                     </div>
-                    <div class="mb-3 pb-3">
+                    <div class="mb-3">
                         <label for="confirm_password" class="form-label">Confirm Password</label>
                         <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Konfirmasi password Anda" required>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Register</button>
+                    <div class="pt-4">
+                        <button type="submit" class="btn btn-primary w-100">Register</button>
+                    </div>
                 </form>
                 <div class="text-center mt-4">
                     <a href="..\auth\Login.php" class="text-decoration-none text-info">Sudah punya akun? Login</a>
@@ -249,12 +233,23 @@
     
 
     <!-- Footer -->
-    <footer class="text-center text-white" style="background-color: #1C1C1C;">
+    <footer class="text-center text-white">
         <div class="container">
             <p>© 2024 UAP Corporation. Hak cipta dilindungi Undang-Undang. Semua game gratis</p>
         </div>
     </footer>
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.min.js"></script>
+    <script>
+        <?php if (isset($_SESSION['error_message'])): ?>
+            let errorMessage = "<?php echo $_SESSION['error_message']; ?>";
+            Swal.fire({
+                icon: 'error',
+                title: 'Register Gagal!',
+                text: errorMessage,
+            });
+            <?php unset($_SESSION['error_message']); ?>
+        <?php endif; ?>
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>
