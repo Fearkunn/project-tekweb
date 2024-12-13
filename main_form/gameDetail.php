@@ -65,11 +65,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['review_content'])) {
     // Handle review submission
     $review_content = trim($_POST['review_content']);
     $user_id = $_SESSION['user_id']; // Assuming id_user is stored in the session
-    if ($is_logged_in && !empty($review_content)) {
-        $query_insert_review = "INSERT INTO review (review_content, id_user, id_game) VALUES (?, ?, ?)";
-        $stmt_insert_review = $conn->prepare($query_insert_review);
-        $stmt_insert_review->bind_param("sii", $review_content, $user_id, $game_id);
-        $stmt_insert_review->execute();
+
+     if ($is_logged_in && !empty($review_content)) {
+        if (isset($_POST['edit_review_id'])) {
+            $review_id = intval($_POST['edit_review_id']);
+            $query_update_review = "UPDATE review SET review_content = ? WHERE id_review = ? AND id_user = ?";
+            $stmt_update_review = $conn->prepare($query_update_review);
+            $stmt_update_review->bind_param("sii", $review_content, $review_id, $user_id);
+            $stmt_update_review->execute();
+        } else {
+            $query_insert_review = "INSERT INTO review (review_content, id_user, id_game) VALUES (?, ?, ?)";
+            $stmt_insert_review = $conn->prepare($query_insert_review);
+            $stmt_insert_review->bind_param("sii", $review_content, $user_id, $game_id);
+            $stmt_insert_review->execute();
+        }
         header("Location: gameDetail.php?game_id=$game_id"); // Refresh to display the new review
         exit();
     }
@@ -354,9 +363,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_review_id'])) 
                         <input type="hidden" name="delete_review_id" value="<?php echo htmlspecialchars($review['id_review']); ?>">
                         <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                     </form>
+                    <button class="btn btn-warning btn-sm edit-review" data-review-id="<?php echo $review['id_review']; ?>" data-review-content="<?php echo htmlspecialchars($review['review_content']); ?>">Edit</button>
                 <?php endif; ?>
             </div>
         <?php endforeach; ?>
+        <script>
+            document.querySelectorAll('.edit-review').forEach(button => {
+                button.addEventListener('click', function () {
+                    const reviewId = this.dataset.reviewId;
+                    const reviewContent = this.dataset.reviewContent;
+
+                    // Tampilkan formulir ulasan
+                    const form = document.getElementById('review-form');
+                    form.querySelector('textarea').value = reviewContent; // Isi teksarea dengan konten ulasan
+                    form.style.display = 'block'; // Pastikan formulir terlihat
+
+                    // Hapus input tersembunyi lama jika ada
+                    const oldInput = form.querySelector('input[name="edit_review_id"]');
+                    if (oldInput) {
+                        oldInput.remove();
+                    }
+
+                    // Tambahkan input tersembunyi baru untuk review_id
+                    const hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.name = 'edit_review_id';
+                    hiddenInput.value = reviewId;
+                    form.appendChild(hiddenInput);
+                });
+            });
+        </script>
     <?php else: ?>
         <p>No reviews yet.</p>
     <?php endif; ?>
