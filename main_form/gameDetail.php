@@ -61,6 +61,30 @@ if($is_logged_in){ //jika ada is logged_in tetapi jika ada username kosong / tid
 }else{
     $username = '';
 }
+
+$is_publisher = false;
+
+if ($is_logged_in) {
+    // Siapkan query
+    $query = "SELECT publisher_name FROM publisher WHERE publisher_name = ?";
+    $stmt = $conn->prepare($query);
+
+    if ($stmt) {
+       $stmt->bind_param("s", $username);
+        $stmt->execute();
+    
+        $result = $stmt->get_result();
+        $publisher = $result->fetch_assoc(); //untuk di cek di isset($publisher['publisher_name'])
+
+        //jika isset mengeluarkan hasil null maka is publisher akan jadi false
+        if (isset($publisher['publisher_name']) && $publisher['publisher_name'] === $username) {
+            $is_publisher = true;
+        }else{
+            $is_publisher = false;
+        }
+    }
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['review_content'])) {
     // Handle review submission
     $review_content = trim($_POST['review_content']);
@@ -362,7 +386,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_review_id'])) 
 
     <div class="reviews-section">
     <h2>Reviews</h2>
-    <?php if ($is_logged_in): ?>
+    <?php if ($is_logged_in && !$is_publisher): ?>
         <!-- Add Review Form -->
         <button class="btn btn-primary my-3 " id="toggle-review-form">Add Review</button>
         <form method="POST" class="mt-3" id="review-form" style="display: none;">
@@ -376,7 +400,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_review_id'])) 
             });
         </script>
     <?php else: ?>
-        <p>You must <a href="../auth/login.php">log in</a> to add a review.</p>
+        <p>Silakan login sebagai user untuk menambahkan review</p>
     <?php endif; ?>
     <?php if (!empty($reviews)): ?>
         <?php foreach ($reviews as $review): ?>
