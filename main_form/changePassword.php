@@ -53,9 +53,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $confirm_password = $_POST['confirm_password'];
 
     if (empty($current_password) || empty($new_password) || empty($confirm_password)) {
-        $error = "All fields are required!";
+        $_SESSION['Send'] = ['type' => 'error', 'message' => 'password tidak boleh kosong'];
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit();
     } elseif ($new_password !== $confirm_password) {
-        $error = "New passwords do not match!";
+        $_SESSION['Send'] = ['type' => 'error', 'message' => 'password tidak sama'];
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit();
     } else {
         // Ambil password saat ini dari database
         $stmt = $conn->prepare("SELECT $password_column FROM $table WHERE " . ($table === "users" ? "username = ?" : "publisher_name = ?"));
@@ -73,20 +77,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $update_stmt = $conn->prepare($update_query);
                 $update_stmt->bind_param("ss", $hashed_password, $current_username);
                 if ($update_stmt->execute()) {
-                    $_SESSION['Send'] = ['type' => 'success', 'message' => 'Change Password Success', 'redirect' => 'mainForm.php'];
+                    $_SESSION['Send'] = ['type' => 'success', 'message' => 'password berhasil diperbarui', 'redirect' => '../main_form/userProfile.php'];
                 } else {
-                    $_SESSION['Send'] = ['type' => 'error', 'message' => 'Failed to update password.'];
-                    header("Location: ../main_form/changePassword.php");
+                    $_SESSION['Send'] = ['type' => 'error', 'message' => 'gagal memperbarui password'];
+                    header("Location: " . $_SERVER['PHP_SELF']);
                     exit();
                 }
             } else {
-                $_SESSION['Send'] = ['type' => 'error', 'message' => 'Incorrect current password!'];
-                header("Location: ../main_form/changePassword.php");
+                $_SESSION['Send'] = ['type' => 'error', 'message' => 'password saat ini salah'];
+                header("Location: " . $_SERVER['PHP_SELF']);
                 exit();
             }
         } else {
-            $_SESSION['Send'] = ['type' => 'error', 'message' => 'User not found!'];
-            header("Location: ../main_form/changePassword.php");
+            $_SESSION['Send'] = ['type' => 'error', 'message' => 'user tidak ditemukan'];
+            header("Location: " . $_SERVER['PHP_SELF']);
             exit();
         }
     }
@@ -157,10 +161,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php if (isset($_SESSION['Send'])): ?>
                 <script>
                     Swal.fire({
-                        title: "<?= $_SESSION['Send']['type'] === 'success' ? 'Berhasil!' : 'Gagal!' ?>",
+                        title: "<?= $_SESSION['Send']['type'] === 'success' ? 'Ganti Password Berhasil!' : 'Ganti Password Gagal!' ?>",
                         text: "<?= $_SESSION['Send']['message'] ?>",
                         icon: "<?= $_SESSION['Send']['type'] ?>",
-                        confirmButtonText: "OK"
                     }).then(() => {
                         <?php if ($_SESSION['Send']['type'] === 'success' && isset($_SESSION['Send']['redirect'])): ?>
                             window.location.href = "<?= $_SESSION['Send']['redirect'] ?>";
@@ -180,18 +183,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <section id="password-section">
         <div class="container">
             <div class="form-box">
-                <h2 class="pb-3">Change Password</h2>
+                <h2 class="pb-3">Ganti Password</h2>
                 <form method="POST">
                     <div class="mb-3">
-                        <label for="current_password" class="form-label">Current Password</label>
+                        <label for="current_password" class="form-label">Password Sekarang</label>
                         <input type="password" class="form-control" name="current_password" id="current_password" required>
                     </div>
                     <div class="mb-3">
-                        <label for="new_password" class="form-label">New Password</label>
+                        <label for="new_password" class="form-label">Password Baru</label>
                         <input type="password" class="form-control" name="new_password" id="new_password" required>
                     </div>
                     <div class="mb-3 pb-2">
-                        <label for="confirm_password" class="form-label">Confirm New Password</label>
+                        <label for="confirm_password" class="form-label">Konfirmasi Password Baru</label>
                         <input type="password" class="form-control" name="confirm_password" id="confirm_password" required>
                     </div>
                     <button type="submit" class="btn btn-primary">Update Password</button>

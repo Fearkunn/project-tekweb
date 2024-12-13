@@ -173,21 +173,21 @@ if ($user_result->num_rows > 0) {
 
             <div class="text-center">
                 <a href="changeProfilePicture.php" class="btn btn-primary">Edit Profile</a>
-                <a href="changePassword.php" class="btn btn-warning">Change Password</a>
-                <a href="changeUsername.php" class="btn btn-info">Change Username</a>
-                <a href="deleteAccount.php" class="btn btn-danger">Delete Account</a>
+                <a href="changePassword.php" class="btn btn-warning">Ganti Password</a>
+                <a href="changeUsername.php" class="btn btn-info">Ganti Username</a>
+                <a href="deleteAccount.php" class="btn btn-danger">Hapus Akun</a>
             </div>
 
 
             <!-- Stats Section -->
              <?php if ($role == "PUBLISHER") : ?>
             <div class="stats text-center">
-                <p><strong>Total Games Published:</strong> <?php echo $total_games; ?></p>
+                <p><strong>Jumlah Game Yang Telah Dipublish:</strong> <?php echo $total_games; ?></p>
             </div>
             <?php endif; ?>
             <?php if ($role == "USER") : ?>
                 <div class="stats text-center">
-                    <p><strong>Total Games Owned:</strong> <?php echo $total_games;?></p>
+                    <p><strong>Jumlah Game Yang Dimiliki:</strong> <?php echo $total_games;?></p>
                 </div>
             <?php endif;?>
         </div>

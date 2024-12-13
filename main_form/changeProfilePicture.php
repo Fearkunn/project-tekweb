@@ -3,13 +3,15 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+if (!isset($_SESSION['username'])) {
+    header("Location: ../auth/login.php");
+    exit();
+}
+
 include('../db_connect/DatabaseConnection.php'); // Sesuaikan dengan jalur file Anda
 
 define('IMGBB_URL', 'https://api.imgbb.com/1/upload'); // URL ImgBB API
-define('IMGBB_API_KEY', '635ce58a6dce8d81a73d9f2d6edb0e9f'); // Ganti dengan API Key Anda
-
-$errorMessage = '';
-$success = '';
+define('IMGBB_API_KEY', 'cd64310f3d944ddab347166d2cd115d6'); // Ganti dengan API Key Anda
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['user_profile'])) {
     $user_profile = $_FILES['user_profile'];
@@ -37,7 +39,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['user_profile'])) {
 
         $response = curl_exec($ch);
         if (curl_errno($ch)) {
-            $_SESSION['Send'] = ['type' => 'error', 'message' => 'cURL Error: ' . curl_error($ch)];
+            $_SESSION['Send'] = ['type' => 'error', 'message' => "gagal mengupload gambar"];
+            header("Location: " . $_SERVER['PHP_SELF']);
+            exit();
         }
         curl_close($ch);
 
@@ -47,13 +51,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['user_profile'])) {
         if (isset($responseData['data']['url'])) {
             $ImagePath = $responseData['data']['url']; // URL gambar yang diunggah
         } else {
-            $_SESSION['Send'] = ['type' => 'error', 'message' => "Gagal mengupload gambar: " . ($responseData['error']['message'] ?? 'Unknown error')];
-            header("Location: ../main_form/changeProfilePictuere.php");
+            $_SESSION['Send'] = ['type' => 'error', 'message' => "gagal mengupload gambar"];
+            header("Location: " . $_SERVER['PHP_SELF']);
             exit();
         }
     } else {
-        $_SESSION['Send'] = ['type' => 'error', 'message' => "File tidak valid. Harap unggah gambar."];
-        header("Location: ../main_form/changeProfilePictuere.php");
+        $_SESSION['Send'] = ['type' => 'error', 'message' => "file tidak valid, harap mengupload gambar"];
+        header("Location: " . $_SERVER['PHP_SELF']);
         exit();
     }
 
@@ -95,15 +99,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['user_profile'])) {
             $update_stmt = $conn->prepare($update_query);
             $update_stmt->bind_param("si", $ImagePath, $_SESSION['user_id']);
             if ($update_stmt->execute()) {
-                $_SESSION['Send'] = ['type' => 'success', 'message' => 'Foto profil berhasil diperbarui!', 'redirect' => 'userProfile.php'];
+                $_SESSION['Send'] = ['type' => 'success', 'message' => 'foto profile berhasil diperbarui', 'redirect' => '../main_form/userProfile.php'];
             } else {
-                $_SESSION['Send'] = ['type' => 'error', 'message' => 'Gagal memperbarui foto profil di database.'];
-                header("Location: ../main_form/changeProfilePictuere.php");
+                $_SESSION['Send'] = ['type' => 'error', 'message' => 'gagal memperbarui foto profile'];
+                header("Location: " . $_SERVER['PHP_SELF']);
                 exit();
             }
         } else {
-            $_SESSION['Send'] = ['type' => 'error', 'message' => 'Akun tidak ditemukan di sistem.'];
-            header("Location: ../main_form/changeProfilePictuere.php");
+            $_SESSION['Send'] = ['type' => 'error', 'message' => 'akun tidak ditemukan di sistem'];
+            header("Location: " . $_SERVER['PHP_SELF']);
             exit();
         }
     }
@@ -115,6 +119,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['user_profile'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Edit Profile</title>
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="icon" href="../assets/UAP.ico" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -173,10 +178,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['user_profile'])) {
     <?php if (isset($_SESSION['Send'])): ?>
             <script>
                 Swal.fire({
-                    title: "<?= $_SESSION['Send']['type'] === 'success' ? 'Berhasil!' : 'Gagal!' ?>",
+                    title: "<?= $_SESSION['Send']['type'] === 'success' ? 'Edit Profile Berhasil!' : 'Edit Profile Gagal!' ?>",
                     text: "<?= $_SESSION['Send']['message'] ?>",
                     icon: "<?= $_SESSION['Send']['type'] ?>",
-                    confirmButtonText: "OK"
                 }).then(() => {
                     <?php if ($_SESSION['Send']['type'] === 'success' && isset($_SESSION['Send']['redirect'])): ?>
                         window.location.href = "<?= $_SESSION['Send']['redirect'] ?>";
@@ -199,7 +203,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['user_profile'])) {
                 <h2 class="pb-3">Edit Profile Picture</h2>
                 <form method="POST" enctype="multipart/form-data">
                     <div class="mb-3 pb-2">
-                        <label for="user_profile" class="form-label">Upload New Profile Picture</label>
+                        <label for="user_profile" class="form-label">Upload Profile Picture Baru</label>
                         <input type="file" class="form-control" name="user_profile" id="user_profile" required>
                     </div>
                     <button type="submit" class="btn btn-primary">Update Profile Picture</button>
@@ -207,5 +211,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['user_profile'])) {
             </div>
         </div>
     </section>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>

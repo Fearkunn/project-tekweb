@@ -13,6 +13,19 @@
             header("Location: " . $_SERVER['PHP_SELF']);
             exit();
         } else {
+            // Pengecekan apakah username sudah digunakan di salah satu tabel
+            $check_username_query = "SELECT 'exists' FROM users WHERE username = '$username'
+                                     UNION
+                                     SELECT 'exists' FROM publisher WHERE publisher_name = '$username'";
+            $check_username_result = mysqli_query($conn, $check_username_query);
+
+            if (mysqli_num_rows($check_username_result) > 0) {
+                $_SESSION['status'] = "username_conflict";
+                header("Location: " . $_SERVER['PHP_SELF']);
+                exit();
+            }
+
+            // Pengecekan role berdasarkan email
             if (strpos($email, '@publisher') !== false) {
                 $query = "SELECT * FROM publisher WHERE publisher_email = '$email'";
                 $result = mysqli_query($conn, $query);
@@ -21,35 +34,27 @@
                     header("Location: " . $_SERVER['PHP_SELF']);
                     exit();
                 } else {
-                    $query = "SELECT * FROM publisher WHERE publisher_name = '$username'";
-                    $result = mysqli_query($conn, $query);
-                    if (mysqli_num_rows($result) > 0) {
-                        $_SESSION['status'] = "publisher_name";
+                    $id_query = "SELECT MAX(id_publisher) AS max_id FROM publisher";
+                    $id_result = mysqli_query($conn, $id_query);
+                    $id_row = mysqli_fetch_assoc($id_result);
+                    $new_publisher_id = $id_row['max_id'] + 1;
+                    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+                    $insert_query = "INSERT INTO publisher (id_publisher, publisher_name, publisher_password, publisher_email) 
+                                     VALUES ('$new_publisher_id', '$username', '$hashed_password', '$email')";
+                    if (mysqli_query($conn, $insert_query)) {
+                        $_SESSION['user_id'] = $new_publisher_id;
+                        $_SESSION['username'] = $username; 
+                        $_SESSION['role_user'] = 'PUBLISHER';
+                        $_SESSION['status'] = "publisher";
                         header("Location: " . $_SERVER['PHP_SELF']);
                         exit();
                     } else {
-                        $id_query = "SELECT MAX(id_publisher) AS max_id FROM publisher";
-                        $id_result = mysqli_query($conn, $id_query);
-                        $id_row = mysqli_fetch_assoc($id_result);
-                        $new_publisher_id = $id_row['max_id'] + 1;
-                        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-                        $insert_query = "INSERT INTO publisher (id_publisher, publisher_name, publisher_password, publisher_email) 
-                                        VALUES ('$new_publisher_id', '$username', '$hashed_password', '$email')";
-                        if (mysqli_query($conn, $insert_query)) {
-                            $_SESSION['user_id'] = $new_publisher_id;
-                            $_SESSION['username'] = $username; 
-                            $_SESSION['role_user'] = 'PUBLISHER';
-                            $_SESSION['status'] = "publisher";
-                            header("Location: " . $_SERVER['PHP_SELF']);
-                            exit();
-                        } else {
-                            $_SESSION['status'] = "fail";
-                            header("Location: " . $_SERVER['PHP_SELF']);
-                            exit();
-                        }
+                        $_SESSION['status'] = "fail";
+                        header("Location: " . $_SERVER['PHP_SELF']);
+                        exit();
                     }
-            }
-         } else {
+                }
+            } else {
                 $query = "SELECT * FROM users WHERE user_email = '$email'";
                 $result = mysqli_query($conn, $query);
                 if (mysqli_num_rows($result) > 0) {
@@ -57,38 +62,31 @@
                     header("Location: " . $_SERVER['PHP_SELF']);
                     exit();
                 } else {
-                    $query = "SELECT * FROM users WHERE username = '$username'";
-                    $result = mysqli_query($conn, $query);
-                    if (mysqli_num_rows($result) > 0) {
-                        $_SESSION['status'] = "user_name";
+                    $id_query = "SELECT MAX(id_user) AS max_id FROM users";
+                    $id_result = mysqli_query($conn, $id_query);
+                    $id_row = mysqli_fetch_assoc($id_result);
+                    $new_user_id = $id_row['max_id'] + 1;
+                    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+                    $insert_query = "INSERT INTO users (id_user, username, user_email, user_password, role_user) 
+                                     VALUES ('$new_user_id', '$username', '$email', '$hashed_password', 'USER')";
+                    if (mysqli_query($conn, $insert_query)) {
+                        $_SESSION['user_id'] = $new_user_id;
+                        $_SESSION['username'] = $username; 
+                        $_SESSION['role_user'] = 'USER';
+                        $_SESSION['status'] = "user";
                         header("Location: " . $_SERVER['PHP_SELF']);
                         exit();
                     } else {
-                        $id_query = "SELECT MAX(id_user) AS max_id FROM users";
-                        $id_result = mysqli_query($conn, $id_query);
-                        $id_row = mysqli_fetch_assoc($id_result);
-                        $new_user_id = $id_row['max_id'] + 1;
-                        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-                        $insert_query = "INSERT INTO users (id_user, username, user_email, user_password,role_user) 
-                                         VALUES ('$new_user_id', '$username', '$email', '$hashed_password','USER')";
-                        if (mysqli_query($conn, $insert_query)) {
-                            $_SESSION['user_id'] = $new_user_id;
-                            $_SESSION['username'] = $username; 
-                            $_SESSION['role_user'] = 'USER';
-                            $_SESSION['status'] = "user";
-                            header("Location: " . $_SERVER['PHP_SELF']);
-                            exit();
-                        } else {
-                            $_SESSION['status'] = "fail";
-                            header("Location: " . $_SERVER['PHP_SELF']);
-                            exit();
-                        }
+                        $_SESSION['status'] = "fail";
+                        header("Location: " . $_SERVER['PHP_SELF']);
+                        exit();
                     }
                 }
             }
         }
     }
 ?>
+
 
 <!doctype html>
 <html lang="en">
@@ -265,23 +263,11 @@
                     title: 'Register User Gagal!',
                     text: 'email sudah digunakan user lain',
                 });
-            <?php elseif ($_SESSION['status'] == 'user_name'): ?>
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Register User Gagal!',
-                    text: 'username sudah digunakan user lain',
-                });
             <?php elseif ($_SESSION['status'] == 'publisher_email'): ?>
                 Swal.fire({
                     icon: 'error',
                     title: 'Register Publisher Gagal!',
                     text: 'email sudah digunakan publisher lain',
-                });
-            <?php elseif ($_SESSION['status'] == 'publisher_name'): ?>
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Register Publisher Gagal!',
-                    text: 'username sudah digunakan publisher lain',
                 });
             <?php elseif ($_SESSION['status'] == 'fail'): ?>
                 Swal.fire({
@@ -294,6 +280,12 @@
                     icon: 'error',
                     title: 'Register Gagal!',
                     text: 'password tidak sama',
+                });
+            <?php elseif ($_SESSION['status'] == 'username_conflict'): ?>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Register Gagal!',
+                    text: 'username sudah digunakan',
                 });
             <?php endif; ?>
             <?php unset($_SESSION['status']); // Hapus status setelah ditampilkan ?>

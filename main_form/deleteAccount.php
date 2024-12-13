@@ -69,6 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Delete Account</title>
     <link rel="icon" href="../assets/UAP.ico" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         body { 
@@ -131,13 +132,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <section id="delete-section">
         <div class="container">
             <div class="delete-account-box">
-                <h2 class="pb-3">Delete Account</h2>
+                <h2 class="pb-3">Hapus Akun</h2>
                 <?php if ($error): ?>
                     <div class="alert alert-danger"><?php echo $error; ?></div>
                 <?php endif; ?>
                 <form id="delete-form" method="POST">
-                    <p class="pb-2">Are you sure you want to delete your account? This action is permanent.</p>
-                    <button type="button" class="btn btn-danger" id="confirm-delete-btn">Delete Account</button>
+                    <p class="pb-2">Apakah Anda yakin hendak menghapus akun? Aksi ini bersifat permanen.</p>
+                    <button type="button" class="btn btn-danger" id="confirm-delete-btn">Hapus</button>
                 </form>
             </div>
         </div>
@@ -146,14 +147,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script>
         document.getElementById('confirm-delete-btn').addEventListener('click', function() {
             Swal.fire({
-                title: 'Are you sure?',
-                text: 'This action is permanent and cannot be undone.',
+                title: 'Apakah Anda Yakin?',
+                text: 'aksi ini bersifat permanen dan tidak bisa dibatalkan',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#dc3545',
                 cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Yes, delete it!',
-                cancelButtonText: 'No, cancel!'
+                confirmButtonText: 'Hapus',
+                cancelButtonText: 'Kembali'
             }).then((result) => {
                 if (result.isConfirmed) {
                     // If user confirms, submit the form
@@ -162,5 +163,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             });
         });
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>

@@ -9,8 +9,6 @@ if (!isset($_SESSION['username'])) {
 
 include('../db_connect/DatabaseConnection.php');
 
-$error = '';
-$success = '';
 $current_username = $_SESSION['username'];
 
 // Periksa apakah username ada di tabel `users` atau `publisher`
@@ -49,8 +47,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $new_username = $_POST['new_username'];
 
     if (empty($new_username)) {
-        $_SESSION['Send'] = ['type' => 'error', 'message' => 'Username cannot be empty!'];
-        header("Location: ../main_form/changeUsername.php");
+        $_SESSION['Send'] = ['type' => 'error', 'message' => 'username tidak boleh kosong'];
+        header("Location: " . $_SERVER['PHP_SELF']);
         exit();
     } else {
         // Cek apakah username baru sudah digunakan di tabel `users`
@@ -68,8 +66,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $publisher_exists = $check_publisher_stmt->get_result()->num_rows > 0;
 
         if ($user_exists || $publisher_exists) {
-            $_SESSION['Send'] = ['type' => 'error', 'message' => 'Username already taken!'];
-            header("Location: ../main_form/changeUsername.php");
+            $_SESSION['Send'] = ['type' => 'error', 'message' => 'username sudah digunakan'];
+            header("Location: " . $_SERVER['PHP_SELF']);
             exit();
         } else {
             // Lakukan update username
@@ -79,11 +77,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($update_stmt->execute()) {
                 // Perbarui sesi dengan username baru
                 $_SESSION['username'] = $new_username;
-                $_SESSION['Send'] = ['type' => 'success', 'message' => 'Username berhasil diperbarui!','redirect' => '../main_form/mainForm.php'];
+                $_SESSION['Send'] = ['type' => 'success', 'message' => 'username berhasil diperbarui','redirect' => '../main_form/userProfile.php'];
                 
             } else {
-                $_SESSION['Send'] = ['type' => 'error', 'message' => 'Terjadi kesalahan saat memperbarui username.'];
-                header("Location: ../main_form/changeusername.php");
+                $_SESSION['Send'] = ['type' => 'error', 'message' => 'gagal memperbarui username'];
+                header("Location: " . $_SERVER['PHP_SELF']);
                 exit();
             }
         }
@@ -99,6 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Change Username</title>
     <link rel="icon" href="../assets/UAP.ico" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
@@ -156,10 +155,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php if (isset($_SESSION['Send'])): ?>
             <script>
                 Swal.fire({
-                    title: "<?= $_SESSION['Send']['type'] === 'success' ? 'Berhasil!' : 'Gagal!' ?>",
+                    title: "<?= $_SESSION['Send']['type'] === 'success' ? 'Ganti Username Berhasil!' : 'Ganti Username Gagal!' ?>",
                     text: "<?= $_SESSION['Send']['message'] ?>",
                     icon: "<?= $_SESSION['Send']['type'] ?>",
-                    confirmButtonText: "OK"
                 }).then((result) => { //jika berhasil redirect kesini
                     <?php if ($_SESSION['Send']['type'] === 'success' && isset($_SESSION['Send']['redirect'])): ?>  
                         window.location.href = "<?= $_SESSION['Send']['redirect'] ?>";
@@ -180,10 +178,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <section id="username-section">
         <div class="container">
             <div class="form-box">
-                <h2 class="pb-3">Change Username</h2>
+                <h2 class="pb-3">Ganti Username</h2>
                 <form method="POST">
                     <div class="mb-3 pb-2">
-                        <label for="new_username" class="form-label">New Username</label>
+                        <label for="new_username" class="form-label">Username Baru</label>
                         <input type="text" class="form-control" name="new_username" id="new_username" required>
                     </div>
                     <button type="submit" class="btn btn-primary">Update Username</button>
@@ -191,5 +189,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
     </section>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>

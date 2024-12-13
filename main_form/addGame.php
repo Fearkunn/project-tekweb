@@ -6,7 +6,7 @@ if (session_status() === PHP_SESSION_NONE) {
 include('../db_connect/DatabaseConnection.php');
 
 // Define ImgBB API key and URL
-define('IMGBB_API_KEY', 'YOUR_IMGBB_API_KEY'); // Replace with your ImgBB API key
+define('IMGBB_API_KEY', 'cd64310f3d944ddab347166d2cd115d6'); // Replace with your ImgBB API key
 define('IMGBB_URL', 'https://api.imgbb.com/1/upload');
 
 // Proses jika form ditambahkan
@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['gameName'])) {
         // Prepare data for ImgBB
         $data = [
             'image' => $imageData,
-            'key' => '635ce58a6dce8d81a73d9f2d6edb0e9f'
+            'key' => IMGBB_API_KEY
         ];
 
         // Use cURL to upload the image
