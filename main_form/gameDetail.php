@@ -116,6 +116,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_review_id'])) 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?php echo htmlspecialchars($game['game_name']); ?> - Game Detail</title>
     <link rel="icon" href="../assets/UAP.ico" type="image/x-icon"> 
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <style>
@@ -271,11 +273,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_review_id'])) 
             padding: 15px;
             background-color: #34495e;
             border-radius: 5px;
+            position: relative;
         }
 
         .review strong {
             color: #ffffff;
         }
+        .review .review-content {
+            flex: 1;
+        }
+
+        .review-actions {
+            display: inline;
+            gap: 10px; /* Jarak antar tombol */
+            justify-content: flex-start; /* Posisikan tombol ke kiri */
+        }
+
+        .review-actions button {
+            flex-grow: 0; /* Tidak membesar otomatis */
+            padding: 5px 10px; /* Ukuran padding tombol */
+            font-size: 0.875rem; /* Ukuran teks tombol */
+            border-radius: 5px; /* Untuk estetika */
+            max-width: 120px; /* Batas lebar maksimum */
+            white-space: nowrap; /* Hindari teks membungkus */
+        }
+
+
     </style>
 </head>
 <body>
@@ -351,18 +374,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_review_id'])) 
     <?php endif; ?>
     <?php if (!empty($reviews)): ?>
         <?php foreach ($reviews as $review): ?>
-            <div class="review d-flex justify-content-between align-items-start">
+            <div class="review d-flex">
                 <div class="review-content">
                     <p><strong><?php echo htmlspecialchars($review['username']); ?>:</strong></p>
                     <p><?php echo nl2br(htmlspecialchars($review['review_content'])); ?></p>
                 </div>
                 <?php if ($is_logged_in && $username === $review['username']): ?>
-                    <!-- Tombol Hapus untuk Ulasan Milik Pengguna -->
-                    <form method="POST">
-                        <input type="hidden" name="delete_review_id" value="<?php echo htmlspecialchars($review['id_review']); ?>">
-                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                    </form>
-                    <button class="btn btn-warning btn-sm edit-review" data-review-id="<?php echo $review['id_review']; ?>" data-review-content="<?php echo htmlspecialchars($review['review_content']); ?>">Edit</button>
+                    <div class="review-actions">
+                        <form method="POST" style="display: inline;">
+                            <input type="hidden" name="delete_review_id" value="<?php echo htmlspecialchars($review['id_review']); ?>">
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                        <button class="btn btn-warning btn-sm edit-review" data-review-id="<?php echo $review['id_review']; ?>" data-review-content="<?php echo htmlspecialchars($review['review_content']); ?>">Edit</button>
+                    </div>
                 <?php endif; ?>
             </div>
         <?php endforeach; ?>
@@ -400,6 +424,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_review_id'])) 
 </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>
