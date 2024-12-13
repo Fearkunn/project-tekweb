@@ -148,11 +148,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['user_profile'])) {
         }
         .navbar-brand, .nav-link {
             color: #FFFFFF !important;
-        }
-        .navbar-brand {
             font-weight: bold;
-            font-size: 1.5rem;
+            font-size: 1.25rem;
         }
+        
         .form-box { 
             background-color: rgba(0, 0, 0, 0.8);
             padding: 30px 25px;

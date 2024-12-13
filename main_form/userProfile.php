@@ -1,5 +1,4 @@
 <?php
-// Start session and include database connection
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -11,7 +10,6 @@ if (!isset($_SESSION['role_user'])) {
     exit();
 }
 
-// Check if user is logged in
 $is_logged_in = isset($_SESSION['username']) && !empty($_SESSION['username']);
 $user_id = $is_logged_in ? $_SESSION['username'] : '';
 
@@ -23,7 +21,7 @@ if (!$is_logged_in) {
     exit();
 }
 
-// Fetch user profile and role
+// Fetch user profile dan rolenya
 $user_query = "
     SELECT username, user_profile, role_user
     FROM users 
@@ -41,7 +39,7 @@ if ($user_result->num_rows > 0) {
         : "../assets/login.png";
     
     $username = htmlspecialchars($user_data['username']);
-    // Fetch total number of games owned by the user
+    // Fetch total games yang dimiliki user sesuai username
     $total_games_query = "
         SELECT COUNT(*) AS total_games
         FROM library
@@ -58,7 +56,7 @@ if ($user_result->num_rows > 0) {
     $total_games_data = $total_games_result->fetch_assoc();
     $total_games = $total_games_data['total_games'];
 } else {
-    // If user_id is not found in users table, check publisher table
+    // Jika user_id tidak ada di tabel users, check tabel publisher
     $publisher_query = "
         SELECT publisher_name, publisher_logo 
         FROM publisher 
@@ -70,7 +68,7 @@ if ($user_result->num_rows > 0) {
     $publisher_result = $publisher_stmt->get_result();
 
     if ($publisher_result->num_rows > 0) {
-        // If user_id is found in publisher table
+        // Jika user_id ditemukan di tabel publisher
         $publisher_data = $publisher_result->fetch_assoc();
         $profile_picture = !empty($publisher_data['publisher_logo']) && filter_var($publisher_data['publisher_logo'], FILTER_VALIDATE_URL)
         ? $publisher_data['publisher_logo']
@@ -130,10 +128,8 @@ if ($user_result->num_rows > 0) {
         }
         .navbar-brand, .nav-link {
             color: #FFFFFF !important;
-        }
-        .navbar-brand {
             font-weight: bold;
-            font-size: 1.5rem;
+            font-size: 1.25rem;
         }
         .user-profile {
             text-align: center;

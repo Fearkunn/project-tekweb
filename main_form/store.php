@@ -112,8 +112,6 @@ if ($is_logged_in) {
         }
         .navbar-brand, .nav-link {
             color: #FFFFFF !important; /* Font putih untuk kontras */
-        }
-        .navbar-brand {
             font-weight: bold;
             font-size: 1.25rem;
         }

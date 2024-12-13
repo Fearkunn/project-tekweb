@@ -1,16 +1,15 @@
 <?php
-// Start session and include database connection
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
 include('../db_connect/DatabaseConnection.php');
 
-// Check if user is logged in
+// Check jika user sudah login
 $is_logged_in = isset($_SESSION['username']) && !empty($_SESSION['username']);
 $user_id = $is_logged_in ? ($_SESSION['user_id'] ?? '') : '';
 
-// Redirect to login page if not logged in
+// Redirect ke login page jika belum login
 if (!$is_logged_in) {
     header("Location: ../auth/login.php");
     exit;
@@ -26,13 +25,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['like_game_id'])) {
     $likedGameId = intval($_POST['like_game_id']);
     $isLiked = isset($_POST['liked']) ? 1 : 0;
 
-    // Update is_like in the library table
+    // Update is_like di tabel library
     $updateLikeQuery = "UPDATE library SET is_like = ? WHERE id_user = ? AND id_game = ?";
     $stmt = $conn->prepare($updateLikeQuery);
     $stmt->bind_param("iii", $isLiked, $user_id, $likedGameId);
     $stmt->execute();
 
-    // Update like count in the games table
+    // Update like count di tabel games
     if ($isLiked) {
         $incrementQuery = "UPDATE games SET like_count = like_count + 1 WHERE id_game = ?";
         $stmt = $conn->prepare($incrementQuery);
@@ -46,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['like_game_id'])) {
     }
 }
 
-// Fetch user's games from the database
+// Fetch games user  dari database
 $order_by = '';
 if (isset($_GET['sort'])) {
     if ($_GET['sort'] === 'asc') {
@@ -89,8 +88,6 @@ $userLiked = '';
         }
         .navbar-brand, .nav-link {
             color: #FFFFFF !important; /* Font putih untuk kontras */
-        }
-        .navbar-brand {
             font-weight: bold;
             font-size: 1.25rem;
         }

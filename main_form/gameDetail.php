@@ -5,10 +5,10 @@ if (session_status() === PHP_SESSION_NONE) {
 
 include('../db_connect/DatabaseConnection.php');
 
-// Get the game ID from the URL
+// Ambil game id
 $game_id = isset($_GET['game_id']) ? intval($_GET['game_id']) : 0;
 
-// Fetch game details along with publisher, genres, and reviews
+// Fetch game details
 $query_game = "SELECT g.game_name, g.game_desc, g.release_date, g.like_count, g.games_image, p.publisher_name, p.publisher_logo 
                FROM games g
                JOIN publisher p ON g.id_publisher = p.id_publisher
@@ -20,7 +20,7 @@ $result_game = $stmt->get_result();
 $game = $result_game->fetch_assoc();
 
 if (!$game) {
-    // Redirect or show an error if game not found
+    // Redirect or tunjukkan error jika game tidak ditemukan
     header("Location: store.php");
     exit();
 }
@@ -53,10 +53,10 @@ while ($row = $result_reviews->fetch_assoc()) {
     $reviews[] = $row;
 }
 
-// Check if user is logged in
-$is_logged_in = isset($_SESSION['username']) && !empty($_SESSION['username']); //set is logged in
+// Check jika user sudah login
+$is_logged_in = isset($_SESSION['username']) && !empty($_SESSION['username']);
 
-if($is_logged_in){ //jika ada is logged_in jika ga ada username kosong
+if($is_logged_in){ //jika ada is logged_in tetapi jika ada username kosong / tidak ada username
     $username = $_SESSION['username'];
 }else{
     $username = '';
@@ -64,7 +64,7 @@ if($is_logged_in){ //jika ada is logged_in jika ga ada username kosong
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['review_content'])) {
     // Handle review submission
     $review_content = trim($_POST['review_content']);
-    $user_id = $_SESSION['user_id']; // Assuming id_user is stored in the session
+    $user_id = $_SESSION['user_id']; // ID pengguna dari sesi
 
      if ($is_logged_in && !empty($review_content)) {
         if (isset($_POST['edit_review_id'])) {
@@ -134,11 +134,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_review_id'])) 
     }
     .navbar-brand, .nav-link {
         color: #FFFFFF !important; /* Font putih untuk kontras */
-    }
-    .navbar-brand {
         font-weight: bold;
         font-size: 1.25rem;
     }
+    
     .navbar-abc .nav-link:hover {
         color: #FF4C4C !important; /* Merah terang saat hover */
     }
@@ -405,8 +404,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_review_id'])) 
 
                     // Tampilkan review saat ini
                     const form = document.getElementById('review-form');
-                    form.querySelector('textarea').value = reviewContent; // Isi teksarea dengan konten ulasan
-                    form.style.display = 'block'; // Pastikan formulir terlihat
+                    form.querySelector('textarea').value = reviewContent; // Isi teks area dengan review baru
+                    form.style.display = 'block';
                     
                     // Hapus input lama jika ada
                     const oldInput = form.querySelector('input[name="edit_review_id"]');

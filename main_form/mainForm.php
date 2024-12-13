@@ -7,9 +7,9 @@ if (session_status() === PHP_SESSION_NONE) {
 include('../db_connect/DatabaseConnection.php');
 
 
-$is_logged_in = isset($_SESSION['username']) && !empty($_SESSION['username']); //set is logged in
+$is_logged_in = isset($_SESSION['username']) && !empty($_SESSION['username']);
 
-if($is_logged_in){ //jika ada is logged_in jika ga ada username kosong
+if($is_logged_in){ //jika ada is logged_in tapi jika ga ada username (kosong)
     $username = $_SESSION['username'];
 }else{
     $username = '';
@@ -38,10 +38,6 @@ if ($is_logged_in) {
     }
 }
 
-//$query = "SELECT id_game, game_name, game_desc, games_image, release_date, like_count FROM games WHERE is_admit = 1";
-//$result = $conn->query($query);
-
-
 ?>
 <!doctype html>
 <html lang="en">
@@ -61,8 +57,6 @@ if ($is_logged_in) {
     }
     .navbar-brand, .nav-link {
         color: #FFFFFF !important; /* Font putih untuk kontras */
-    }
-    .navbar-brand {
         font-weight: bold;
         font-size: 1.25rem;
     }
@@ -138,7 +132,7 @@ if ($is_logged_in) {
     .btn-danger {
         background-color: #ff4444;
         border: none;
-        transition: background 0.3s;
+        transition: Backgrounds 0.3s;
     }
 
     .btn-danger:hover {

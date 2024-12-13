@@ -39,14 +39,14 @@ if ($game_id > 0) {
                     $_SESSION['message'] = "Terjadi kesalahan saat menyimpan game.";
                 }
 
-                // Close stmt_save if it was created
+                // Close stmt_save jika dibuat
                 $stmt_save->close();
             } else {
                 $_SESSION['message'] = "Gagal menyiapkan query untuk menyimpan game.";
             }
         }
 
-        // Close stmt_check if it was created
+        // Close stmt_check jika dibuat
         $stmt_check->close();
     } else {
         $_SESSION['message'] = "Gagal menyiapkan query untuk memeriksa game di library.";

@@ -128,11 +128,8 @@
 
     .navbar-brand, .nav-link {
         color: #FFFFFF !important;
-    }
-
-    .navbar-brand {
         font-weight: bold;
-        font-size: 1.5rem;
+        font-size: 1.25rem;
     }
 
     .container {

@@ -90,10 +90,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
     .navbar-brand, .nav-link {
         color: #FFFFFF !important;
-    }
-    .navbar-brand {
         font-weight: bold;
-        font-size: 1.5rem;
+        font-size: 1.25rem;
     }
 
     .container {
@@ -140,7 +138,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         padding: 30px;
         background-color: #1C1C1C;
     }
-
    
 
 </style>

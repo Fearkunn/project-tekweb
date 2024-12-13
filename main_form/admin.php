@@ -72,11 +72,10 @@ while ($row = $topLikedGamesResult->fetch_assoc()) {
     }
     .navbar-brand, .nav-link {
         color: #FFFFFF !important; /* Font putih untuk kontras */
-    }
-    .navbar-brand {
         font-weight: bold;
         font-size: 1.25rem;
     }
+    
     .navbar-abc .nav-link:hover {
         color: #FF4C4C !important; /* Merah terang saat hover */
     }
