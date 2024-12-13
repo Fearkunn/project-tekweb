@@ -115,17 +115,6 @@ if ($is_logged_in) {
         border-color:white;
     }
 
-    .navbar-custom{
-        background: linear-gradient( rgba(200, 14, 49, 0.8), rgba(125, 7, 23, 0.8));
-    }
-
-    .navbar-custom a:hover{
-        background-color: #c51d3a; /* Darker red background on hover */
-        border-radius: 4px; /* Optional: Rounded corners on hover */
-        color: white !important;
-    }
-
-
     .carousel-item {
     transition: transform 0.5s ease-in-out;
     }

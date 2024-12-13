@@ -1,3 +1,4 @@
+
 <?php
 session_start();
 include('../db_connect/DatabaseConnection.php');
@@ -67,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         margin: 0;
         padding: 0;
         font-family: Arial, sans-serif;
-        background-color: #0f1a23;
+        background-color: #2C2C2C;
         color: white;
 
     }
@@ -75,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         min-height: 100vh;
         display: flex;
         flex-direction: column;
-        background-image: url('../assets/login.png');
+        background-image: url('../assets/Login.png');
         background-size: cover;
         background-repeat: no-repeat;
         background-position: center top;
@@ -83,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         padding: 0;
     }
     .navbar {
-        background-color: #0f1a23;
+        background-color: #2C2C2C;
         font-family: Arial, sans-serif;
         padding: 10px 20px;
     }
@@ -103,7 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     .login-box {
-        background-color: #0f1a23;
+        background-color: rgba(0, 0, 0, 0.8);
         padding: 30px 25px;
         border-radius: 10px;
         color: white;
@@ -137,22 +138,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         color: #AAA;
         text-align: center;
         padding: 30px;
-        background-color: #0f1a23;
-    }
-    .btn-primary {
-        background-color: #1b6ca8; /* Biru terang untuk kontras */
-        border-color: #1b6ca8;
-        color: white;
-        font-weight: bold;
+        background-color: #1C1C1C;
     }
 
-    .btn-primary:hover {
-        background-color: #145582; /* Warna lebih gelap untuk efek hover */
-        border-color: #145582;
-    }
-    .text-info:hover {
-        color: white !important;
-    }
    
 
 </style>
@@ -194,17 +182,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </section>
 
 <!-- Baru di UAP Section -->
-<section class="text-white pt-5 pb-1">
+<section class="text-white pt-5 pb-1" style="background-color: #1C1C1C;">
     <div class="container">
         <div class="row">
             <div class="col-md-9 d-flex flex-column justify-content-center">
-                <h3 class="mb-3" style="font-size: 1.5rem; ">Baru di UAP?</h3>
+                <h3 class="mb-3" style="font-size: 1.5rem; font-weight: bold;">Baru di UAP?</h3>
                 <p style="color: #ccc; font-size: 1.1rem;">
                     Gratis dan mudah. Temukan ribuan game untuk dimainkan dengan jutaan teman baru.
                 </p>
             </div>
             <div class="col-md-3 d-flex flex-column justify-content-center">
-            <a href="..\auth\Register.php" class="btn btn-primary mb-3 py-3">
+            <a href="..\auth\Register.php" class="btn btn-primary mb-3  py-3">
                 Buat Akun
             </a>
                 
@@ -217,9 +205,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 
     <!-- Footer -->
-    <footer class="text-center text-white">
+    <footer class="text-center text-white" style="background-color: #1C1C1C;">
         <div class="container">
-            <p style="color: #ccc;">© 2024 UAP Corporation. Hak cipta dilindungi Undang-Undang. Semua game gratis</p>
+            <p>© 2024 UAP Corporation. Hak cipta dilindungi Undang-Undang. Semua game gratis</p>
         </div>
 
     </footer>

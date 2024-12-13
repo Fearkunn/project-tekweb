@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
-            background-color: #0f1a23;
+            background-color: #2C2C2C;
             color: white;
         }
 
@@ -81,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background-position: center top;
         }
         .navbar {
-            background-color: #0f1a23;
+            background-color: #2C2C2C;
             font-family: Arial, sans-serif;
             padding: 10px 20px;
         }
@@ -103,14 +103,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .forgot-password-box {
-            background-color: #0f1a23;
+            background-color: rgba(0, 0, 0, 0.8);
             padding: 30px 25px;
             border-radius: 10px;
             color: white;
             width: 100%;
             max-width: 400px;
         }
-
+        
         section .btn-primary {
             padding: 10px 20px;
             font-size: 1rem;
@@ -122,21 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: #AAA;
             text-align: center;
             padding: 30px;
-            background-color: #0f1a23;
-        }
-        .btn-primary {
-            background-color: #1b6ca8; /* Biru terang untuk kontras */
-            border-color: #1b6ca8;
-            color: white;
-            font-weight: bold;
-        }
-
-        .btn-primary:hover {
-            background-color: #145582; /* Warna lebih gelap untuk efek hover */
-            border-color: #145582;
-        }
-        .text-info:hover {
-            color: white !important;
+            background-color: #1C1C1C;
         }
     </style>
 </head>
@@ -183,7 +169,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- Footer -->
     <footer class="text-center text-white">
         <div class="container">
-            <p style="color: #ccc;">© 2024 UAP Corporation. Hak cipta dilindungi Undang-Undang. Semua game gratis</p>
+            <p>© 2024 UAP Corporation. Hak cipta dilindungi Undang-Undang. Semua game gratis</p>
         </div>
     </footer>
 
