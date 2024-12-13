@@ -347,7 +347,7 @@ $games = $gamesStmt->get_result();
 
                 echo "<form method='POST'>";
                 echo "<button type='submit' name='delete_game_id' value='" . $game['id_game'] . "' class='btn btn-danger'>Hapus</button>";
-                echo "<button type='button' class='btn btn-primary' data-bs-toggle='modal' data-bs-target='#editGameModal" . $game['id_game'] . "'>Edit</button>";
+                echo "<button type='button' class='btn btn-primary ms-2' data-bs-toggle='modal' data-bs-target='#editGameModal" . $game['id_game'] . "'>Edit</button>";
                 echo "</form>";
                 echo "</div></div></div>";
 
