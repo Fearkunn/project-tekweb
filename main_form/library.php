@@ -203,33 +203,40 @@ $userLiked = '';
         </div>
         
         <div class="row py-5">
-            <?php if (!empty($library)): ?>
-                <?php foreach ($library as $game): ?>
-                    <div class="col-md-3 mb-4">
-                        <div class="card text-bg-dark game-card">
-                            <img src="<?php echo htmlspecialchars($game['games_image']); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($game['game_name']); ?>">
-                            <div class="card-body">
-                                <h5 class="card-title"><?php echo htmlspecialchars($game['game_name']); ?></h5>
-                                <p class="card-text">Likes: <?php echo htmlspecialchars($game['like_count']); ?></p>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <form method="POST" action="">
-                                        <input type="hidden" name="like_game_id" value="<?php echo $game['id_game']; ?>">
-                                        <input type="checkbox" class="form-check-input" name="liked" id="like-<?php echo $game['id_game']; ?>" 
-                                            onchange="this.form.submit()" 
-                                            <?php echo $game['is_like'] == 1 ? 'checked' : ''; ?>>
-                                        <label for="like-<?php echo $game['id_game']; ?>">Like</label>
-                                    </form>
-                                    <a href="gameDetail.php?game_id=<?php echo $game['id_game']; ?>" class="btn btn-info btn-sm">Review</a>
-                                </div>
+        <?php if (!empty($library)): ?>
+            <?php foreach ($library as $game): ?>
+                <div class="col-md-3 mb-4">
+                    <div class="card text-bg-dark game-card">
+                        <img src="<?php echo htmlspecialchars($game['games_image']); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($game['game_name']); ?>">
+                        <div class="card-body">
+                            <h5 class="card-title"><?php echo htmlspecialchars($game['game_name']); ?></h5>
+                            <p class="card-text">Likes: <?php echo htmlspecialchars($game['like_count']); ?></p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <form method="POST" action="">
+                                    <input type="hidden" name="like_game_id" value="<?php echo $game['id_game']; ?>">
+                                    <input type="checkbox" class="form-check-input" name="liked" id="like-<?php echo $game['id_game']; ?>" 
+                                        onchange="this.form.submit()" 
+                                        <?php echo $game['is_like'] == 1 ? 'checked' : ''; ?>>
+                                    <label for="like-<?php echo $game['id_game']; ?>">Like</label>
+                                </form>
+                                <a href="gameDetail.php?game_id=<?php echo $game['id_game']; ?>" class="btn btn-info btn-sm">Review</a>
+                            </div>
+                            <div class="mt-3">
+                                <?php if (!empty($game['games_image'])): ?>
+                                    <a href="downloadgame.php?game_id=<?php echo $game['id_game']; ?>" class="btn btn-success btn-sm" download>Download Game</a>
+                                <?php else: ?>
+                                    <span class="text-warning">Download unavailable</span>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <div class="col-12">
-                    <p class="text-center">You don't own any games yet. Visit the store to purchase games!</p>
                 </div>
-            <?php endif; ?>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <div class="col-12">
+                <p class="text-center">You don't own any games yet. Visit the store to purchase games!</p>
+            </div>
+        <?php endif; ?>
         </div>
     </div>
 

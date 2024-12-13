@@ -42,7 +42,7 @@ $query = "
     LEFT JOIN detail_genre dg ON g.id_game = dg.id_game
     LEFT JOIN genre gen ON dg.id_genre = gen.id_genre
     LEFT JOIN publisher p ON g.id_publisher = p.id_publisher
-    WHERE 1=1
+    WHERE g.is_admit=1
 ";
 
 $params = [];
