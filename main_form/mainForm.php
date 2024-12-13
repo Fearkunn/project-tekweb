@@ -362,11 +362,10 @@ if ($is_logged_in) {
                                             <script>
                                                 document.addEventListener('DOMContentLoaded', function() {
                                                     Swal.fire({
-                                                        title: "Good job!",
-                                                        text: "Game added to your library!",
+                                                        title: "Game Berhasil Ditambahkan!",
+                                                        text: "silakan cek di library",
                                                         icon: "success"
                                                     });then(() => {
-                                                  
                                                     window.location.href = "../main_form/mainForm.php";
                                                 });
                                               });
@@ -469,8 +468,8 @@ if ($is_logged_in) {
                                         <script>
                                             document.addEventListener('DOMContentLoaded', function() {
                                                 Swal.fire({
-                                                    title: "Good job!",
-                                                    text: "Game added to your library!",
+                                                    title: "Game Berhasil Ditambahkan!",
+                                                    text: "silakan cek di library",
                                                     icon: "success"
                                                 });
                                                 header("Location: ../main_form/mainForm.php")
