@@ -339,7 +339,7 @@ if ($is_logged_in) {
 
 
 <!-- Game Cards -->
-<div class="container">
+<div class="container pt-5">
     <div class="row g-2">
         <?php if ($result->num_rows > 0): ?>
             <?php while ($row = $result->fetch_assoc()): ?>
