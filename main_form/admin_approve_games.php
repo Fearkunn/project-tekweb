@@ -38,12 +38,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $updateStmt = $conn->prepare($updateQuery);
     $updateStmt->bind_param("i", $gameId);
     if ($updateStmt->execute()) {
-        $_SESSION['Send'] = ['type' => 'success', 'message' => 'Game disetujui','redirect' => 'admin_approve_games.php'];
+        $_SESSION['Send'] = ['type' => 'success', 'message' => 'game berhasil disetujui','redirect' => '../main_form/admin_approve_games.php'];
     } else {
-        $errorMessage = "Gagal menyetujui game: " . $conn->error;
-        $_SESSION['Send'] = ['type' => 'error', 'message' => 'Gagal menyetujui game: '. $conn->error];
+        $_SESSION['Send'] = ['type' => 'error', 'message' => 'gagal menyetujui game'];
         header('Location: ' . $_SERVER['PHP_SELF']);
-        exit;
+        exit();
     }
 }
 ?>
@@ -54,8 +53,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Admin - Approve Games</title>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="icon" href="../assets/UAP.ico" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
     .navbar {
@@ -104,10 +104,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 <?php if (isset($_SESSION['Send'])): ?>
             <script>
                 Swal.fire({
-                    title: "<?= $_SESSION['Send']['type'] === 'success' ? 'Berhasil!' : 'Gagal!' ?>",
+                    title: "<?= $_SESSION['Send']['type'] === 'success' ? 'Approve Game Berhasil!' : 'Approve Game Gagal!' ?>",
                     text: "<?= $_SESSION['Send']['message'] ?>",
                     icon: "<?= $_SESSION['Send']['type'] ?>",
-                    confirmButtonText: "OK"
                 }).then(() => {
                     <?php if ($_SESSION['Send']['type'] === 'success' && isset($_SESSION['Send']['redirect'])): ?>
                         window.location.href = "<?= $_SESSION['Send']['redirect'] ?>";
@@ -164,7 +163,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 
 </html>

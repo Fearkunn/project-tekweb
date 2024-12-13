@@ -63,20 +63,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $stmt = $conn->prepare("DELETE FROM detail_genre WHERE id_game = ?");
     $stmt->bind_param("i", $gameId);
     if ($stmt->execute()) {
-        $successMessage = "Detail berhasil dihapus.";
+        $stmt = $conn->prepare("DELETE FROM games WHERE id_game = ?");
+        $stmt->bind_param("i", $gameId);
+        if ($stmt->execute()) {
+            $_SESSION['Send'] = ['type' => 'success', 'message' => 'game berhasil dihapus','redirect' => '../main_form/admin_delete_games.php'];
+        } else {
+            $_SESSION['Send'] = ['type' => 'error', 'message' => 'game gagal dihapus'];
+            header('Location: ' . $_SERVER['PHP_SELF']);
+            exit();
+        }
     } else {
-        $errorMessage = "Gagal menghapus detail: " . $conn->error;
-    }
-    $stmt = $conn->prepare("DELETE FROM games WHERE id_game = ?");
-    $stmt->bind_param("i", $gameId);
-    if ($stmt->execute()) {
-        $_SESSION['Send'] = ['type' => 'success', 'message' => 'Game berhasil dihapus.','redirect' => 'admin_delete_games.php'];
-        header('Location: ../main_form/admin_delete_games.php');
-        exit();
-    } else {
-        $errorMessage = "Gagal menghapus game: " . $conn->error;
-        $_SESSION['Send'] = ['type' => 'error', 'message' => 'Gagal menghapus game: ' . $conn -> error];
-        header('Location: ../main_form/admin_delete_games.php');
+        $_SESSION['Send'] = ['type' => 'error', 'message' => 'game gagal dihapus'];
+        header('Location: ' . $_SERVER['PHP_SELF']);
         exit();
     }
 }
@@ -88,6 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Admin - Delete Games</title>
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="icon" href="../assets/UAP.ico" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -138,10 +137,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     <?php if (isset($_SESSION['Send'])): ?>
             <script>
                 Swal.fire({
-                    title: "<?= $_SESSION['Send']['type'] === 'success' ? 'Berhasil!' : 'Gagal!' ?>",
+                    title: "<?= $_SESSION['Send']['type'] === 'success' ? 'Hapus Game Berhasil!' : 'Hapus Game Gagal!' ?>",
                     text: "<?= $_SESSION['Send']['message'] ?>",
                     icon: "<?= $_SESSION['Send']['type'] ?>",
-                    confirmButtonText: "OK"
                 }).then(() => {
                     <?php if ($_SESSION['Send']['type'] === 'success' && isset($_SESSION['Send']['redirect'])): ?>
                         window.location.href = "<?= $_SESSION['Send']['redirect'] ?>";
@@ -175,16 +173,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     <div class="container py-5">
         <h2 class="text-center pb-5">Delete Games</h2>
 
-        <?php if (isset($errorMessage)): ?>
-            <div class="alert alert-danger" role="alert">
-                <?php echo $errorMessage; ?>
-            </div>
-        <?php endif; ?>
-
         <!-- Search Form -->
         <form method="POST" class="mb-4">
             <div class="input-group">
-                <input type="text" class="form-control" name="search" placeholder="Search by game name..." value="<?php echo htmlspecialchars($searchTerm); ?>">
+                <input type="text" class="form-control" name="search" placeholder="Cari nama game..." value="<?php echo htmlspecialchars($searchTerm); ?>">
                 <button class="btn btn-secondary" type="submit">Search</button>
             </div>
         </form>
@@ -210,6 +202,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             <?php endwhile; ?>
         </div>
     </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>
