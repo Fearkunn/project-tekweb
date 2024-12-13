@@ -48,13 +48,6 @@ $query = "
 $params = [];
 $types = "";
 
-// Filter genre
-if (!empty($selectedGenre)) {
-    $query .= " AND dg.id_genre = ?";
-    $params[] = $selectedGenre;
-    $types .= "i";
-}
-
 // Filter publisher
 if (!empty($selectedPublisher)) {
     $query .= " AND g.id_publisher = ?";
@@ -70,6 +63,14 @@ if (!empty($search)) {
 }
 
 $query .= " GROUP BY g.id_game";
+
+// Filter genre
+if (!empty($selectedGenre)) {
+    $query .= " HAVING GROUP_CONCAT(DISTINCT dg.id_genre SEPARATOR ', ') LIKE ?";
+    $params[] = "%" . $selectedGenre . "%";
+    $types .= "s";
+}
+
 
 $stmt = $conn->prepare($query);
 
