@@ -279,10 +279,7 @@ if ($is_logged_in) {
                         <li class="nav-item">
                             <a href="../main_form/addGame.php" class="nav-link">Add Game</a>
                         </li>
-                    <?php endif; ?>  
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Community</a>
-                    </li>
+                    <?php endif; ?> 
                     <li class="nav-item">
                         <a class="nav-link disabled" aria-disabled="true" href="#"><?php echo $username; ?></a>
                     </li>   

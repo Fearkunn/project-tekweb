@@ -167,9 +167,6 @@ $userLiked = '';
                         <a class="nav-link" href="../main_form/library.php">Library</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Community</a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link disabled" aria-disabled="true" href="#"><?php echo $username; ?></a>
                     </li>
                 </ul>

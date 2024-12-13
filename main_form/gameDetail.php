@@ -373,18 +373,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_review_id'])) 
                     const reviewId = this.dataset.reviewId;
                     const reviewContent = this.dataset.reviewContent;
 
-                    // Tampilkan formulir ulasan
+                    // Tampilkan review saat ini
                     const form = document.getElementById('review-form');
                     form.querySelector('textarea').value = reviewContent; // Isi teksarea dengan konten ulasan
                     form.style.display = 'block'; // Pastikan formulir terlihat
-
-                    // Hapus input tersembunyi lama jika ada
+                    
+                    // Hapus input lama jika ada
                     const oldInput = form.querySelector('input[name="edit_review_id"]');
                     if (oldInput) {
                         oldInput.remove();
                     }
 
-                    // Tambahkan input tersembunyi baru untuk review_id
+                    // Tambahkan input baru untuk review_id
                     const hiddenInput = document.createElement('input');
                     hiddenInput.type = 'hidden';
                     hiddenInput.name = 'edit_review_id';
