@@ -354,6 +354,8 @@ if ($is_logged_in) {
                             <a href="gameDetail.php?game_id=<?php echo $row['id_game']; ?>" class="btn btn-primary">View Details</a>
                             <?php if (!$is_publisher && !in_array($row['id_game'], $libraryGames)): ?>
                                 <a href="saveGame.php?game_id=<?php echo $row['id_game']; ?>" class="btn btn-success">Save Game</a>
+                            <?php elseif (!$is_publisher && in_array($row['id_game'], $libraryGames)): ?>
+                                <button class="btn btn-success" disabled>Already in Library</button>
                             <?php endif; ?>
                         </div>
                     </div>
