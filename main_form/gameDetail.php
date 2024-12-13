@@ -292,7 +292,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_review_id'])) 
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item"><a class="nav-link active" aria-current="page" href="store.php">Store</a></li>
                 <li class="nav-item"><a class="nav-link" href="../main_form/library.php">Library</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Community</a></li>
                 <li class="nav-item"><a class="nav-link disabled" aria-disabled="true" href="#"><?php echo $username; ?></a></li>
             </ul>
             <?php if ($is_logged_in): ?>

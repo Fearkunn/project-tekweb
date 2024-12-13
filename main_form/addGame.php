@@ -30,7 +30,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['gameName'])) {
     } else {
         die("Publisher tidak ditemukan untuk pengguna ini.");
     }
-    
 
     // Proses upload gambar cover ke ImgBB
     $coverImagePath = null;
@@ -181,6 +180,7 @@ $games = $gamesStmt->get_result();
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <title>Add Game</title>
     <style>
     body {
@@ -347,8 +347,45 @@ $games = $gamesStmt->get_result();
 
                 echo "<form method='POST'>";
                 echo "<button type='submit' name='delete_game_id' value='" . $game['id_game'] . "' class='btn btn-danger'>Hapus</button>";
+                echo "<button type='button' class='btn btn-primary' data-bs-toggle='modal' data-bs-target='#editGameModal" . $game['id_game'] . "'>Edit</button>";
                 echo "</form>";
                 echo "</div></div></div>";
+
+                // Modal untuk edit game
+                echo "<div class='modal fade' id='editGameModal" . $game['id_game'] . "' tabindex='-1' aria-labelledby='editGameModalLabel" . $game['id_game'] . "' aria-hidden='true'>";
+                echo "<div class='modal-dialog modal-lg modal-dialog-centered'>";
+                echo "<div class='modal-content'>";
+                echo "<div class='modal-header'>";
+                echo "<h5 class='modal-title' id='editGameModalLabel" . $game['id_game'] . "'>Edit Game</h5>";
+                echo "<button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>";
+                echo "</div>";
+                echo "<form action='' method='POST'>";
+                echo "<div class='modal-body'>";
+                echo "<input type='hidden' name='edit_game_id' value='" . $game['id_game'] . "'>";
+                echo "<div class='mb-3'>";
+                echo "<label for='editGameName" . $game['id_game'] . "' class='form-label'>Nama Game</label>";
+                echo "<input type='text' class='form-control' id='editGameName" . $game['id_game'] . "' name='editGameName' value='" . htmlspecialchars($game['game_name']) . "' required>";
+                echo "</div>";
+                echo "<div class='mb-3'>";
+                echo "<label for='editGameDesc" . $game['id_game'] . "' class='form-label'>Deskripsi Game</label>";
+                echo "<textarea class='form-control' id='editGameDesc" . $game['id_game'] . "' name='editGameDesc' rows='3' required>" . htmlspecialchars($game['game_desc']) . "</textarea>";
+                echo "</div>";
+                echo "<div class='mb-3'>";
+                echo "<label for='editIsAdmit" . $game['id_game'] . "' class='form-label'>Status</label>";
+                echo "<div class='form-check'>";
+                echo "<input class='form-check-input' type='checkbox' id='editIsAdmit" . $game['id_game'] . "' name='editIsAdmit' " . ($game['is_admit'] ? 'checked' : '') . ">";
+                echo "<label class='form-check-label' for='editIsAdmit" . $game['id_game'] . "'>Diterima</label>";
+                echo "</div>";
+                echo "</div>";
+                echo "</div>";
+                echo "<div class='modal-footer'>";
+                echo "<button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>Tutup</button>";
+                echo "<button type='submit' class='btn btn-primary'>Simpan Perubahan</button>";
+                echo "</div>";
+                echo "</form>";
+                echo "</div>";
+                echo "</div>";
+                echo "</div>";
             }
             ?>
         </div>
