@@ -34,31 +34,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['gameName'])) {
     // Proses upload gambar cover ke ImgBB
     $coverImagePath = null;
 
-    // Check if the file was uploaded without errors
+    // Check jika file terupload tanpa error
     if (isset($coverImage) && $coverImage['error'] == 0) {
         $imageData = base64_encode(file_get_contents($coverImage['tmp_name']));
         
-        // Prepare data for ImgBB
+        // Persiapan data untuk ImgBB
         $data = [
             'image' => $imageData,
             'key' => IMGBB_API_KEY
         ];
 
-        // Use cURL to upload the image
+        // Kirim data ke ImgBB menggunakan cURL
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, IMGBB_URL);
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
-        // Execute cURL and get the response
+        // Execute cURL
         $response = curl_exec($ch);
 
-        // Decode the response
+        // Decode respons yang didapat
         $responseData = json_decode($response, true);
 
         if (isset($responseData['data']['url'])) {
-            $coverImagePath = $responseData['data']['url']; // Get the URL of the uploaded image
+            $coverImagePath = $responseData['data']['url']; // Mengambil URL image yang diupload
         } else {
             $_SESSION['status'] = "upload";
             header("Location: " . $_SERVER['PHP_SELF']);
@@ -280,8 +280,6 @@ $games = $gamesStmt->get_result();
     }
     .navbar-brand, .nav-link {
         color: #FFFFFF !important;
-    }
-    .navbar-brand {
         font-weight: bold;
         font-size: 1.5rem;
     }
