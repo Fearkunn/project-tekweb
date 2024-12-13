@@ -9,7 +9,7 @@
         $confirm_password = mysqli_real_escape_string($conn, $_POST['confirm_password']);
 
         if ($confirm_password !== $password) {
-            $_SESSION['error_message'] = "password tidak sama";
+            $_SESSION['status'] = "password_mismatch";
             header("Location: " . $_SERVER['PHP_SELF']);
             exit();
         } else {
@@ -17,14 +17,14 @@
                 $query = "SELECT * FROM publisher WHERE publisher_email = '$email'";
                 $result = mysqli_query($conn, $query);
                 if (mysqli_num_rows($result) > 0) {
-                    $_SESSION['error_message'] = "publisher dengan email yang sama sudah ada";
+                    $_SESSION['status'] = "publisher_email";
                     header("Location: " . $_SERVER['PHP_SELF']);
                     exit();
                 } else {
                     $query = "SELECT * FROM publisher WHERE publisher_name = '$username'";
                     $result = mysqli_query($conn, $query);
                     if (mysqli_num_rows($result) > 0) {
-                        $_SESSION['error_message'] = "publisher dengan nama yang sama sudah ada";
+                        $_SESSION['status'] = "publisher_name";
                         header("Location: " . $_SERVER['PHP_SELF']);
                         exit();
                     } else {
@@ -39,10 +39,11 @@
                             $_SESSION['user_id'] = $new_publisher_id;
                             $_SESSION['username'] = $username; 
                             $_SESSION['role_user'] = 'PUBLISHER';
-                            header("Location: ..\main_form\mainForm.php");
+                            $_SESSION['status'] = "publisher";
+                            header("Location: " . $_SERVER['PHP_SELF']);
                             exit();
                         } else {
-                            $_SESSION['error_message'] = "terjadi kesalahan, silakan coba lagi";
+                            $_SESSION['status'] = "fail";
                             header("Location: " . $_SERVER['PHP_SELF']);
                             exit();
                         }
@@ -52,14 +53,14 @@
                 $query = "SELECT * FROM users WHERE user_email = '$email'";
                 $result = mysqli_query($conn, $query);
                 if (mysqli_num_rows($result) > 0) {
-                    $_SESSION['error_message'] = "user dengan email yang sama sudah ada";
+                    $_SESSION['status'] = "user_email";
                     header("Location: " . $_SERVER['PHP_SELF']);
                     exit();
                 } else {
                     $query = "SELECT * FROM users WHERE username = '$username'";
                     $result = mysqli_query($conn, $query);
                     if (mysqli_num_rows($result) > 0) {
-                        $_SESSION['error_message'] = "user dengan nama yang sama sudah ada";
+                        $_SESSION['status'] = "user_name";
                         header("Location: " . $_SERVER['PHP_SELF']);
                         exit();
                     } else {
@@ -74,10 +75,11 @@
                             $_SESSION['user_id'] = $new_user_id;
                             $_SESSION['username'] = $username; 
                             $_SESSION['role_user'] = 'USER';
-                            header("Location: ..\main_form\mainForm.php");
+                            $_SESSION['status'] = "user";
+                            header("Location: " . $_SERVER['PHP_SELF']);
                             exit();
                         } else {
-                            $_SESSION['error_message'] = "terjadi kesalahan, silakan coba lagi";
+                            $_SESSION['status'] = "fail";
                             header("Location: " . $_SERVER['PHP_SELF']);
                             exit();
                         }
@@ -240,14 +242,61 @@
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.min.js"></script>
     <script>
-        <?php if (isset($_SESSION['error_message'])): ?>
-            let errorMessage = "<?php echo $_SESSION['error_message']; ?>";
-            Swal.fire({
-                icon: 'error',
-                title: 'Register Gagal!',
-                text: errorMessage,
-            });
-            <?php unset($_SESSION['error_message']); ?>
+        <?php if (isset($_SESSION['status'])): ?>
+            <?php if ($_SESSION['status'] == 'user'): ?>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Register User Berhasil!',
+                    text: 'silakan melakukan login',
+                }).then((result) => {
+                    window.location.href = '../auth/login.php'; // Redirect ke halaman login
+                });
+            <?php elseif ($_SESSION['status'] == 'publisher'): ?>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Register Publisher Berhasil!',
+                    text: 'silakan melakukan login',
+                }).then((result) => {
+                    window.location.href = '../auth/login.php'; // Redirect ke halaman login
+                });
+            <?php elseif ($_SESSION['status'] == 'user_email'): ?>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Register User Gagal!',
+                    text: 'email sudah digunakan user lain',
+                });
+            <?php elseif ($_SESSION['status'] == 'user_name'): ?>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Register User Gagal!',
+                    text: 'username sudah digunakan user lain',
+                });
+            <?php elseif ($_SESSION['status'] == 'publisher_email'): ?>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Register Publisher Gagal!',
+                    text: 'email sudah digunakan publisher lain',
+                });
+            <?php elseif ($_SESSION['status'] == 'publisher_name'): ?>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Register Publisher Gagal!',
+                    text: 'username sudah digunakan publisher lain',
+                });
+            <?php elseif ($_SESSION['status'] == 'fail'): ?>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Register Gagal!',
+                    text: 'terjadi kesalahan, silakan coba lagi',
+                });
+            <?php elseif ($_SESSION['status'] == 'password_mismatch'): ?>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Register Gagal!',
+                    text: 'password tidak sama',
+                });
+            <?php endif; ?>
+            <?php unset($_SESSION['status']); // Hapus status setelah ditampilkan ?>
         <?php endif; ?>
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>

@@ -110,6 +110,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             width: 100%;
             max-width: 400px;
         }
+        
+        section .btn-primary {
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 5px;
+        }
 
         footer {
             font-size: 0.9rem;
@@ -177,9 +183,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     title: 'Reset Password Berhasil!',
                     text: 'silakan melakukan login',
                 }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.href = 'Login.php'; // Redirect ke halaman login
-                    }
+                    window.location.href = '../auth/login.php'; // Redirect ke halaman login
                 });
             <?php elseif ($_SESSION['reset_status'] == 'failed'): ?>
                 Swal.fire({

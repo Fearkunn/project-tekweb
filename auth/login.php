@@ -8,7 +8,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $password = mysqli_real_escape_string($conn, $_POST['user_password']);
     if ($username == $password && $username == 'admin') {
         $_SESSION['role_user'] = 'admin';
-        header("Location:../main_form/admin.php");
+        $_SESSION['status'] = "admin";
+        header("Location: " . $_SERVER['PHP_SELF']);
         exit();
     }
 
@@ -22,7 +23,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $_SESSION['user_id'] = $user['id_publisher'];
         $_SESSION['username'] = $user['publisher_name'];
         $_SESSION['role_user'] = 'PUBLISHER';
-        header("Location: ../main_form/mainForm.php");
+        $_SESSION['status'] = "publisher";
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit();
     }else{
 
         $stmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
@@ -34,11 +37,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($user && password_verify($password, $user['user_password'])) {
             $_SESSION['user_id'] = $user['id_user'];
             $_SESSION['username'] = $user['username'];
-            $_SESSION['role_user'] = 'USER';          
-            header("Location: ../main_form/mainForm.php");
+            $_SESSION['role_user'] = 'USER';    
+            $_SESSION['status'] = "user";       
+            header("Location: " . $_SERVER['PHP_SELF']);
             exit();
         } else {
-            $_SESSION['error_message'] = "username atau password salah";
+            $_SESSION['status'] = "gagal";
             header("Location: " . $_SERVER['PHP_SELF']);
             exit();
         }
@@ -136,18 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         background-color: #1C1C1C;
     }
 
-    .register-btn{
-        background: linear-gradient(90deg, #1b73e8, #004ba0);
-        border: none;
-        color: white;
-        transition: background-color 0.3s ease, transform 0.3s ease;
-        
-    }
-
-    .register-btn:hover {
-        background: linear-gradient(90deg, #004ba0, #1b73e8);
-        transform: scale(1.05);
-    }
+   
 
 </style>
 
@@ -198,7 +191,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </p>
             </div>
             <div class="col-md-3 d-flex flex-column justify-content-center">
-            <a href="..\auth\Register.php" class="btn btn-primary mb-3  py-3 register-btn">
+            <a href="..\auth\Register.php" class="btn btn-primary mb-3  py-3">
                 Buat Akun
             </a>
                 
@@ -219,14 +212,39 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.min.js"></script>
     <script>
-        <?php if (isset($_SESSION['error_message'])): ?>
-            let errorMessage = "<?php echo $_SESSION['error_message']; ?>";
-            Swal.fire({
-                icon: 'error',
-                title: 'Login Gagal!',
-                text: errorMessage,
-            });
-            <?php unset($_SESSION['error_message']); ?>
+        <?php if (isset($_SESSION['status'])): ?>
+            <?php if ($_SESSION['status'] == 'user'): ?>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Login User Berhasil!',
+                    text: 'selamat menikmati UAP',
+                }).then((result) => {
+                    window.location.href = '../main_form/mainForm.php'; // Redirect ke halaman login
+                });
+            <?php elseif ($_SESSION['status'] == 'publisher'): ?>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Login Publisher Berhasil!',
+                    text: 'selamat menikmati UAP',
+                }).then((result) => {
+                    window.location.href = '../main_form/mainForm.php'; // Redirect ke halaman login
+                });
+            <?php elseif ($_SESSION['status'] == 'admin'): ?>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Login Admin Berhasil!',
+                    text: 'selamat bekerja',
+                }).then((result) => {  
+                    window.location.href = '../main_form/admin.php'; // Redirect ke halaman login
+                });
+            <?php elseif ($_SESSION['status'] == 'gagal'): ?>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Login Gagal!',
+                    text: 'username / password salah',
+                });
+            <?php endif; ?>
+            <?php unset($_SESSION['status']); // Hapus status setelah ditampilkan ?>
         <?php endif; ?>
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
