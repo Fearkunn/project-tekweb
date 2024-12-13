@@ -73,14 +73,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['review_content'])) {
             $stmt_update_review = $conn->prepare($query_update_review);
             $stmt_update_review->bind_param("sii", $review_content, $review_id, $user_id);
             $stmt_update_review->execute();
+            $_SESSION['status'] = "edit";     
+            header("Location: " . $_SERVER['PHP_SELF'] . "?game_id=" . $game_id);
+            exit();
         } else {
             $query_insert_review = "INSERT INTO review (review_content, id_user, id_game) VALUES (?, ?, ?)";
             $stmt_insert_review = $conn->prepare($query_insert_review);
             $stmt_insert_review->bind_param("sii", $review_content, $user_id, $game_id);
             $stmt_insert_review->execute();
+            $_SESSION['status'] = "success";     
+            header("Location: " . $_SERVER['PHP_SELF'] . "?game_id=" . $game_id);
+            exit();
         }
-        header("Location: gameDetail.php?game_id=$game_id"); // Refresh to display the new review
-        exit();
     }
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_review_id'])) {
@@ -101,10 +105,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_review_id'])) 
         $stmt_delete_review = $conn->prepare($query_delete_review);
         $stmt_delete_review->bind_param("i", $review_id);
         $stmt_delete_review->execute();
-        header("Location: gameDetail.php?game_id=$game_id"); // Refresh halaman
+        $_SESSION['status'] = "delete"; 
+        header("Location: " . $_SERVER['PHP_SELF'] . "?game_id=" . $game_id);
         exit();
     } else {
-        echo "<script>alert('You can only delete your own reviews.');</script>";
+        $_SESSION['status'] = "error"; 
+        header("Location: " . $_SERVER['PHP_SELF'] . "?game_id=" . $game_id);
+        exit();
     }
 }
 
@@ -383,7 +390,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_review_id'])) 
                     <div class="review-actions">
                         <form method="POST" style="display: inline;">
                             <input type="hidden" name="delete_review_id" value="<?php echo htmlspecialchars($review['id_review']); ?>">
-                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
                         </form>
                         <button class="btn btn-warning btn-sm edit-review" data-review-id="<?php echo $review['id_review']; ?>" data-review-content="<?php echo htmlspecialchars($review['review_content']); ?>">Edit</button>
                     </div>
@@ -423,7 +430,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_review_id'])) 
     
 </div>
 </div>
-
+    <script>
+        <?php if (isset($_SESSION['status'])): ?>
+            <?php if ($_SESSION['status'] == 'success'): ?>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Add Review Berhasil!',
+                    text: 'review berhasil ditambahkan',
+                });
+            <?php elseif ($_SESSION['status'] == 'edit'): ?>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Edit Review Berhasil!',
+                    text: 'review berhasil diedit',
+                });
+            <?php elseif ($_SESSION['status'] == 'error'): ?>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Hapus Review Gagal!',
+                    text: 'silakan mencoba ulang',
+                });
+            <?php elseif ($_SESSION['status'] == 'delete'): ?>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Hapus Review Berhasil!',
+                    text: 'review berhasil dihapus',
+                });
+            <?php endif; ?>
+            <?php unset($_SESSION['status']); // Hapus status setelah ditampilkan ?>
+        <?php endif; ?>
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
