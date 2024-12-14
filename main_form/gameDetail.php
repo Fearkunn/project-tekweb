@@ -53,6 +53,9 @@ while ($row = $result_reviews->fetch_assoc()) {
     $reviews[] = $row;
 }
 
+// Periksa apakah user adalah admin
+$is_admin = isset($_SESSION['role_user'])&& $_SESSION['role_user']=== 'admin';
+
 // Check jika user sudah login
 $is_logged_in = isset($_SESSION['username']) && !empty($_SESSION['username']);
 
@@ -180,6 +183,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_review_id'])) 
         text-decoration: none;
     }
     .login-btn:hover {
+        background-color: #FF4C4C; /* Tombol berubah merah terang saat hover */
+        color: #FFFFFF; /* Font tetap putih */
+    }
+    .logout-btn {
+        background-color: #000000; /* Tombol hitam */
+        border: 2px solid #FF4C4C; /* Garis tepi merah */
+        padding: 5px 10px;
+        border-radius: 3px;
+        color: #FFFFFF; /* Font putih */
+        text-decoration: none;
+    }
+    .logout-btn:hover {
         background-color: #FF4C4C; /* Tombol berubah merah terang saat hover */
         color: #FFFFFF; /* Font tetap putih */
     }
@@ -332,38 +347,73 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_review_id'])) 
     </style>
 </head>
 <body>
-
-<nav class="navbar navbar-expand-lg">
-    <div class="container-fluid">
-        <a class="navbar-brand logo" href="mainForm.php">
-            <img src="..\assets\Logo.svg" alt="UapLogo">
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse justify-content-center navbar-abc" id="navbarScroll">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item"><a class="nav-link active" aria-current="page" href="store.php">Store</a></li>
-                <li class="nav-item"><a class="nav-link" href="../main_form/library.php">Library</a></li>
-                <li class="nav-item"><a class="nav-link disabled" aria-disabled="true" href="#"><?php echo $username; ?></a></li>
-            </ul>
-            <?php if ($is_logged_in): ?>
-                <div class="dropdown" style="background-color: #2C2C2C;">
-                    <button class=" btn btn-secondary dropdown-toggle bi bi-person-circle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" style="font-size: 1.3rem; background-color: #2C2C2C;" aria-expanded="false">
-                        <?php echo " ", $username; ?>
-                    </button>
-                    <ul class="dropdown-menu bg-dark" aria-labelledby="dropdownMenuButton1">
-                        <li><a class="dropdown-item" href="userProfile.php">Profile</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="../auth/logout.php">Logout</a></li>
-                    </ul>
-                </div>
-            <?php else: ?>
-                <a href="..\auth\login.php" class="btn btn-danger">Login</a>
-            <?php endif; ?>
+<?php if ($is_admin): ?>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand logo" href="admin.php">
+                <img src="..\assets\Logo.svg" alt="UapLogo">
+            </a>
+            <div class="collapse navbar-collapse justify-content-center navbar-abc" id="navbarScroll">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="admin.php">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="admin_approve_games.php">Approve Games</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="admin_delete_games.php">Delete Games</a>
+                    </li>
+                </ul>
+                <a href="../auth/logout.php" class="logout-btn">Logout</a>
+            </div>
         </div>
-    </div>
-</nav>
+    </nav>
+<?php else: ?>  
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand logo" href="mainForm.php">
+                <img src="..\assets\Logo.svg" alt="UapLogo">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-center navbar-abc" id="navbarScroll">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="store.php">Store</a>
+                        </li>
+                        <?php if (!$is_publisher): ?>
+                            <li class="nav-item">
+                                <a class="nav-link" href="../main_form/library.php">Library</a>
+                            </li>
+                        <?php elseif ($is_publisher): ?>
+                            <li class="nav-item">
+                                <a href="../main_form/addGame.php" class="nav-link">Add Game</a>
+                            </li>
+                        <?php endif; ?>  
+                        <li class="nav-item">
+                            <a class="nav-link disabled" aria-disabled="true" href="#"><?php echo $username; ?></a>
+                        </li>   
+                    </ul>
+                <?php if ($is_logged_in): ?>
+                    <div class="dropdown" style="background-color: #2C2C2C;">
+                        <button class=" btn btn-secondary dropdown-toggle bi bi-person-circle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" style="font-size: 1.3rem; background-color: #2C2C2C;" aria-expanded="false">
+                            <?php echo " ", $username; ?>
+                        </button>
+                        <ul class="dropdown-menu bg-dark" aria-labelledby="dropdownMenuButton1">
+                            <li><a class="dropdown-item" href="userProfile.php">Profile</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="../auth/logout.php">Logout</a></li>
+                        </ul>
+                    </div>
+                <?php else: ?>
+                    <a href="..\auth\login.php" class="btn login-btn">Login</a>
+                <?php endif; ?>
+            </div>
+        </div>
+    </nav>
+<?php endif; ?>
 
 <div class="container game-container">
     <div class="hero-section">
@@ -373,7 +423,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_review_id'])) 
         <div class="game-details">
             <h1 class="game-title"><?php echo htmlspecialchars($game['game_name']); ?></h1>
             <p><strong>Publisher:</strong> <?php echo htmlspecialchars($game['publisher_name']); ?></p>
-            <p><strong>Release Date:</strong> <?php echo date('F j, Y', strtotime($game['release_date'])); ?></p>
+            <p><strong>Tanggal Rilis:</strong> <?php echo date('F j, Y', strtotime($game['release_date'])); ?></p>
             <p class="game-description"><?php echo nl2br(htmlspecialchars($game['game_desc'])); ?></p>
             <p><strong>Genres:</strong></p>
             <div class="tags">
@@ -388,7 +438,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_review_id'])) 
     <h2>Reviews</h2>
     <?php if ($is_logged_in && !$is_publisher): ?>
         <!-- Add Review Form -->
-        <button class="btn btn-primary my-3 " id="toggle-review-form">Add Review</button>
+        <button class="btn btn-primary my-3 " id="toggle-review-form">Tambah Review</button>
         <form method="POST" class="mt-3" id="review-form" style="display: none;">
             <textarea name="review_content" class="form-control mb-2" rows="4" placeholder="Write your review here..."></textarea>
             <button type="submit" class="btn btn-success my-2">Submit Review</button>

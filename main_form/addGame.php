@@ -9,6 +9,15 @@ include('../db_connect/DatabaseConnection.php');
 define('IMGBB_API_KEY', 'cd64310f3d944ddab347166d2cd115d6'); // Replace with your ImgBB API key
 define('IMGBB_URL', 'https://api.imgbb.com/1/upload');
 
+
+$is_logged_in = isset($_SESSION['username']) && !empty($_SESSION['username']);
+
+if($is_logged_in){ //jika ada is logged_in tapi jika ga ada username (kosong)
+    $username = $_SESSION['username'];
+}else{
+    $username = '';
+}
+
 // Proses jika form ditambahkan
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['gameName'])) {
     // Proses tambah game
@@ -274,31 +283,95 @@ $games = $gamesStmt->get_result();
         padding: 0;
     }
     .navbar {
-        background-color: #2C2C2C;
-        font-family: Arial, sans-serif;
-        padding: 10px 20px;
+    background-color: #2C2C2C; /* Tetap abu-abu gelap */
+    font-family: Arial, sans-serif;
     }
     .navbar-brand, .nav-link {
-        color: #FFFFFF !important;
+        color: #FFFFFF !important; /* Font putih untuk kontras */
         font-weight: bold;
-        font-size: 1.5rem;
+        font-size: 1.25rem;
+    }
+    .navbar-abc .nav-link:hover {
+        color: #FF4C4C !important; /* Merah terang saat hover */
+    }
+    .nav-link {
+        margin-right: 1.5rem;
+    }
+    .navbar-toggler {
+        border-color: #FFFFFF; /* Tanda toggle putih */
+    }
+    .login-btn {
+        background-color: #000000; /* Tombol hitam */
+        border: 2px solid #FF4C4C; /* Garis tepi merah */
+        padding: 5px 10px;
+        border-radius: 3px;
+        color: #FFFFFF; /* Font putih */
+        text-decoration: none;
+    }
+    .login-btn:hover {
+        background-color: #FF4C4C; /* Tombol berubah merah terang saat hover */
+        color: #FFFFFF; /* Font tetap putih */
     }
     .btn {
         cursor: pointer; 
-        transition: transform 0.2s; 
     }
-    .btn:hover { 
-        transform: scale(1.05); 
+    .LoginText {
+        font-size: 50px;
+        font-family: Arial, sans-serif;
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8); /* Memastikan teks tetap jelas */
     }
+    .dropdown-toggle::after {
+    display: none;
+    }
+    .dropdown{
+        padding-right: 5rem;
+    }
+    .dropdown-item{
+        color: white;
+    }
+    .dropdown-divider{
+        border-color:white;
+    }
+
     </style>
 </head>
 <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
-            <a class="navbar-brand mx-auto" href="../main_form/mainForm.php">
-                <img src="../assets/UapLogoText.svg" alt="UapLogo">
+            <a class="navbar-brand logo" href="mainForm.php">
+                <img src="..\assets\Logo.svg" alt="UapLogo">
             </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-center navbar-abc" id="navbarScroll">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="store.php">Store</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="../main_form/addGame.php" class="nav-link">Add Game</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link disabled" aria-disabled="true" href="#"><?php echo $username; ?></a>
+                        </li>   
+                    </ul>
+                <?php if ($is_logged_in): ?>
+                    <div class="dropdown" style="background-color: #2C2C2C;">
+                        <button class=" btn btn-secondary dropdown-toggle bi bi-person-circle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" style="font-size: 1.3rem; background-color: #2C2C2C;" aria-expanded="false">
+                            <?php echo " ", $username; ?>
+                        </button>
+                        <ul class="dropdown-menu bg-dark" aria-labelledby="dropdownMenuButton1">
+                            <li><a class="dropdown-item" href="userProfile.php">Profile</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="../auth/logout.php">Logout</a></li>
+                        </ul>
+                    </div>
+                <?php else: ?>
+                    <a href="..\auth\login.php" class="btn login-btn">Login</a>
+                <?php endif; ?>
+            </div>
         </div>
     </nav>
 
@@ -399,11 +472,13 @@ $games = $gamesStmt->get_result();
                 $statusClass = $game['is_admit'] ? 'text-success' : 'text-danger'; // Menggunakan warna hijau untuk approved dan merah untuk rejected
                 $statusText = $game['is_admit'] ? 'Sudah Diterima' : 'Belum Diterima';
                 echo "<p class='$statusClass pb-3'>$statusText</p>";
-
-                echo "<form method='POST'>";
+                echo "<div class='d-flex justify-content-between'>";
+                echo "<form method='POST' class='d-flex'>";
                 echo "<button type='submit' name='delete_game_id' value='" . $game['id_game'] . "' class='btn btn-danger'>Hapus</button>";
                 echo "<button type='button' class='btn btn-primary ms-2' data-bs-toggle='modal' data-bs-target='#editGameModal" . $game['id_game'] . "'>Edit</button>";
                 echo "</form>";
+                echo "<a href='gameDetail.php?game_id=" . $game['id_game'] . "' class='btn btn-info ms-2'>Lihat Detail</a>";
+                echo "</div>"; 
                 echo "</div></div></div>";
                 
                 $selectedGenresStmt = $conn->prepare("

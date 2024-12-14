@@ -7,8 +7,12 @@ include('../db_connect/DatabaseConnection.php');
 
 // Periksa login
 $is_logged_in = isset($_SESSION['username']) && !empty($_SESSION['username']);
-$username = $is_logged_in ? $_SESSION['username'] : '';
 
+if($is_logged_in){ //jika ada is logged_in tapi jika ga ada username (kosong)
+    $username = $_SESSION['username'];
+}else{
+    $username = '';
+}
 // Periksa apakah user adalah publisher
 $is_publisher = false;
 if ($is_logged_in) {
@@ -300,7 +304,7 @@ if ($is_logged_in) {
     <form method="GET" action="" class="row">
         <div class="col-md-5">
             <select name="genre" class="form-select">
-                <option value="">All Genres</option>
+                <option value="">Semua Genre</option>
                 <?php while ($row = $genresResult->fetch_assoc()): ?>
                     <option value="<?php echo $row['id_genre']; ?>" <?php echo $selectedGenre == $row['id_genre'] ? 'selected' : ''; ?>>
                         <?php echo htmlspecialchars($row['genre_name']); ?>
@@ -310,7 +314,7 @@ if ($is_logged_in) {
         </div>
         <div class="col-md-5">
             <select name="publisher" class="form-select">
-                <option value="">All Publishers</option>
+                <option value="">Semua Publisher</option>
                 <?php while ($row = $publishersResult->fetch_assoc()): ?>
                     <option value="<?php echo $row['id_publisher']; ?>" <?php echo $selectedPublisher == $row['id_publisher'] ? 'selected' : ''; ?>>
                         <?php echo htmlspecialchars($row['publisher_name']); ?>
@@ -338,11 +342,11 @@ if ($is_logged_in) {
                             <p class="card-text"><?php echo htmlspecialchars(substr($row['game_desc'], 0, 50)); ?></p>
                             <p class="card-text"><small>Genres: <?php echo htmlspecialchars($row['genres']); ?></small></p>
                             <p class="card-text"><small>Publisher: <?php echo htmlspecialchars($row['publisher_name']); ?></small></p>
-                            <a href="gameDetail.php?game_id=<?php echo $row['id_game']; ?>" class="btn btn-primary">View Details</a>
-                            <?php if (!$is_publisher && !in_array($row['id_game'], $libraryGames)): ?>
-                                <a href="saveGame.php?game_id=<?php echo $row['id_game']; ?>" class="btn btn-danger">Add to Library</a>
-                            <?php elseif (!$is_publisher && in_array($row['id_game'], $libraryGames)): ?>
-                                <button class="btn btn-success" disabled>Already in Library</button>
+                            <a href="gameDetail.php?game_id=<?php echo $row['id_game']; ?>" class="btn btn-primary">Lihat Detail</a>
+                            <?php if ($is_logged_in && !$is_publisher && !in_array($row['id_game'], $libraryGames)): ?>
+                                <a href="saveGame.php?game_id=<?php echo $row['id_game']; ?>" class="btn btn-danger">Add ke Library</a>
+                            <?php elseif ($is_logged_in && !$is_publisher && in_array($row['id_game'], $libraryGames)): ?>
+                                <button class="btn btn-success" disabled>Sudah di Library</button>
                             <?php endif; ?>
                         </div>
                     </div>

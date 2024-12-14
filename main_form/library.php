@@ -184,14 +184,14 @@ $userLiked = '';
 
     <div class="container mt-5">
         <div class="d-flex justify-content-between align-items-center">
-            <h1>Your Library</h1>
+            <h1>Library Anda</h1>
             <!-- Toggle between Ascending, Descending and No Sorting -->
             <a href="?sort=<?php echo $order_by === 'ASC' ? 'desc' : ($order_by === 'DESC' ? '' : 'asc'); ?>" class="btn btn-secondary sort-button">
                 <?php 
                     if ($order_by === 'ASC') {
                         echo 'Sort Descending';
                     } elseif ($order_by === 'DESC') {
-                        echo 'Order By History';
+                        echo 'Sort By History';
                     } else {
                         echo 'Sort Ascending';
                     }
@@ -232,7 +232,7 @@ $userLiked = '';
                 <?php endforeach; ?>
             <?php else: ?>
                 <div class="col-12">
-                    <p class="text-center">You don't own any games yet. Visit the store to purchase games!</p>
+                    <p class="text-center">Anda tidak memiliki game, silakan kunjungi store</p>
                 </div>
             <?php endif; ?>
         </div>

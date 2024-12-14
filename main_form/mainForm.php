@@ -251,7 +251,7 @@ if ($is_logged_in) {
 <section id="carousel">
     <!-- FITUR REKOMENDASI GAME -->
     <div class="container mt-5">
-        <h1 class="text-center mb-4 text-warning">Featured Free Games</h1>
+        <h1 class="text-center mb-4 text-warning">Game Gratis Unggulan</h1>
         <div id="gameCarousel" class="carousel slide" data-bs-ride="carousel">
             <div class="carousel-inner">
                 <?php
@@ -323,15 +323,15 @@ if ($is_logged_in) {
 
                                         <!-- Tombol-tombol disusun berdampingan -->
                                         <div class="d-flex justify-content-start gap-2 mt-5">
-                                            <a href="gameDetail.php?game_id=<?= $game['id_game'] ?>" class="btn btn-primary">View Details</a>
+                                            <a href="gameDetail.php?game_id=<?= $game['id_game'] ?>" class="btn btn-primary">Lihat Detail</a>
                                             <?php if (!$is_publisher && !$is_in_library && $is_logged_in): ?>
                                                 <!-- Form to add to library directly in this page -->
                                                 <form method="POST" id="addToLibraryForm">
                                                     <input type="hidden" name="id_game" value="<?= $game['id_game'] ?>">
-                                                    <button type="submit" name="add_to_library" class="btn btn-danger">Add to Library</button>
+                                                    <button type="submit" name="add_to_library" class="btn btn-danger">Add ke Library</button>
                                                 </form>
                                             <?php elseif (!$is_publisher && $is_logged_in): ?>
-                                                <button class="btn btn-success" disabled>Already in Library</button>
+                                                <button class="btn btn-success" disabled>Sudah di Library</button>
                                             <?php endif; ?>
                                         </div>
                                         
@@ -360,8 +360,8 @@ if ($is_logged_in) {
                 ?>
                     <div class="carousel-item active">
                         <div class="text-center p-5" style="background: #121212; color: #fff;">
-                            <h5>No Games Available</h5>
-                            <p>Please add games to the database.</p>
+                            <h5>Tidak Ada Game</h5>
+                            <p>silakan tambahkan games</p>
                         </div>
                     </div>
                 <?php endif; ?>
@@ -381,7 +381,7 @@ if ($is_logged_in) {
 
 <section>
     <div class="container mt-5">
-        <h2 class="text-center mb-4">All Free Games</h2>
+        <h2 class="text-center mb-4">Semua Game Gratis</h2>
         <div class="row">
             <?php
             $query = "
@@ -436,15 +436,15 @@ if ($is_logged_in) {
                                     </div>
                                 </div>
                                 <div class="d-flex justify-content-start gap-2 mt-5">
-                                        <a href="gameDetail.php?game_id=<?= $game['id_game'] ?>" class="btn btn-primary">View Details</a>
+                                        <a href="gameDetail.php?game_id=<?= $game['id_game'] ?>" class="btn btn-primary">Lihat Detail</a>
                                         <?php if (!$is_publisher && !$is_in_library && $is_logged_in): ?>
                                             <!-- Form to add to library directly in this page -->
                                             <form method="POST" id="addToLibraryForm">
                                                 <input type="hidden" name="id_game" value="<?= $game['id_game'] ?>">
-                                                <button type="submit" name="add_to_library" class="btn btn-danger">Add to Library</button>
+                                                <button type="submit" name="add_to_library" class="btn btn-danger">Add ke Library</button>
                                             </form>
                                         <?php elseif (!$is_publisher && $is_logged_in): ?>
-                                            <button class="btn btn-success" disabled>Already in Library</button>
+                                            <button class="btn btn-success" disabled>Sudah di Library</button>
                                         <?php endif; ?>
                                 </div>
                                         
@@ -471,7 +471,7 @@ if ($is_logged_in) {
             else:
             ?>
                 <div class="col-12">
-                    <p class="text-center">No games available. Please add games to the database.</p>
+                    <p class="text-center">Tidak ada game, silakan tambahkan game</p>
                 </div>
             <?php endif; ?>
         </div>
