@@ -43,6 +43,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['like_game_id'])) {
         $stmt->bind_param("i", $likedGameId);
         $stmt->execute();
     }
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit;
 }
 
 // Fetch games user  dari database
@@ -78,7 +80,8 @@ $userLiked = '';
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Library</title>
     <link rel="icon" href="../assets/UAP.ico" type="image/x-icon">
-
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <style>
@@ -197,43 +200,93 @@ $userLiked = '';
         </div>
         
         <div class="row py-5">
-        <?php if (!empty($library)): ?>
-            <?php foreach ($library as $game): ?>
-                <div class="col-md-3 mb-4">
-                    <div class="card text-bg-dark game-card">
-                        <img src="<?php echo htmlspecialchars($game['games_image']); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($game['game_name']); ?>">
-                        <div class="card-body">
-                            <h5 class="card-title"><?php echo htmlspecialchars($game['game_name']); ?></h5>
-                            <p class="card-text">Likes: <?php echo htmlspecialchars($game['like_count']); ?></p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <form method="POST" action="">
-                                    <input type="hidden" name="like_game_id" value="<?php echo $game['id_game']; ?>">
-                                    <input type="checkbox" class="form-check-input" name="liked" id="like-<?php echo $game['id_game']; ?>" 
-                                        onchange="this.form.submit()" 
-                                        <?php echo $game['is_like'] == 1 ? 'checked' : ''; ?>>
-                                    <label for="like-<?php echo $game['id_game']; ?>">Like</label>
-                                </form>
-                                <a href="gameDetail.php?game_id=<?php echo $game['id_game']; ?>" class="btn btn-info">Review</a>
-                            </div>
-                            <div class="mt-3">
-                                <?php if (!empty($game['games_image'])): ?>
-                                    <a href="downloadgame.php?game_id=<?php echo $game['id_game']; ?>" class="btn btn-success" download>Download Game</a>
-                                <?php else: ?>
-                                    <span class="text-warning">Download unavailable</span>
-                                <?php endif; ?>
+            <?php if (!empty($library)): ?>
+                <?php foreach ($library as $game): ?>
+                    <div class="col-md-3 mb-4">
+                        <div class="card text-bg-dark game-card">
+                            <img src="<?php echo htmlspecialchars($game['games_image']); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($game['game_name']); ?>">
+                            <div class="card-body">
+                                <h5 class="card-title"><?php echo htmlspecialchars($game['game_name']); ?></h5>
+                                <p class="card-text">Likes: <?php echo htmlspecialchars($game['like_count']); ?></p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <form method="POST" action="" id="like-form-<?php echo $game['id_game']; ?>">
+                                        <input type="hidden" name="like_game_id" value="<?php echo $game['id_game']; ?>">
+                                        <input type="checkbox" class="form-check-input like-checkbox" 
+                                            name="liked" 
+                                            id="like-<?php echo $game['id_game']; ?>" 
+                                            <?php echo $game['is_like'] == 1 ? 'checked' : ''; ?>>
+                                        <label for="like-<?php echo $game['id_game']; ?>">Like</label>
+                                    </form>
+                                    <a href="gameDetail.php?game_id=<?php echo $game['id_game']; ?>" class="btn btn-info">Review</a>
+                                </div>
+                                <div class="mt-3">
+                                    <?php if (!empty($game['games_image'])): ?>
+                                        <a href="downloadgame.php?game_id=<?php echo $game['id_game']; ?>" class="btn btn-success" onclick="showDownloadSuccessAlert(event)">Download Game</a>
+                                    <?php else: ?>
+                                        <span class="text-warning">Download unavailable</span>
+                                    <?php endif; ?>
+                                </div>
                             </div>
                         </div>
                     </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <div class="col-12">
+                    <p class="text-center">You don't own any games yet. Visit the store to purchase games!</p>
                 </div>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <div class="col-12">
-                <p class="text-center">You don't own any games yet. Visit the store to purchase games!</p>
-            </div>
-        <?php endif; ?>
+            <?php endif; ?>
         </div>
-    </div>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Ambil semua checkbox dengan class `like-checkbox`
+            const likeCheckboxes = document.querySelectorAll('.like-checkbox');
+            
+            likeCheckboxes.forEach(function (checkbox) {
+                checkbox.addEventListener('change', function () {
+                    const form = this.closest('form');
+                    const isChecked = this.checked;
+
+                    // SweetAlert untuk status like
+                    if (isChecked) {
+                        Swal.fire({
+                            title: 'Like Diberikan!',
+                            text: 'anda memberikan like untuk game ini',
+                            icon: 'success',
+                        }).then(() => {
+                            form.submit();
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Like Ditarik!',
+                            text: 'anda menarik like anda untuk game ini',
+                            icon: 'error',
+                        }).then(() => {
+                            form.submit();
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+    <script>
+        function showDownloadSuccessAlert(event) {
+            // Mencegah link untuk melakukan aksi default
+            event.preventDefault();
+
+            // Menampilkan SweetAlert bahwa game berhasil diunduh
+            Swal.fire({
+                title: 'Download Berhasil!',
+                text: 'selamat menikmati game',
+                icon: 'success',
+            }).then(() => {
+                // Setelah SweetAlert ditutup, lanjutkan ke halaman download
+                window.location.href = event.target.href;
+            });
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>

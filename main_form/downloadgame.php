@@ -16,7 +16,7 @@ if (!isset($_GET['game_id']) || empty($_GET['game_id'])) {
 
 $game_id = intval($_GET['game_id']);
 
-// Fetch game image URL and nama game dari DB
+// Fetch game image URL dan nama game dari DB
 $query = "SELECT games_image, game_name FROM games WHERE id_game = ?";
 $stmt = $conn->prepare($query);
 $stmt->bind_param("i", $game_id);
@@ -31,9 +31,6 @@ $game = $result->fetch_assoc();
 $imageUrl = $game['games_image'];
 $gameName = $game['game_name']; 
 
-// Check jika nama game sudah benar
-echo "Game Name: " . $gameName . "<br>";
-
 // Validasi URL
 if (!filter_var($imageUrl, FILTER_VALIDATE_URL)) {
     die("Invalid image URL.");
@@ -43,10 +40,7 @@ if (!filter_var($imageUrl, FILTER_VALIDATE_URL)) {
 $fileExtension = strtolower(pathinfo(parse_url($imageUrl, PHP_URL_PATH), PATHINFO_EXTENSION));
 
 // Check file extension
-echo "File Extension: " . $fileExtension . "<br>";
-
-$contentType = 'application/octet-stream'; // Default tipe content
-
+$contentType = 'application/octet-stream'; // Default tipe konten
 // Set tipe konten berdasarkan file extensionnya
 switch ($fileExtension) {
     case 'jpg':
