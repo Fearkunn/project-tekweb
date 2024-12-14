@@ -25,7 +25,7 @@ if ($game_id > 0) {
 
         if ($result_check->num_rows > 0) {
             // Jika game sudah ada di library
-            $_SESSION['message'] = "Game sudah ada di library Anda!";
+            $_SESSION['message'] = "library";
         } else {
             // Jika belum, simpan game ke library
             $query_save = "INSERT INTO library (id_user, id_game) VALUES (?, ?)";
@@ -34,22 +34,22 @@ if ($game_id > 0) {
                 $stmt_save->bind_param("ii", $user_id, $game_id);
 
                 if ($stmt_save->execute()) {
-                    $_SESSION['message'] = "Game berhasil disimpan ke library Anda!";
+                    $_SESSION['message'] = "success";
                 } else {
-                    $_SESSION['message'] = "Terjadi kesalahan saat menyimpan game.";
+                    $_SESSION['message'] = "error";
                 }
 
                 // Close stmt_save jika dibuat
                 $stmt_save->close();
             } else {
-                $_SESSION['message'] = "Gagal menyiapkan query untuk menyimpan game.";
+                $_SESSION['message'] = "query";
             }
         }
 
         // Close stmt_check jika dibuat
         $stmt_check->close();
     } else {
-        $_SESSION['message'] = "Gagal menyiapkan query untuk memeriksa game di library.";
+        $_SESSION['message'] = "query";
     }
 }
 

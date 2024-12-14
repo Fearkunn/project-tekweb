@@ -104,6 +104,8 @@ if ($is_logged_in) {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Store</title>
     <link rel="icon" href="../assets/UAP.ico" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <style>
@@ -163,16 +165,6 @@ if ($is_logged_in) {
         }
         .dropdown-divider{
             border-color:white;
-        }
-
-        .navbar-custom{
-            background: linear-gradient( rgba(200, 14, 49, 0.8), rgba(125, 7, 23, 0.8));
-        }
-
-        .navbar-custom a:hover{
-            background-color: #c51d3a; /* Darker red background on hover */
-            border-radius: 4px; /* Optional: Rounded corners on hover */
-            color: white !important;
         }
 
         .search-bar {
@@ -236,11 +228,6 @@ if ($is_logged_in) {
 
 .btn {
     margin-top: auto; /* Menjaga agar tombol tetap di bawah */
-    transition: transform 0.2s; /* Memberikan efek hover pada tombol */
-}
-
-.btn:hover {
-    transform: scale(1.05); /* Efek zoom saat hover */
 }
 
 .card-text {
@@ -348,12 +335,12 @@ if ($is_logged_in) {
                         <img src="<?php echo htmlspecialchars($row['games_image']); ?>" alt="<?php echo htmlspecialchars($row['game_name']); ?>" class="card-img-top">
                         <div class="card-body">
                             <h5 class="card-title"><?php echo htmlspecialchars($row['game_name']); ?></h5>
-                            <p class="card-text"><?php echo htmlspecialchars(substr($row['game_desc'], 0, 50)) . '...'; ?></p>
+                            <p class="card-text"><?php echo htmlspecialchars(substr($row['game_desc'], 0, 50)); ?></p>
                             <p class="card-text"><small>Genres: <?php echo htmlspecialchars($row['genres']); ?></small></p>
                             <p class="card-text"><small>Publisher: <?php echo htmlspecialchars($row['publisher_name']); ?></small></p>
                             <a href="gameDetail.php?game_id=<?php echo $row['id_game']; ?>" class="btn btn-primary">View Details</a>
                             <?php if (!$is_publisher && !in_array($row['id_game'], $libraryGames)): ?>
-                                <a href="saveGame.php?game_id=<?php echo $row['id_game']; ?>" class="btn btn-success">Save Game</a>
+                                <a href="saveGame.php?game_id=<?php echo $row['id_game']; ?>" class="btn btn-danger">Add to Library</a>
                             <?php elseif (!$is_publisher && in_array($row['id_game'], $libraryGames)): ?>
                                 <button class="btn btn-success" disabled>Already in Library</button>
                             <?php endif; ?>
@@ -362,12 +349,42 @@ if ($is_logged_in) {
                 </div>
             <?php endwhile; ?>
         <?php else: ?>
-            <p class="text-center">Tidak ada game yang ditemukan.</p>
+            <p class="text-center">Tidak ada game yang ditemukan</p>
         <?php endif; ?>
     </div>
 </div>
 
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        <?php if (isset($_SESSION['message'])): ?>
+            <?php if ($_SESSION['message'] == 'success'): ?>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Game Berhasil Ditambahkan!',
+                    text: 'silakan cek di library',
+                });
+            <?php elseif ($_SESSION['message'] == 'library'): ?>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Game Gagal Ditambahkan!',
+                    text: 'game sudah berada di library',
+                });
+            <?php elseif ($_SESSION['status'] == 'error'): ?>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Game Gagal Ditambahkan!',
+                    text: 'silakan mencoba ulang',
+                });
+            <?php elseif ($_SESSION['status'] == 'query'): ?>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Game Gagal Ditambahkan!',
+                    text: 'terjadi kesalahan query',
+                });
+            <?php endif; ?>
+            <?php unset($_SESSION['message']); // Hapus status setelah ditampilkan ?>
+        <?php endif; ?>
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>

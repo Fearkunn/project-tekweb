@@ -129,16 +129,6 @@ if ($is_logged_in) {
         border-radius: 50%;
     }
 
-    .btn-danger {
-        background-color: #ff4444;
-        border: none;
-        transition: Backgrounds 0.3s;
-    }
-
-    .btn-danger:hover {
-        background-color: #ff6666;
-    }
-
     #gameSlider{
         display: flex;
         justify-content: center;
@@ -157,13 +147,9 @@ if ($is_logged_in) {
         border-radius: 12px;
         text-transform: capitalize;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        transition: transform 0.2s;
         background-color: #2C2C2C;
     }
 
-    .badge:hover {
-        transform: scale(1.1);
-    }
         .card {
         background-color: #333;
         border-radius: 8px;
@@ -175,12 +161,10 @@ if ($is_logged_in) {
     }
 
     .card:hover {
-        transform: scale(1.05);
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
     }
 
     .card-img-left {
-        border-radius: 8px;
         width: 350px; /* Size gambar yang lebih besar */
         height: 200px; /* Ukuran tinggi gambar */
         object-fit: cover;
@@ -314,40 +298,40 @@ if ($is_logged_in) {
                         }
                 ?>
                 <!-- CAROUSEL -->
-                        <div class="carousel-item <?= $isActive ?>">
+                        <div class="carousel-item <?= $isActive ?>" style="border-radius: 8px; overflow: hidden;">
                             <div class="row">
                                 <div class="col-md-4">
-                                    <div class="game-image-container" style="height: 400px; overflow: hidden;">
+                                    <div class="game-image-container" style="height: 400px;">
                                         <img src="<?= htmlspecialchars($game['games_image']) ?>" 
                                              class="d-block mx-auto" 
                                              alt="<?= htmlspecialchars($game['game_name']) ?>" 
-                                             style="width:100%;object-fit: fill;object-position:top; border-radius: 8px;">
+                                             style="width: 100%; height: 400px; object-fit: cover; border-radius: 8px;">
                                     </div>
                                 </div>
-                                <div class="col-md-8 d-flex flex-column justify-content-center bg-dark text-white p-4" style="border-radius: 8px;">
+                                <div class="col-md-8 d-flex flex-column justify-content-center bg-dark text-white p-4" style=" border-radius: 8px;">
                                     <h3 class="text-warning"><?= htmlspecialchars($game['game_name']) ?></h3>
                                     <p><?= htmlspecialchars($game['game_desc']) ?></p>
                                     <p>Released: <?= date('d M Y', strtotime($game['release_date'])) ?></p>
                                     <p>Likes: <?= $game['like_count'] ?></p>
                                     <div class="mt-2">
                                         <h5 class="text-light">Genres:</h5>
-                                        <div class="d-flex flex-wrap gap-2">
+                                        <div class="d-flex flex-wrap gap-2 pt-2">
                                             <?php foreach ($genres as $genre): ?>
                                                 <span class="badge bg-secondary"><?= htmlspecialchars(trim($genre)) ?></span>
                                             <?php endforeach; ?>
                                         </div>
 
                                         <!-- Tombol-tombol disusun berdampingan -->
-                                        <div class="d-flex justify-content-start gap-2 mt-3">
-                                            <a href="gameDetail.php?game_id=<?= $game['id_game'] ?>" class="btn btn-primary btn-sm">View Details</a>
+                                        <div class="d-flex justify-content-start gap-2 mt-5">
+                                            <a href="gameDetail.php?game_id=<?= $game['id_game'] ?>" class="btn btn-primary">View Details</a>
                                             <?php if (!$is_publisher && !$is_in_library && $is_logged_in): ?>
                                                 <!-- Form to add to library directly in this page -->
                                                 <form method="POST" id="addToLibraryForm">
                                                     <input type="hidden" name="id_game" value="<?= $game['id_game'] ?>">
-                                                    <button type="submit" name="add_to_library" class="btn btn-danger btn-sm">Add to Library</button>
+                                                    <button type="submit" name="add_to_library" class="btn btn-danger">Add to Library</button>
                                                 </form>
                                             <?php elseif (!$is_publisher && $is_logged_in): ?>
-                                                <button class="btn btn-success btn-sm" disabled>Already in Library</button>
+                                                <button class="btn btn-success" disabled>Already in Library</button>
                                             <?php endif; ?>
                                         </div>
                                         
@@ -436,47 +420,51 @@ if ($is_logged_in) {
                         $_SESSION['game_added'] = true;
                     }
             ?>
-                    <div class="col-12 mb-2">
-                        <a href="gameDetail.php?game_id=<?= $game['id_game'] ?>" style="text-decoration: none; color: inherit;">
-                        <div class="card d-flex flex-row h-100">
-                            <img src="<?= $game['games_image'] ?>" class="card-img-left" alt="<?= $game['game_name'] ?>" style="object-fit: cover; border-radius: 8px; padding: 2px">
-                            <div class="card-body p-2">
+                    <div class="col-12 mb-2 gy-3">
+                        <div class="card d-flex flex-row h-100" style="border-radius: 8px; overflow: hidden;">
+                            <img src="<?= $game['games_image'] ?>" class="card-img-left" alt="<?= $game['game_name'] ?>" style="width: 300px; height: 300px; object-fit: cover;">>
+                            <div class="card-body ps-3">
                                 <h5 class="card-title" style="font-size: 1.3rem;"><?= htmlspecialchars($game['game_name']) ?></h5>
                                 <p class="card-text" style="font-size: 0.75rem;">Released: <?= date('d M Y', strtotime($game['release_date'])) ?></p>
                                 <p class="card-text" style="font-size: 0.75rem;">Likes: <?= $game['like_count'] ?></p>
                                 <div class="mb-2">
                                     <h6 style="color: white;">Genres:</h6>
-                                    <div class="d-flex flex-wrap gap-2">
+                                    <div class="d-flex flex-wrap gap-2 pt-2">
                                         <?php foreach ($genres as $genre): ?>
                                             <span class="badge bg-secondary"><?= htmlspecialchars(trim($genre)) ?></span>
                                         <?php endforeach; ?>
                                     </div>
                                 </div>
-                                <?php if (!$is_publisher && !$is_in_library && $is_logged_in): ?>
-                                    <!-- Form to add to library directly in this page -->
-                                    <form method="POST">
-                                        <input type="hidden" name="id_game" value="<?= $game['id_game'] ?>">
-                                        <button type="submit" name="add_to_library" class="btn btn-danger btn-sm mt-3">Add to Library</button>
-                                    </form>
-                                    <?php if (isset($_SESSION['game_added']) && $_SESSION['game_added']): ?>
-                                        <script>
-                                            document.addEventListener('DOMContentLoaded', function() {
-                                                Swal.fire({
-                                                    title: "Game Berhasil Ditambahkan!",
-                                                    text: "silakan cek di library",
-                                                    icon: "success"
-                                                });
-                                                header("Location: ../main_form/mainForm.php")
-                                            });
-                                        </script>
+                                <div class="d-flex justify-content-start gap-2 mt-5">
+                                        <a href="gameDetail.php?game_id=<?= $game['id_game'] ?>" class="btn btn-primary">View Details</a>
+                                        <?php if (!$is_publisher && !$is_in_library && $is_logged_in): ?>
+                                            <!-- Form to add to library directly in this page -->
+                                            <form method="POST" id="addToLibraryForm">
+                                                <input type="hidden" name="id_game" value="<?= $game['id_game'] ?>">
+                                                <button type="submit" name="add_to_library" class="btn btn-danger">Add to Library</button>
+                                            </form>
+                                        <?php elseif (!$is_publisher && $is_logged_in): ?>
+                                            <button class="btn btn-success" disabled>Already in Library</button>
+                                        <?php endif; ?>
+                                </div>
+                                        
+                                <!-- SweetAlert setelah game ditambahkan -->
+                                <?php if (isset($_SESSION['game_added']) && $_SESSION['game_added']): ?>
+                                    <script>
+                                        document.addEventListener('DOMContentLoaded', function() {
+                                            Swal.fire({
+                                                title: "Game Berhasil Ditambahkan!",
+                                                text: "silakan cek di library",
+                                                icon: "success"
+                                            });then(() => {
+                                            window.location.href = "../main_form/mainForm.php";
+                                        });
+                                        });
+                                    </script>
                                     <?php unset($_SESSION['game_added']); ?>
-                                    <?php endif; ?>
-                                <?php elseif (!$is_publisher && $is_logged_in): ?>
-                                    <button class="btn btn-success btn-sm mt-3" disabled>Already in Library</button>
-                                <?php endif; ?>
+                                    <?php endif; ?> 
                             </div>
                         </div>
-                        </a>
                     </div>
             <?php
                 endwhile;

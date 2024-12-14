@@ -213,11 +213,11 @@ $userLiked = '';
                                         <?php echo $game['is_like'] == 1 ? 'checked' : ''; ?>>
                                     <label for="like-<?php echo $game['id_game']; ?>">Like</label>
                                 </form>
-                                <a href="gameDetail.php?game_id=<?php echo $game['id_game']; ?>" class="btn btn-info btn-sm">Review</a>
+                                <a href="gameDetail.php?game_id=<?php echo $game['id_game']; ?>" class="btn btn-info">Review</a>
                             </div>
                             <div class="mt-3">
                                 <?php if (!empty($game['games_image'])): ?>
-                                    <a href="downloadgame.php?game_id=<?php echo $game['id_game']; ?>" class="btn btn-success btn-sm" download>Download Game</a>
+                                    <a href="downloadgame.php?game_id=<?php echo $game['id_game']; ?>" class="btn btn-success" download>Download Game</a>
                                 <?php else: ?>
                                     <span class="text-warning">Download unavailable</span>
                                 <?php endif; ?>
