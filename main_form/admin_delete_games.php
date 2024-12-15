@@ -15,8 +15,14 @@ if (!$is_admin) {
 
 // Ambil data semua game
 $searchTerm = '';
-if (isset($_POST['search'])) {
-    $searchTerm = $_POST['search'];
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['search'])) {
+    $searchTerm =$_POST['search'];
+    header("Location: ?search=" . urlencode($searchTerm));
+    exit();
+}
+
+if (isset($_GET['search'])) {
+    $searchTerm = $_GET['search'];
     $query_all_games = "
         SELECT 
         g.id_game, 
@@ -183,26 +189,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
         <h3 class="pt-3 pb-4">Daftar Game:</h3>
         <div class="row">
-            <?php while ($row = $result_all_games->fetch_assoc()): ?>
-                <div class="col-md-4 mb-4">
-                    <div class="card text-bg-dark h-100">
-                        <img src="<?php echo $row['games_image']; ?>" alt="Cover" class="card-img-top" style="height: 200px; object-fit: cover;">
-                        <div class="card-body">
-                            <h5 class="card-title"><?php echo $row['game_name']; ?></h5>
-                            <p class="card-text"><?php echo $row['game_desc']; ?></p>
-                            <p class="card-text">Publisher: <?php echo $row['publisher_name']; ?></p>
-                            <p class="card-text pb-3">Genre: <?php echo $row['genres']; ?></p>
-                            <div class="d-flex">
-                                <a href="gameDetail.php?game_id=<?php echo $row['id_game']; ?>" class="btn btn-primary me-2">Lihat Detail</a>
-                                <form method="POST">
-                                    <input type="hidden" name="game_id" value="<?php echo $row['id_game']; ?>">
-                                    <button type="submit" name="action" value="delete" class="btn btn-danger delete-btn" id="delete-btn">Hapus</button>
-                                </form>
+            <?php if ($result_all_games && $result_all_games->num_rows > 0): ?>
+                <?php while ($row = $result_all_games->fetch_assoc()): ?>
+                    <div class="col-md-4 mb-4">
+                        <div class="card text-bg-dark h-100">
+                            <img src="<?php echo $row['games_image']; ?>" alt="Cover" class="card-img-top" style="height: 200px; object-fit: cover;">
+                            <div class="card-body">
+                                <h5 class="card-title"><?php echo $row['game_name']; ?></h5>
+                                <p class="card-text"><?php echo $row['game_desc']; ?></p>
+                                <p class="card-text">Publisher: <?php echo $row['publisher_name']; ?></p>
+                                <p class="card-text pb-3">Genre: <?php echo $row['genres']; ?></p>
+                                <div class="d-flex">
+                                    <a href="gameDetail.php?game_id=<?php echo $row['id_game']; ?>" class="btn btn-primary me-2">Lihat Detail</a>
+                                    <form method="POST">
+                                        <input type="hidden" name="game_id" value="<?php echo $row['id_game']; ?>">
+                                        <button type="submit" name="action" value="delete" class="btn btn-danger delete-btn" id="delete-btn">Hapus</button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
+                <?php endwhile; ?>
+            <?php else: ?>  
+                <div class="col-12">
+                    <p class="text-center">tidak ada game yang ditemukan</p>
                 </div>
-            <?php endwhile; ?>
+            <?php endif; ?>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.min.js"></script>
