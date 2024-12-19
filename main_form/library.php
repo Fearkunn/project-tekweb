@@ -104,9 +104,9 @@ $userLiked = '';
             border-color: #FFFFFF; /* Tanda toggle putih */
         }
         body{
-        background-image: url('../assets/Background.png');
+        background-image: url('../assets/Backgrounds.png');
         background-size: cover;
-        background-repeat: no-repeat;
+        background-repeat: repeat;
         background-position: center top;
         height: 100vh;
         align-items: center; /* Agar teks di tengah secara vertikal */

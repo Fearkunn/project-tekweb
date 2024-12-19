@@ -275,7 +275,7 @@ $games = $gamesStmt->get_result();
         min-height: 100vh;
         display: flex;
         flex-direction: column;
-        background-image: url('../assets/Background.png');
+        background-image: url('../assets/Backgrounds.png');
         background-size: cover;
         background-repeat: no-repeat;
         background-position: center top;
@@ -331,6 +331,15 @@ $games = $gamesStmt->get_result();
     }
     .dropdown-divider{
         border-color:white;
+    }
+    .card-text {
+        display: -webkit-box;
+        -webkit-line-clamp: 3; /* Batasi deskripsi maksimal 3 baris */
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis; /* Tampilkan "..." jika teks terlalu panjang */
+        height: auto;
+        margin-bottom: 10px;
     }
 
     </style>
@@ -462,23 +471,28 @@ $games = $gamesStmt->get_result();
             <?php
             while ($game = $games->fetch_assoc()) {
                 echo "<div class='col mb-4 mt-3'>";
-                echo "<div class='card text-bg-dark h-100'>";
+                echo "<div class='card text-bg-dark h-100 d-flex flex-column'>"; // Flexbox untuk proper alignment
                 echo "<img src='" . $game['games_image'] . "' alt='Cover' class='card-img-top' style='height: 200px; object-fit: cover;'>";
-                echo "<div class='card-body'>";
+
+                echo "<div class='card-body d-flex flex-column'>"; // Flexbox untuk card body
                 echo "<h5 class='card-title'>" . $game['game_name'] . "</h5>";
                 echo "<p class='card-text'>" . $game['game_desc'] . "</p>";
                 echo "<p class='card-text'>Genre: " . (htmlspecialchars($game['genres']) ?: 'No genre specified') . "</p>";
-                // Indikator Status
-                $statusClass = $game['is_admit'] ? 'text-success' : 'text-danger'; // Menggunakan warna hijau untuk approved dan merah untuk rejected
+
+                // Status indicator
+                $statusClass = $game['is_admit'] ? 'text-success' : 'text-danger'; // Green for approved, red for pending
                 $statusText = $game['is_admit'] ? 'Sudah Diterima' : 'Belum Diterima';
-                echo "<p class='$statusClass pb-3'>$statusText</p>";
-                echo "<div class='d-flex justify-content-between'>";
+                echo "<p class='$statusClass mt-auto mb-2'>$statusText</p>"; // Positioned above buttons
+
+                // Buttons
+                echo "<div class='d-flex justify-content-between'>"; // Buttons aligned at the bottom
                 echo "<form method='POST' class='d-flex'>";
                 echo "<button type='submit' name='delete_game_id' value='" . $game['id_game'] . "' class='btn btn-danger'>Hapus</button>";
                 echo "<button type='button' class='btn btn-primary ms-2' data-bs-toggle='modal' data-bs-target='#editGameModal" . $game['id_game'] . "'>Edit</button>";
                 echo "</form>";
                 echo "<a href='gameDetail.php?game_id=" . $game['id_game'] . "' class='btn btn-info ms-2'>Lihat Detail</a>";
-                echo "</div>"; 
+                echo "</div>"; // Close buttons container
+
                 echo "</div></div></div>";
                 
                 $selectedGenresStmt = $conn->prepare("

@@ -39,14 +39,15 @@ $publishersResult = $conn->query($publishersQuery);
 
 // Query untuk games dengan filter
 $query = "
-    SELECT g.*, 
-           GROUP_CONCAT(DISTINCT gen.genre_name SEPARATOR ', ') AS genres, 
-           p.publisher_name
+    SELECT 
+        g.*, 
+        GROUP_CONCAT(DISTINCT gen.genre_name SEPARATOR ', ') AS genres, 
+        p.publisher_name
     FROM games g
     LEFT JOIN detail_genre dg ON g.id_game = dg.id_game
     LEFT JOIN genre gen ON dg.id_genre = gen.id_genre
     LEFT JOIN publisher p ON g.id_publisher = p.id_publisher
-    WHERE g.is_admit=1
+    WHERE g.is_admit = 1
 ";
 
 $params = [];
@@ -66,15 +67,18 @@ if (!empty($search)) {
     $types .= "s";
 }
 
-$query .= " GROUP BY g.id_game";
-
 // Filter genre
 if (!empty($selectedGenre)) {
-    $query .= " HAVING GROUP_CONCAT(DISTINCT dg.id_genre SEPARATOR ', ') LIKE ?";
-    $params[] = "%" . $selectedGenre . "%";
-    $types .= "s";
+    $query .= " AND EXISTS (
+        SELECT 1 
+        FROM detail_genre dg_sub 
+        WHERE dg_sub.id_game = g.id_game AND dg_sub.id_genre = ?
+    )";
+    $params[] = $selectedGenre;
+    $types .= "i";
 }
 
+$query .= " GROUP BY g.id_game";
 
 $stmt = $conn->prepare($query);
 
@@ -146,7 +150,7 @@ if ($is_logged_in) {
         body{
             background-image: url('../assets/Backgrounds.png');
             background-size: cover;
-            background-repeat: no-repeat;
+            background-repeat: repeat;
             background-position: center top;
             height: 100vh;
             align-items: center; /* Agar teks di tengah secara vertikal */
@@ -215,36 +219,38 @@ if ($is_logged_in) {
         padding: 5px 10px;
     }
     .card {
-    display: flex;
-    flex-direction: column;
-    height: auto;
-    width: 100%;
-}
-
-.card-body {
-    flex-grow: 1; /* Membuat konten card mengisi ruang yang tersedia */
-}
-
-.card-img-top {
-    height: 200px; /* Menentukan tinggi gambar */
-    object-fit: cover; /* Membuat gambar menutupi area yang tersedia */
-}
-
-.btn {
-    margin-top: auto; /* Menjaga agar tombol tetap di bawah */
-}
-
-.card-text {
-        font-size: 1rem; /* Ukuran teks lebih kecil */
-        height: 50px; /* Batasi tinggi untuk memastikan teks tidak terlalu panjang */
-        overflow: hidden; /* Menyembunyikan teks yang melampaui batas */
-        text-overflow: ellipsis; /* Tampilkan "..." jika teks terlalu panjang */
-        line-height: 1rem; /* Mengatur jarak antar baris teks agar lebih kompak */
+        display: flex;
+        flex-direction: column;
+        height: 100%; /* Kartu memiliki tinggi yang konsisten */
     }
 
-.card-footer {
-    text-align: center; /* Mengatur footer untuk tombol agar rata tengah */
-}
+    .card-body {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        flex-grow: 1;
+    }
+
+   
+
+    .card-img-top {
+        height: 200px; /* Tetapkan tinggi gambar */
+        object-fit: cover; /* Gambar mengisi penuh area */
+    }
+
+    .btn {
+        margin-top: auto; /* Menjaga agar tombol tetap di bawah */
+    }
+
+    .card-text {
+        display: -webkit-box;
+        -webkit-line-clamp: 3; /* Batasi deskripsi maksimal 3 baris */
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis; /* Tampilkan "..." jika teks terlalu panjang */
+        height: auto;
+        margin-bottom: 10px;
+    }
     </style>
 </head>
 <body>
@@ -331,23 +337,25 @@ if ($is_logged_in) {
 
 <!-- Game Cards -->
 <div class="container pt-5">
-    <div class="row g-2">
+    <div class="row g-4">
         <?php if ($result->num_rows > 0): ?>
             <?php while ($row = $result->fetch_assoc()): ?>
-                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                    <div class="card card-game text-bg-dark">
+                <div class="col-lg-4 col-md-4 col-sm-6">
+                    <div class="card text-bg-dark">
                         <img src="<?php echo htmlspecialchars($row['games_image']); ?>" alt="<?php echo htmlspecialchars($row['game_name']); ?>" class="card-img-top">
                         <div class="card-body">
                             <h5 class="card-title"><?php echo htmlspecialchars($row['game_name']); ?></h5>
-                            <p class="card-text"><?php echo htmlspecialchars(substr($row['game_desc'], 0, 50)); ?></p>
+                            <p class="card-text"><?php echo htmlspecialchars($row['game_desc']); ?></p>
                             <p class="card-text"><small>Genres: <?php echo htmlspecialchars($row['genres']); ?></small></p>
                             <p class="card-text"><small>Publisher: <?php echo htmlspecialchars($row['publisher_name']); ?></small></p>
-                            <a href="gameDetail.php?game_id=<?php echo $row['id_game']; ?>" class="btn btn-primary">Lihat Detail</a>
-                            <?php if ($is_logged_in && !$is_publisher && !in_array($row['id_game'], $libraryGames)): ?>
-                                <a href="saveGame.php?game_id=<?php echo $row['id_game']; ?>" class="btn btn-danger">Add ke Library</a>
-                            <?php elseif ($is_logged_in && !$is_publisher && in_array($row['id_game'], $libraryGames)): ?>
-                                <button class="btn btn-success" disabled>Sudah di Library</button>
-                            <?php endif; ?>
+                            <div>
+                                <a href="gameDetail.php?game_id=<?php echo $row['id_game']; ?>" class="btn btn-primary">Lihat Detail</a>
+                                <?php if ($is_logged_in && !$is_publisher && !in_array($row['id_game'], $libraryGames)): ?>
+                                    <a href="saveGame.php?game_id=<?php echo $row['id_game']; ?>" class="btn btn-danger">Add ke Library</a>
+                                <?php elseif ($is_logged_in && !$is_publisher && in_array($row['id_game'], $libraryGames)): ?>
+                                    <button class="btn btn-success" disabled>Sudah di Library</button>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -126,16 +126,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         color: #FFFFFF; /* Font tetap putih */
     }
     body{
-        background-image: url('../assets/Background.png');
+        background-image: url('../assets/Backgrounds.png');
         background-size: cover;
-        background-repeat: no-repeat;
+        background-repeat: repeat;
         background-position: center top;
         height: 100vh;
         align-items: center; /* Agar teks di tengah secara vertikal */
         justify-content: center; /* Agar teks di tengah secara horizontal */
         color: #FFFFFF;
     }
-    
+    .card-body {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .card-body .card-text.mb-auto {
+        margin-bottom: auto; 
+    }
+
+    .d-flex.justify-content-between {
+        margin-top: auto; 
+    }
+    .card-text {
+        display: -webkit-box;
+        -webkit-line-clamp: 3; /* Batasi deskripsi maksimal 3 baris */
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis; /* Tampilkan "..." jika teks terlalu panjang */
+        height: auto;
+    }
     </style>
 </head>
 
@@ -189,33 +208,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
         <h3 class="pt-3 pb-4">Daftar Game:</h3>
         <div class="row">
-            <?php if ($result_all_games && $result_all_games->num_rows > 0): ?>
-                <?php while ($row = $result_all_games->fetch_assoc()): ?>
-                    <div class="col-md-4 mb-4">
-                        <div class="card text-bg-dark h-100">
-                            <img src="<?php echo $row['games_image']; ?>" alt="Cover" class="card-img-top" style="height: 200px; object-fit: cover;">
-                            <div class="card-body">
-                                <h5 class="card-title"><?php echo $row['game_name']; ?></h5>
-                                <p class="card-text"><?php echo $row['game_desc']; ?></p>
-                                <p class="card-text">Publisher: <?php echo $row['publisher_name']; ?></p>
-                                <p class="card-text pb-3">Genre: <?php echo $row['genres']; ?></p>
-                                <div class="d-flex">
-                                    <a href="gameDetail.php?game_id=<?php echo $row['id_game']; ?>" class="btn btn-primary me-2">Lihat Detail</a>
-                                    <form method="POST">
-                                        <input type="hidden" name="game_id" value="<?php echo $row['id_game']; ?>">
-                                        <button type="submit" name="action" value="delete" class="btn btn-danger delete-btn" id="delete-btn">Hapus</button>
-                                    </form>
-                                </div>
+        <?php if ($result_all_games && $result_all_games->num_rows > 0): ?>
+            <?php while ($row = $result_all_games->fetch_assoc()): ?>
+                <div class="col-md-4 mb-4">
+                    <div class="card text-bg-dark h-100 d-flex flex-column">
+                        <img src="<?php echo $row['games_image']; ?>" alt="Cover" class="card-img-top" style="height: 200px; object-fit: cover;">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title"><?php echo $row['game_name']; ?></h5>
+                            <p class="card-text"><?php echo $row['game_desc']; ?></p>
+                            <p class="card-text">Publisher: <?php echo $row['publisher_name']; ?></p>
+                            <p class="card-text mb-auto">Genre: <?php echo $row['genres']; ?></p>
+                            <!-- Buttons -->
+                            <div class="d-flex justify-content-start mt-3">
+                                <a href="gameDetail.php?game_id=<?php echo $row['id_game']; ?>" class="btn btn-primary me-2">Lihat Detail</a>
+                                <form method="POST">
+                                    <input type="hidden" name="game_id" value="<?php echo $row['id_game']; ?>">
+                                    <button type="submit" name="action" value="delete" class="btn btn-danger delete-btn" id="delete-btn">Hapus</button>
+                                </form>
                             </div>
                         </div>
                     </div>
-                <?php endwhile; ?>
-            <?php else: ?>  
-                <div class="col-12">
-                    <p class="text-center">tidak ada game yang ditemukan</p>
                 </div>
-            <?php endif; ?>
-        </div>
+            <?php endwhile; ?>
+        <?php else: ?>  
+            <div class="col-12">
+                <p class="text-center">Tidak ada game yang ditemukan</p>
+            </div>
+        <?php endif; ?>
+    </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
