@@ -106,7 +106,8 @@ $userLiked = '';
         body{
         background-image: url('../assets/Backgrounds.png');
         background-size: cover;
-        background-repeat: repeat;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
         background-position: center top;
         height: 100vh;
         align-items: center; /* Agar teks di tengah secara vertikal */

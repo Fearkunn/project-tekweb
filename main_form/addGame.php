@@ -278,6 +278,7 @@ $games = $gamesStmt->get_result();
         background-image: url('../assets/Backgrounds.png');
         background-size: cover;
         background-repeat: no-repeat;
+        background-attachment: fixed;
         background-position: center top;
         margin: 0;
         padding: 0;
